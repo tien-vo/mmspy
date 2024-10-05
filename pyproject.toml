@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "mmsws"
+version = "0.1.0"
+description = "A Python API for LASP MMS Science Data Center (SDC) web services"
+authors = [
+    "Tien Vo <tvo.work@proton.me>"
+]
+license = "GPL-3.0-only"
+readme = "README.md"
+packages = [
+    { include = "mmsws", from = "src", to = "mmsws" }
+]
+repository = "https://github.com/tien-vo/mmsws"
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+keywords = [
+    "space plasma",
+    "heliophysics",
+    "plasma",
+    "plasma physics",
+    "science",
+    "magnetospheric multiscale mission",
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
