@@ -1,0 +1,53 @@
+extend-exclude = [
+    "projects",
+    "tests",
+]
+
+[lint]
+extend-select = [
+    "A",        # flake8-builtins
+    "ANN",      # flake8-annotation
+    "ARG",      # flake8-unused-arguments
+    "COM",      # flake8-commas
+    "C4",       # flake8-comprehensions
+    "D",        # pydocstyle
+    "EM",       # flake8-errmsg
+    "FIX",      # flake8-fixme
+    "G",        # flake8-logging-format
+    "ICN",      # flake8-import-conventions
+    "ISC",      # flake8-implicit-str-concat
+    "INP",      # flake8-no-pep420
+    "LOG",      # flake8-logging
+    "N",        # pep8-naming
+    "NPY201",   # numpy v2
+    "PIE",      # flake8-pie
+    "PT",       # flake8-pytest-style
+    "PTH",      # flake8-use-pathlib
+    "PLC",      # pylint convention
+    "PLE",      # pylint error
+    "PLR",      # pylint refactor
+    "PLW",      # pylint warnings
+    "Q",        # flake8-quotes
+    "RET",      # flake8-return
+    "RSE",      # flake8-raise
+    "RUF",      # ruff
+    "SIM",      # flake8-simplify
+    "SLF",      # flake8-self
+    "TCH",      # flake8-type-checking
+    "TD",       # flake8-todos
+    "TID",      # flake8-tidy-imports
+    "T20",      # flake8-print
+    "W",        # pycodestyle warnings
+]
+ignore = [
+    "ANN101",   # Type hint `self` argument
+    "ANN002",   # Type hint for *args
+    "ANN003",   # Type hint for **kwargs
+    "N803",     # Function arguments must be lowercase
+    "N806",     # Variable in function must be lowercase
+]
+
+[lint.per-file-ignores]
+"__init__.py" = [
+    "F401",     # unused-import
+]
