@@ -1,0 +1,12 @@
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  - poetry
+platforms:
+  - linux-64
+  - osx-64
+  - osx-arm64      # Apple Silicon
+  - linux-aarch64  # Arm64
+  - win-64
