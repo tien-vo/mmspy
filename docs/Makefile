@@ -2,6 +2,7 @@
 
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
+SPHINXAUTOBUILD = sphinx-autobuild
 SOURCEDIR     = .
 BUILDDIR      = _build
 
@@ -23,6 +24,10 @@ html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+.PHONY: live-html
+live-html:
+	$(SPHINXAUTOBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
