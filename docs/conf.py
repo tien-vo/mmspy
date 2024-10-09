@@ -36,7 +36,16 @@ exclude_patterns = [
 autodoc_typehints = "none"
 
 # sphinx.ext.extlinks
-extlinks = {}
+extlinks = {
+    "pyspedas_time_shift": (
+        (
+            "https://github.com/spedas/pyspedas/blob/"
+            "f8f7988bff274620c587781c67d1330fc4338a2d/"
+            "pyspedas/projects/mms/%s"
+        ),
+        None,
+    ),
+}
 
 # sphinx.ext.intersphinx
 intersphinx_mapping = {
