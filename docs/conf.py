@@ -10,6 +10,8 @@ release = mmsws.__version__
 version = mmsws.__version__[0]
 
 # -- General configuration ---------------------------------------------------
+source_suffix = ".rst"
+root_doc = "index"
 default_role = "py:obj"
 pygments_style = "sphinx"
 extensions = [
@@ -91,11 +93,11 @@ html_theme_options = {
     "repository_branch": "main",
     "navigation_with_keys": False,
     "navigation_depth": 4,
-    "path_to_docs": "doc",
+    "path_to_docs": "docs",
     "use_edit_page_button": True,
     "use_repository_button": True,
     "use_issues_button": True,
-    "home_page_in_toc": False,
+    "home_page_in_toc": True,
 }
 
 html_static_path = []
