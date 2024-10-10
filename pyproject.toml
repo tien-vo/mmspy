@@ -1,16 +1,16 @@
 [tool.poetry]
-name = "mmsws"
+name = "mmspy"
 version = "0.1.0"
-description = "A Python API for LASP MMS Science Data Center (SDC) web services"
+description = "A Python package for querying and analysing data from the NASA Magnetospheric Multiscale (MMS) mission."
 authors = [
     "Tien Vo <tvo.work@proton.me>"
 ]
 license = "GPL-3.0-only"
 readme = "README.md"
 packages = [
-    { include = "mmsws", from = "src", to = "mmsws" }
+    { include = "mmspy", from = "src", to = "mmspy" }
 ]
-repository = "https://github.com/tien-vo/mmsws"
+repository = "https://github.com/tien-vo/mmspy"
 classifiers = [
     "Development Status :: 1 - Planning",
     "Intended Audience :: Science/Research",
