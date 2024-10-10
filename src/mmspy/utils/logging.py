@@ -6,7 +6,6 @@ __all__ = [
 ]
 
 import logging
-import logging.config
 from os import environ
 
 
