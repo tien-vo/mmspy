@@ -94,5 +94,12 @@ def convert_data_rate(
     setattr(
         query,
         "_data_rate",
-        "fast" if is_data_rate and is_srvy and is_edp_or_fpi else data_rate,
+        (
+            "fast"
+            if is_data_rate
+            and is_srvy
+            and is_edp_or_fpi
+            and query.convert_data_rate
+            else data_rate
+        ),
     )

@@ -12,7 +12,7 @@ from attr.converters import optional, pipe
 
 from .converters import shift_date
 from .validators import (
-    convert_data_rate,
+    convert_data_rate as _convert_data_rate,
     convert_feeps_data_type,
     convert_fpi_data_type,
     one_of,
@@ -47,11 +47,11 @@ class Query:
 
     """
 
-    VALID_TIME_RANGE = (pd.Timestamp("2015-09-01"), pd.Timestamp.today())
+    valid_time_range = (pd.Timestamp("2015-09-01"), pd.Timestamp.today())
 
     # ---- Flags
-    FLAG_SHIFT_TIME_RANGE = True
-    FLAG_CONVERT_DATA_RATE = True
+    shift_time_range = True
+    convert_data_rate = True
 
     # ---- Query parameters
     data: str = field(
@@ -87,7 +87,7 @@ class Query:
         converter=optional(str),
         validator=[
             one_of(from_metadata=True),
-            convert_data_rate,
+            _convert_data_rate,
         ],
         metadata={
             "options": {

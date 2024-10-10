@@ -45,7 +45,7 @@ def time_in_range(
     if time is None:
         return
 
-    valid_start_date, valid_end_date = query.VALID_TIME_RANGE
+    valid_start_date, valid_end_date = query.valid_time_range
     if time < valid_start_date or time > valid_end_date:
         msg = (
             f"{attribute.name!r} ({time}) is out of valid range "

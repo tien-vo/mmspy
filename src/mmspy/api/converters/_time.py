@@ -56,7 +56,7 @@ def shift_date(
     if time is None:
         return None
 
-    if not query.FLAG_SHIFT_TIME_RANGE:
+    if not query.shift_time_range:
         return time
 
     one_second = pd.Timedelta(1, "s")
