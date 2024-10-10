@@ -36,12 +36,15 @@ def convert_feeps_data_type(
     """
     is_feeps = getattr(query, "instrument") == "feeps"
     is_data_type = attribute.name == "data_type"
+    if not (is_feeps and is_data_type):
+        return
+
     setattr(
         query,
         "_data_type",
         (
             data_type.replace("_distribution", "").replace("elc", "electron")
-            if is_feeps and is_data_type and data_type is not None
+            if data_type is not None
             else data_type
         ),
     )

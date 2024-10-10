@@ -43,6 +43,9 @@ def convert_fpi_data_type(
     """
     is_fpi = getattr(query, "instrument") == "fpi"
     is_data_type = attribute.name == "data_type"
+    if not (is_fpi and is_data_type):
+        return
+
     setattr(
         query,
         "_data_type",
@@ -52,7 +55,7 @@ def convert_fpi_data_type(
             .replace("_moments", "-moms")
             .replace("ion", "dis")
             .replace("elc", "des")
-            if is_fpi and is_data_type and data_type is not None
+            if data_type is not None
             else data_type
         ),
     )
