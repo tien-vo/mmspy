@@ -1,3 +1,6 @@
+# Data directories
+data.zarr/
+
 # Docs specific
 docs/_build/
 docs/generated/
