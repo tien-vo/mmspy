@@ -1,13 +1,13 @@
-# mmsws documentation build configuration file
+# mmspy documentation build configuration file
 
-import mmsws
+import mmspy
 
 # -- Project information -----------------------------------------------------
-project = "mmsws"
+project = "mmspy"
 copyright = "2024, Tien Vo"
 author = "Tien Vo"
-release = mmsws.__version__
-version = mmsws.__version__[0]
+release = mmspy.__version__
+version = mmspy.__version__[0]
 
 # -- General configuration ---------------------------------------------------
 source_suffix = ".rst"
@@ -89,7 +89,7 @@ html_theme = "sphinx_book_theme"
 html_title = ""
 
 html_theme_options = {
-    "repository_url": "https://github.com/tien-vo/mmsws",
+    "repository_url": "https://github.com/tien-vo/mmspy",
     "repository_branch": "main",
     "navigation_with_keys": False,
     "navigation_depth": 4,
