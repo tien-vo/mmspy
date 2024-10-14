@@ -190,7 +190,7 @@ class Query:
         }
 
     @property
-    def metadata(self) -> dict[str, str | None]:
+    def metadata(self) -> dict[str, str]:
         r"""Metadata from query parameters."""
         return {
             "probe": self.probe,
@@ -198,7 +198,7 @@ class Query:
             "data_rate": self.data_rate,
             "_data_rate": self._data_rate,
             "data_type": self.data_type,
-            "_data_type": self._data_type,
+            "_data_type": str(self._data_type),
             "data_level": self.data_level,
             "product": self.product,
         }
