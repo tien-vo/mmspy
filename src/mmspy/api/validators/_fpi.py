@@ -37,8 +37,8 @@ def convert_fpi_data_type(
 
     Returns
     -------
-    transformed_data_rate : str
-        Transformed data rate.
+    transformed_data_type : str
+        Transformed data type.
 
     """
     is_fpi = getattr(query, "instrument") == "fpi"

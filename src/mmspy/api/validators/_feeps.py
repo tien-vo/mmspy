@@ -30,8 +30,8 @@ def convert_feeps_data_type(
 
     Returns
     -------
-    transformed_data_rate : str
-        Transformed data rate.
+    transformed_data_type : str
+        Transformed data type.
 
     """
     is_feeps = getattr(query, "instrument") == "feeps"
