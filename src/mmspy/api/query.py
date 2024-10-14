@@ -163,7 +163,7 @@ class Query:
     )
 
     @property
-    def payload(self) -> dict[str, str]:
+    def payload(self) -> dict[str, str | None]:
         r"""HTTP payload constructed from query parameters."""
         fmt = "%Y-%m-%d-%H-%M-%S"
         return {
@@ -181,6 +181,20 @@ class Query:
             "instrument_id": self.instrument,
             "data_rate_mode": self._data_rate,
             "descriptor": self._data_type,
+            "data_level": self.data_level,
+            "product": self.product,
+        }
+
+    @property
+    def metadata(self) -> dict[str, str | None]:
+        r"""Metadata from query parameters."""
+        return {
+            "probe": self.probe,
+            "instrument": self.instrument,
+            "data_rate": self.data_rate,
+            "_data_rate": self._data_rate,
+            "data_type": self.data_type,
+            "_data_type": self._data_type,
             "data_level": self.data_level,
             "product": self.product,
         }
