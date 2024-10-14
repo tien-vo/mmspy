@@ -18,7 +18,6 @@ from .validators import (
     convert_fgm_data_type,
     convert_fpi_data_type,
     one_of,
-    reset_data_type,
     time_in_range,
     time_range_is_valid,
 )
@@ -71,10 +70,7 @@ class Query:
     instrument: str = field(
         default=None,
         converter=optional(str),
-        validator=[
-            one_of(["mec", "fgm", "edp", "fpi", "feeps"]),
-            reset_data_type,
-        ],
+        validator=one_of(["mec", "fgm", "edp", "fpi", "feeps"]),
     )
 
     _data_rate: str = field(

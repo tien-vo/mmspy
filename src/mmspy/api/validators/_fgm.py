@@ -2,7 +2,6 @@ r"""Provide FGM-specific validators for API query parameters."""
 
 __all__ = [
     "convert_fgm_data_type",
-    "reset_data_type",
 ]
 
 from typing import TYPE_CHECKING
@@ -44,24 +43,3 @@ def convert_fgm_data_type(
         return
 
     setattr(query, "_data_type", None)
-
-
-def reset_data_type(
-    query: "Query",
-    attribute: Attribute,
-    value: str,
-) -> None:
-    r"""Reset `query.data_type` to 'bfield' if the instrument is 'fgm'.
-
-    Parameters
-    ----------
-    query : Query
-        `~mmspy.Query` instance in which ``time`` is defined.
-    attribute : Attribute
-        ``Attribute`` of ``query``.
-    value : str
-        Input value.
-
-    """
-    if value == "fgm" and attribute.name == "instrument":
-        setattr(query, "data_type", "bfield")
