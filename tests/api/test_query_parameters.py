@@ -80,14 +80,17 @@ data_type_cases = (
         Case("data_type", data_type, ValueError, instrument="mec")
         for data_type in ["something", "else"]
     ]
-    + [Case("data_type", None, None, None, instrument="fgm")]
+    + [
+        Case("data_type", data_type, None, None, instrument="fgm")
+        for data_type in [None, "bfield"]
+    ]
     + [
         Case("data_type", data_type, ValueError, instrument="fgm")
         for data_type in ["anything", "but", "none"]
     ]
     + [
         Case("data_type", data_type, None, None, instrument="edp")
-        for data_type in ["dce", "scpot", "hmfe"]
+        for data_type in ["efield", "potential"]
     ]
     + [
         Case("data_type", data_type, ValueError, instrument="edp")
