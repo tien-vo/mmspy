@@ -11,9 +11,11 @@ from attr import define, field
 from attr.converters import optional, pipe
 
 from .converters import shift_date
+from .validators import convert_data_rate as _convert_data_rate
 from .validators import (
-    convert_data_rate as _convert_data_rate,
+    convert_edp_data_type,
     convert_feeps_data_type,
+    convert_fgm_data_type,
     convert_fpi_data_type,
     one_of,
     reset_data_type,
@@ -112,14 +114,16 @@ class Query:
         converter=optional(str),
         validator=[
             one_of(from_metadata=True),
+            convert_fgm_data_type,
+            convert_edp_data_type,
             convert_fpi_data_type,
             convert_feeps_data_type,
         ],
         metadata={
             "options": {
                 "mec": ["epht89d", "epht89q", "ephts04d"],
-                "fgm": [],
-                "edp": ["dce", "scpot", "hmfe"],
+                "fgm": ["bfield"],
+                "edp": ["efield", "potential"],
                 "fpi": [
                     f"{i}_{j}"
                     for i, j in cross(
