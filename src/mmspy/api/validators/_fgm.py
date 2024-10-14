@@ -51,7 +51,7 @@ def reset_data_type(
     attribute: Attribute,
     value: str,
 ) -> None:
-    r"""Reset `query.data_type` to ``None`` if the instrument is 'fgm'.
+    r"""Reset `query.data_type` to 'bfield' if the instrument is 'fgm'.
 
     Parameters
     ----------
@@ -64,4 +64,4 @@ def reset_data_type(
 
     """
     if value == "fgm" and attribute.name == "instrument":
-        setattr(query, "data_type", None)
+        setattr(query, "data_type", "bfield")
