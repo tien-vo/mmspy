@@ -52,4 +52,8 @@ def process_cdf_metadata(ds: T_Dataset) -> T_Dataset:
             if isinstance(value, (list, np.ndarray)) and len(value) == 1:
                 attrs[key] = value[0]
 
+    version = ds.attrs.get("Data_version")
+    if version is not None:
+        ds.attrs["Data_version"] = version.replace("v", "")
+
     return ds
