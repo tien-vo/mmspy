@@ -1,9 +1,7 @@
 __all__ = [
-    "process_dce",
-    "process_scpot",
+    "process_efield",
+    "process_potential",
 ]
-
-from pathlib import Path
 
 from cdflib.xarray import cdf_to_xarray
 
@@ -18,14 +16,13 @@ standard_names = {
 }
 
 
-def process_dce(
-    path: Path,
+def process_efield(
     temporary_file: str,
     metadata: dict,
     chunks: dict[str, str] = {"time": "1MB"},
 ) -> None:
     pfx = "{probe}_{instrument}".format(**metadata)
-    sfx = "{data_rate}_{data_level}".format(**metadata)
+    sfx = "{_data_rate}_{data_level}".format(**metadata)
 
     # Load file and fix epoch metadata
     ds = cdf_to_xarray(
@@ -63,26 +60,21 @@ def process_dce(
     ds = ds.drop_duplicates("time").sortby("time")
     ds = ds.chunk(chunks=chunks)
     ds.attrs.update(
-        source=metadata["file_name"],
+        source=metadata["cdf_file_name"],
         probe=metadata["probe"],
         start_date=str(ds.time.values[0]),
         end_date=str(ds.time.values[-1]),
     )
-    ds.to_zarr(
-        mode="w",
-        store=path / metadata["group"][1:],
-        consolidated=True,
-    )
+    ds.to_zarr(mode="w", store=metadata["group"], consolidated=True)
 
 
-def process_scpot(
-    path: Path,
+def process_potential(
     temporary_file: str,
     metadata: dict,
     chunks: dict[str, str] = {"time": "1MB"},
 ) -> None:
     pfx = "{probe}_{instrument}".format(**metadata)
-    sfx = "{data_rate}_{data_level}".format(**metadata)
+    sfx = "{_data_rate}_{data_level}".format(**metadata)
 
     # Load file and fix epoch metadata
     ds = cdf_to_xarray(
@@ -105,7 +97,7 @@ def process_scpot(
     # Final metadata processing
     ds = process_cdf_metadata(ds[list(variables.values())])
     ds.attrs.update(
-        source=metadata["file_name"],
+        source=metadata["cdf_file_name"],
         probe=metadata["probe"],
         start_date=str(ds.time.values[0]),
         end_date=str(ds.time.values[-1]),
@@ -114,8 +106,4 @@ def process_scpot(
     # Save
     ds = ds.drop_duplicates("time").sortby("time")
     ds = ds.chunk(chunks=chunks)
-    ds.to_zarr(
-        mode="w",
-        store=path / metadata["group"][1:],
-        consolidated=True,
-    )
+    ds.to_zarr(mode="w", store=metadata["group"], consolidated=True)
