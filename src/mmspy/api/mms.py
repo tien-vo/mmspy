@@ -12,11 +12,9 @@ class MMS:
     r"""Manager for MMS data.
 
     .. todo:: Write docstring
+
     """
 
-    query: Query = Query(
-        data="science",
-        data_level="l2",
-    )
+    query: Query = Query(data="science", data_level="l2")
     request: Request = Request(query)
     sync: Synchronizer = Synchronizer(query, request)
