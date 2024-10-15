@@ -1,5 +1,9 @@
 r"""Provide interface for data synchronization."""
 
+__all__ = [
+    "Synchronizer",
+]
+
 import logging
 from collections.abc import Callable
 from pathlib import Path
@@ -11,20 +15,32 @@ from pathos.threading import ThreadPool
 from tqdm.contrib.logging import tqdm_logging_redirect as tqdm
 from zarr._storage.store import Store
 
-from .process._edp import process_dce, process_scpot
+from ._utils import bar_config
+from .process._edp import process_efield, process_potential
+from .process._feeps import process_feeps_distribution
 from .process._fgm import process_fgm
-from .process.parse_metadata import parse_metadata
+from .process._fpi import (
+    process_fpi_distribution,
+    process_fpi_moments,
+    process_fpi_partial_moments,
+)
+from .process.metadata import (
+    consolidate_metadata,
+    dataset_is_updated,
+    parse_metadata_from_file_name,
+)
 from .query import Query
 from .request import Request
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 @define
 class Synchronizer:
     r"""Interface for synchronizing data.
 
-    .. todo:: Write docstring
+    .. todo:: Write docstring.
+    .. todo:: Expose API to mirror file structure exactly.
     """
 
     query: Query
@@ -38,90 +54,79 @@ class Synchronizer:
 
     update: bool = False
 
-    def dataset_is_updated(self, metadata: dict) -> bool:
-        r"""Determine if local dataset is updated with remote."""
-        try:
-            ds = zarr.open(self.store)
-            group = metadata["group"]
-            local_version = ds[group].attrs["Data_version"].replace("v", "")
-            remote_version = metadata["version"].replace("v", "")
-            return local_version == remote_version
-        except KeyError:
-            return False
-
-    def parse_metadata(self, file_name: str) -> dict[str, str]:
-        r"""Parse metadata from file name.
-
-        Parameters
-        ----------
-        file_name : str
-            CDF file name.
-
-        Returns
-        -------
-        metadata : dict[str, str]
-            Dictionary containing metadata of ``file_name``.
-
-        """
-        return parse_metadata(file_name, self.query.instrument)
-
     @property
     def process_file(self) -> Callable:
-        r"""Call process functions based on query instrument."""
-        match self.query.instrument:
+        r"""Call process functions based on query instrument.
+
+        .. todo:: Refactor to reduce complexity.
+
+        """
+        query = self.query
+        match query.instrument:
             case "fgm":
                 return process_fgm
             case "edp":
-                match self.query.data_type:
-                    case "dce":
-                        return process_dce
-                    case "scpot":
-                        return process_scpot
+                match query.data_type:
+                    case "efield":
+                        return process_efield
+                    case "potential":
+                        return process_potential
+            case "fpi":
+                match query.data_type[4:]:
+                    case "distribution":
+                        return process_fpi_distribution
+                    case "moments":
+                        return process_fpi_moments
+                    case "partial_moments":
+                        return process_fpi_partial_moments
+            case "feeps":
+                return process_feeps_distribution
 
         raise NotImplementedError
 
     def sync(self, parallel: int = 1, dry_run: bool = True) -> None:
         r"""Sync data store."""
-        q = self.query
-
-        def _helper(cdf_file_name: str) -> None:
-            metadata = self.parse_metadata(cdf_file_name)
-            if not self.update and self.dataset_is_updated(metadata):
-                msg = f"Data from {cdf_file_name} is up-to-date"
-                log.info(msg)
-                return
-
-            store_path = Path(self.store.path)
-            temporary_file = self.request.download_file(cdf_file_name)
-            if temporary_file is not None:
-                self.process_file(store_path, temporary_file, metadata)
-                Path(temporary_file).unlink(missing_ok=True)
-
-                msg = f"Processed {cdf_file_name}"
-                log.info(msg)
-
-        for parameter in ["start_date", "end_date"]:
-            if getattr(q, parameter) is None:
-                msg = f"{parameter!r} is None. This may query a lot of files."
-                log.warning(msg)
-
+        query = self.query
+        store_path = Path(self.store.path)
         cdf_file_list = self.request.cdf_file_list
         if dry_run:
             return
 
+        def _helper(cdf_file_name: str) -> None:
+            metadata = consolidate_metadata(
+                query.metadata,
+                parse_metadata_from_file_name(cdf_file_name, query.instrument),
+                store_path,
+            )
+
+            if not self.update and dataset_is_updated(metadata):
+                msg = f"{cdf_file_name} is up-to-date."
+                LOG.info(msg)
+                return
+
+            temporary_file = self.request.download_file(cdf_file_name)
+            if temporary_file is not None:
+                self.process_file(temporary_file, metadata)
+                Path(temporary_file).unlink(missing_ok=True)
+
+                msg = f"Processed {cdf_file_name}."
+                LOG.info(msg)
+
+        for parameter in ["start_date", "end_date"]:
+            if getattr(query, parameter) is None:
+                msg = f"{parameter!r} is None. This may query a lot of files!"
+                LOG.warning(msg)
+
         # Create directory before anything to avoid multi-threading issue
         zarr.open(self.store)
-        kw = {
-            "desc": (
-                f"Synchronizing {q.instrument!r} "
-                f"from {q.start_date} to {q.end_date}."
+        config = bar_config(
+            desc=(
+                f"Synchronizing {query.instrument} {query.data_type} "
+                f"({query.start_date} - {query.end_date})."
             ),
-            "total": len(cdf_file_list),
-            "bar_format": self.request.bar_format,
-            "dynamic_ncols": True,
-            "ascii": "-#",
-            "position": 1,
-        }
-        with ThreadPool(nodes=parallel) as pool, tqdm(**kw) as bar:
+            total=len(cdf_file_list),
+            position=0,
+        )
+        with ThreadPool(nodes=parallel) as pool, tqdm(**config) as bar:
             for _ in pool.uimap(_helper, cdf_file_list):
                 bar.update()
