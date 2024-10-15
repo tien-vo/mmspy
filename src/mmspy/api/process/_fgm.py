@@ -2,8 +2,6 @@ __all__ = [
     "process_fgm",
 ]
 
-from pathlib import Path
-
 from cdflib.xarray import cdf_to_xarray
 
 from .cdf import process_cdf_epoch, process_cdf_metadata
@@ -18,13 +16,12 @@ standard_names = {
 
 
 def process_fgm(
-    path: Path,
     temporary_file: str,
     metadata: dict,
     chunks: dict[str, str] = {"time": "1MB"},
 ) -> None:
-    pfx = "{probe}_{instrument}".format(**metadata)
-    sfx = "{data_rate}_{data_level}".format(**metadata)
+    prefix = "{probe}_{instrument}".format(**metadata)
+    suffix = "{_data_rate}_{data_level}".format(**metadata)
 
     # Load file and fix epoch metadata
     ds = cdf_to_xarray(temporary_file, to_datetime=True, fillval_to_nan=True)
@@ -41,11 +38,11 @@ def process_fgm(
         variables := {
             "Epoch": "time",
             "Epoch_state": "eph_time",
-            f"{pfx}_b_gse_{sfx}": "B_gse",
-            f"{pfx}_b_gsm_{sfx}": "B_gsm",
-            f"{pfx}_r_gse_{sfx}": "R_gse",
-            f"{pfx}_r_gsm_{sfx}": "R_gsm",
-            f"{pfx}_flag_{sfx}": "flag",
+            f"{prefix}_b_gse_{suffix}": "B_gse",
+            f"{prefix}_b_gsm_{suffix}": "B_gsm",
+            f"{prefix}_r_gse_{suffix}": "R_gse",
+            f"{prefix}_r_gsm_{suffix}": "R_gsm",
+            f"{prefix}_flag_{suffix}": "flag",
         },
     )
     ds = process_cdf_metadata(ds[list(variables.values())])
@@ -57,14 +54,14 @@ def process_fgm(
     ds_field = ds_field.drop_duplicates("time").sortby("time")
     ds_field = ds_field.chunk(chunks=chunks)
     ds_field.attrs.update(
-        source=metadata["file_name"],
+        source=metadata["cdf_file_name"],
         probe=metadata["probe"],
         start_date=str(ds_field.time.values[0]),
         end_date=str(ds_field.time.values[-1]),
     )
     ds_field.to_zarr(
         mode="w",
-        store=path / metadata["group"][1:],
+        store=metadata["group"],
         consolidated=True,
     )
 
@@ -81,13 +78,13 @@ def process_fgm(
     # Slice the data to avoid out of range issue
     ds_eph = ds_eph.chunk(chunks=chunks)
     ds_eph.attrs.update(
-        source=metadata["file_name"],
+        source=metadata["cdf_file_name"],
         probe=metadata["probe"],
         start_date=str(ds_eph.time.values[0]),
         end_date=str(ds_eph.time.values[-1]),
     )
     ds_eph.to_zarr(
         mode="w",
-        store=path / metadata["eph_group"][1:],
+        store=metadata["ephemeris_group"],
         consolidated=True,
     )
