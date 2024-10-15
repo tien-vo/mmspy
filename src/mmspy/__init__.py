@@ -8,6 +8,8 @@ from importlib.metadata import version
 
 __all__ = [
     "api",
+    "computation",
+    "utils",
     "xarray",
 ]
 __version__ = version("mmspy")
@@ -15,7 +17,7 @@ __version__ = version("mmspy")
 import logging.config
 from os import environ
 
-from mmspy import api, xarray
+from mmspy import api, computation, utils, xarray
 
 logging.captureWarnings(True)
 logging.basicConfig(
