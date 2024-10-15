@@ -67,7 +67,7 @@ class Request:
             f"Found {len(cdf_list)} file(s) from query "
             f"({cdf_size:.4f} GB)."
         )
-        LOG.info(msg)
+        LOG.debug(msg)
 
         return cdf_list
 
@@ -87,38 +87,46 @@ class Request:
         """
 
         def _helper() -> tuple:
-            response = self.session.get(
+            temporary_file = NamedTemporaryFile(delete=False, mode="wb")
+
+            with self.session.get(
                 url=f"{self.api}/download/{self.query.data}",
                 params={"file": cdf_file_name},
                 timeout=self.timeout,
                 stream=True,
-                allow_redirects=True,
-            )
-            response.raise_for_status()
-            remote_size = int(response.headers.get("content-length", "0"))
+            ) as response:
+                response.raise_for_status()
+                remote_size = int(response.headers.get("content-length", "0"))
 
-            temporary_file = NamedTemporaryFile(delete=False, mode="wb")
-            with tqdm(
-                **bar_config(
-                    desc=f"Downloading {cdf_file_name}.",
-                    total=remote_size,
-                    unit="B",
-                    unit_scale=True,
-                    leave=False,
-                ),
-            ) as bar:
-                for data in response.iter_content(self.request_chunk_size):
-                    temporary_file.write(data)
-                    bar.update(len(data))
+                with tqdm(
+                    **bar_config(
+                        desc=f"Downloading {cdf_file_name}.",
+                        total=remote_size,
+                        unit="B",
+                        unit_scale=True,
+                        leave=False,
+                    ),
+                ) as bar:
+                    for data in response.iter_content(self.request_chunk_size):
+                        temporary_file.write(data)
+                        temporary_file.flush()
+                        bar.update(len(data))
 
             local_size = Path(temporary_file.name).stat().st_size
-            return remote_size == local_size, temporary_file
+            return local_size, remote_size, temporary_file
 
         for _ in range(self.number_of_attempts):
             try:
-                success, temporary_file = _helper()
-                if success:
+                local_size, remote_size, temporary_file = _helper()
+                if success := (local_size == remote_size):
                     break
+
+                Path(temporary_file.name).unlink(missing_ok=True)
+                msg = (
+                    f"File size mismatch ({local_size!r} != {remote_size!r}). "
+                    f"Trying again..."
+                )
+                LOG.warning(msg)
             except (
                 requests.HTTPError,
                 requests.ConnectionError,
@@ -129,7 +137,6 @@ class Request:
         if not success:
             msg = f"Giving up downloading {cdf_file_name}."
             LOG.warning(msg)
-            Path(temporary_file.name).unlink(missing_ok=True)
             return None
 
         return temporary_file.name
