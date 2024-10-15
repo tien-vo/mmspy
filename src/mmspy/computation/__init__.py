@@ -6,6 +6,14 @@ __all__ = [
     "interpolate_2d_distribution",
     "interpolate_3d_distribution",
     "smooth_distribution",
+    "cwt",
+    "fft",
+    "icwt",
+    "stft",
+    "xr_cwt",
+    "xr_fft",
+    "xr_icwt",
+    "xr_stft",
     "cartesian_to_fac",
     "fac_to_cartesian",
     "quaternion_rotate",
@@ -23,6 +31,7 @@ from .particles import (
     interpolate_3d_distribution,
     smooth_distribution,
 )
+from .time_frequency import cwt, fft, icwt, stft, xr_cwt, xr_fft, xr_icwt, xr_stft
 from .transform import (
     cartesian_to_fac,
     fac_to_cartesian,
