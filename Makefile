@@ -1,4 +1,4 @@
-NAME := mmsws
+NAME := mmspy
 MICROMAMBA := $(shell command -v micromamba 2> /dev/null)
 CONDA_LOCK := conda-lock.yml
 POETRY_LOCK := poetry.lock

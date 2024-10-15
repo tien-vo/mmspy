@@ -1,13 +1,13 @@
-# mmsws documentation build configuration file
+# mmspy documentation build configuration file
 
-import mmsws
+import mmspy
 
 # -- Project information -----------------------------------------------------
-project = "mmsws"
+project = "mmspy"
 copyright = "2024, Tien Vo"
 author = "Tien Vo"
-release = mmsws.__version__
-version = mmsws.__version__[0]
+release = mmspy.__version__
+version = mmspy.__version__[0]
 
 # -- General configuration ---------------------------------------------------
 source_suffix = ".rst"
@@ -38,12 +38,14 @@ autodoc_typehints = "none"
 # sphinx.ext.extlinks
 extlinks = {
     "pyspedas_time_shift": (
-        (
-            "https://github.com/spedas/pyspedas/blob/"
-            "f8f7988bff274620c587781c67d1330fc4338a2d/"
-            "pyspedas/projects/mms/%s"
-        ),
-        None,
+        "https://github.com/spedas/pyspedas/blob/"
+        "2d4fbabc331209e9ade0a8ee8cec5c8ab2e1c9ea/pyspedas/projects/mms/%s",
+        "pyspedas/projects/mms/%s",
+    ),
+    "pytplot_center_time": (
+        "https://github.com/MAVENSDC/PyTplot/blob/"
+        "f7fb3042898a52f8289b9d8c60ffae38949cad04/pytplot/importers/%s",
+        "pytplot/%s",
     ),
 }
 
@@ -98,7 +100,7 @@ html_theme = "sphinx_book_theme"
 html_title = ""
 
 html_theme_options = {
-    "repository_url": "https://github.com/tien-vo/mmsws",
+    "repository_url": "https://github.com/tien-vo/mmspy",
     "repository_branch": "main",
     "navigation_with_keys": False,
     "navigation_depth": 4,

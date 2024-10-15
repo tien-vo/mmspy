@@ -1,7 +1,17 @@
-mmsws
+mmspy
 =====
 
-A Python API for LASP MMS Science Data Center (SDC) web services
+`mmspy` is a package for querying and analysing data from the NASA
+Magnetospheric Multiscale (MMS) mission.
+
+Features
+--------
+
+- Interface for LASP MMS Science Data Center (SDC) web services.
+- Advanced integrator and interpolator for extended 3D particle distribution
+  function.
+- Implementation of multi-spacecraft data analysis methods in `xarray`.
+
 
 About
 -----
@@ -20,7 +30,7 @@ lack of Python utility for direct interactions with the RESTful API
 provided by the
 [LASP Science Data Center](https://lasp.colorado.edu/mms/sdc/public/).
 
-This package is intended to fill in that gap. In addition, `mmsws` is
+This package is intended to fill in that gap. In addition, `mmspy` is
 developed to fully utilize the power of [xarray](https://xarray.dev/),
 [zarr](https://zarr.dev/), and [dask](https://www.dask.org/) for
 scalable data analysis. More updates to come in the near future.
