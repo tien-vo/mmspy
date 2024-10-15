@@ -1,3 +1,7 @@
+# Misc
+todo/
+tmp/
+
 # Data directories
 data.zarr/
 
