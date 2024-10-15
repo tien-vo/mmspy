@@ -9,9 +9,10 @@ import requests
 from attr import define, field
 from tqdm.contrib.logging import tqdm_logging_redirect as tqdm
 
+from ._utils import bar_config
 from .query import Query
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 @define
@@ -40,13 +41,6 @@ class Request:
         converter=lambda x: int(x.to("B").value),
     )
 
-    verbose: bool = True
-
-    bar_format = (
-        "[{bar:40}] | {desc} "
-        "[{n_fmt}/{total_fmt}/{rate_fmt} ({percentage:.0f}%)]"
-    )
-
     @property
     def cdf_file_list(self) -> list[str]:
         r"""Get list of CDF file names relevant to payload information.
@@ -63,18 +57,17 @@ class Request:
             timeout=self.timeout,
             stream=True,
         )
-        if self.verbose:
-            msg = f"Query {response.url.split('?')[1]}"
-            log.info(msg)
         response.raise_for_status()
 
         cdf_info = response.json()["files"]
         cdf_list = [item["file_name"] for item in cdf_info]
         cdf_size = 1e-9 * sum([item["file_size"] for item in cdf_info])  # GB
 
-        if self.verbose:
-            msg = f"Found {len(cdf_list)} files from query ({cdf_size:.4f} GB)"
-            log.info(msg)
+        msg = (
+            f"Found {len(cdf_list)} file(s) from query "
+            f"({cdf_size:.4f} GB)."
+        )
+        LOG.info(msg)
 
         return cdf_list
 
@@ -106,18 +99,17 @@ class Request:
 
             temporary_file = NamedTemporaryFile(delete=False, mode="wb")
             with tqdm(
-                desc=f"Downloading {cdf_file_name}",
-                total=remote_size,
-                unit="B",
-                dynamic_ncols=True,
-                unit_scale=True,
-                bar_format=self.bar_format,
-                ascii="-#",
-                position=0,
+                **bar_config(
+                    desc=f"Downloading {cdf_file_name}.",
+                    total=remote_size,
+                    unit="B",
+                    unit_scale=True,
+                    leave=False,
+                ),
             ) as bar:
                 for data in response.iter_content(self.request_chunk_size):
-                    bar.update(len(data))
                     temporary_file.write(data)
+                    bar.update(len(data))
 
             local_size = Path(temporary_file.name).stat().st_size
             return remote_size == local_size, temporary_file
@@ -136,7 +128,7 @@ class Request:
 
         if not success:
             msg = f"Giving up downloading {cdf_file_name}."
-            log.warning(msg)
+            LOG.warning(msg)
             Path(temporary_file.name).unlink(missing_ok=True)
             return None
 
