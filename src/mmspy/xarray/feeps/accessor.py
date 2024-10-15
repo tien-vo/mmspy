@@ -59,7 +59,7 @@ def _apply_time_dependent_table(
         this_table = this_table.reset_coords(drop=True)
         next_table = next_table.reset_coords(drop=True)
         with xr.set_options(keep_attrs=True):
-            for variable in ["j", "R"]:
+            for variable in ["n", "R"]:
                 ds[variable] = xr.where(
                     left,
                     ds[variable] * this_table,
@@ -119,7 +119,7 @@ class FeepsAccessor:
         if remove_one_count:
             with xr.set_options(keep_attrs=True):
                 sigma_unit = ds.sigma.units.from_metadata
-                for variable in ["j", "R"]:
+                for variable in ["n", "R"]:
                     ds[variable] = xr.where(
                         ds.sigma < error_tolerance.to(sigma_unit).value,
                         ds[variable],
@@ -179,7 +179,7 @@ class FeepsAccessor:
             .sel(probe=ds.attrs["probe"], eye=self.eyes)
             .reset_coords(drop=True)
         )
-        for variable in ["j", "R", "sigma"]:
+        for variable in ["n", "R", "sigma"]:
             attrs = ds[variable].attrs
             ds[variable] = ds[variable] * table
             ds[variable].attrs.update(attrs)
@@ -203,7 +203,7 @@ class FeepsAccessor:
             .sel(probe=ds.attrs["probe"], eye=self.eyes)
             .reset_coords(drop=True)
         )
-        for variable in ["j", "R", "sigma"]:
+        for variable in ["n", "R", "sigma"]:
             attrs = ds[variable].attrs
             ds[variable] = ds[variable] * table
             ds[variable].attrs.update(attrs)
@@ -286,7 +286,7 @@ class FeepsAccessor:
             right_mask = (right & (next_bad == 1)).sel(**kw)
 
             with xr.set_options(keep_attrs=True):
-                for variable in ["j", "R", "sigma"]:
+                for variable in ["n", "R", "sigma"]:
                     ds[variable] = xr.where(~left_mask, ds[variable], np.nan)
                     ds[variable] = xr.where(~right_mask, ds[variable], np.nan)
 
