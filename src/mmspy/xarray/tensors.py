@@ -46,10 +46,6 @@ class RankOneAccessor:
         r"""Return the component of the vector."""
         return self._vector.sel(space_rank_1=component)
 
-    def c(self, component: str) -> xr.DataArray:
-        r"""Alias for `RankOneAccessor.component`."""
-        return self.component(component)
-
 
 @xr.register_dataarray_accessor("rank_2")
 @xr.register_dataset_accessor("rank_2")
@@ -96,7 +92,3 @@ class RankTwoAccessor:
     def component(self, component: str) -> xr.DataArray:
         r"""Return the component of the vector."""
         return self._matrix.sel(space_rank_2=component)
-
-    def c(self, component: str) -> xr.DataArray:
-        r"""Alias for `RankTwoAccessor.component`."""
-        return self.component(component)
