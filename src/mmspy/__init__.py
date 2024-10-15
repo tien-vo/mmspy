@@ -4,19 +4,22 @@ MmsPy is an open source Python package for plasma research with data
 from the NASA Magnetospheric Multiscale (MMS) mission.
 """
 
-from importlib.metadata import version as _version
-
-__version__ = _version("mmspy")
+from importlib.metadata import version
 
 __all__ = [
-    "MMS",
-    "Query",
-    "Request",
+    "api",
+    "xarray",
 ]
+__version__ = version("mmspy")
 
 import logging.config
+from os import environ
 
-from mmspy.api import MMS, Query, Request
-from mmspy.utils.logging import LOGGING_CONFIG
+from mmspy import api, xarray
 
-logging.config.dictConfig(LOGGING_CONFIG)
+logging.captureWarnings(True)
+logging.basicConfig(
+    format="%(asctime)s [%(levelname)s]: %(message)s",
+    datefmt="%y-%b-%d %H:%M:%S",
+    level="INFO" if not bool(environ.get("DEBUG")) else "DEBUG",
+)
