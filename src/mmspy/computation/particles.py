@@ -1,7 +1,7 @@
 r"""Provides functionality for particle distribution calculations."""
 
 __all__ = [
-    "smooth",
+    "smooth_distribution",
     "interpolate_2d_distribution",
     "interpolate_3d_distribution",
     "integrate_3d_distribution",
@@ -22,7 +22,7 @@ from scipy.spatial._qhull import QhullError
 UnitLike: TypeAlias = str | u.Unit
 
 
-def smooth(
+def smooth_distribution(
     da: xr.DataArray,
     dim: int = 2,
     sigma: float = 1.0,
