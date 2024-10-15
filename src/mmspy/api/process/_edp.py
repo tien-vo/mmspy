@@ -25,11 +25,7 @@ def process_efield(
     sfx = "{_data_rate}_{data_level}".format(**metadata)
 
     # Load file and fix epoch metadata
-    ds = cdf_to_xarray(
-        temporary_file,
-        to_datetime=True,
-        fillval_to_nan=True,
-    )
+    ds = cdf_to_xarray(temporary_file, to_datetime=True, fillval_to_nan=True)
     ds = process_cdf_epoch(ds, epoch_variables=[f"{pfx}_epoch_{sfx}"])
     ds = ds.reset_coords()
 
