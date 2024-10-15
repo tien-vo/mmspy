@@ -24,6 +24,7 @@ from .process._fpi import (
     process_fpi_moments,
     process_fpi_partial_moments,
 )
+from .process._mec import process_mec
 from .process.metadata import (
     consolidate_metadata,
     dataset_is_updated,
@@ -55,7 +56,7 @@ class Synchronizer:
     update: bool = False
 
     @property
-    def process_file(self) -> Callable:
+    def process_file(self) -> Callable:  # noqa: PLR0911
         r"""Call process functions based on query instrument.
 
         .. todo:: Refactor to reduce complexity.
@@ -63,6 +64,8 @@ class Synchronizer:
         """
         query = self.query
         match query.instrument:
+            case "mec":
+                return process_mec
             case "fgm":
                 return process_fgm
             case "edp":
