@@ -27,6 +27,8 @@ from .validators import (
 class Query:
     r"""Interface for query parameters.
 
+    .. todo:: Clarify docstring.
+
     Parameters
     ----------
     data : {'science', 'ancillary', 'hk'}, optional
