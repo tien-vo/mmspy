@@ -4,6 +4,8 @@ __all__ = [
 
 from cdflib.xarray import cdf_to_xarray
 
+from mmspy.utils.timing import match_time_resolution
+
 from .cdf import process_cdf_epoch, process_cdf_metadata
 
 standard_names = {
@@ -49,42 +51,24 @@ def process_fgm(
     for variable, name in standard_names.items():
         ds[variable].attrs.update(standard_name=name)
 
-    # Save FGM field measurements
-    ds_field = ds.drop_dims("eph_time")
-    ds_field = ds_field.drop_duplicates("time").sortby("time")
-    ds_field = ds_field.chunk(chunks=chunks)
-    ds_field.attrs.update(
-        source=metadata["cdf_file_name"],
-        probe=metadata["probe"],
-        start_date=str(ds_field.time.values[0]),
-        end_date=str(ds_field.time.values[-1]),
-    )
-    ds_field.to_zarr(
-        mode="w",
-        store=metadata["group"],
-        consolidated=True,
-    )
-
-    # Save FGM ephemeris measurements
-    ds_eph = ds.drop_dims("time").rename({"eph_time": "time"})
+    # Extract ephemeris data, interpolate onto field data, and slice
+    ds_eph = ds.drop_dims("time").rename(eph_time="time")
     ds_eph = ds_eph.drop_duplicates("time").sortby("time")
-    ds_eph = ds_eph.sel(
-        time=slice(
-            ds_field.attrs["start_date"],
-            ds_field.attrs["end_date"],
-        ),
-    )
+    ds_eph = match_time_resolution(ds_eph, ds.time, average=False)
+    ds_eph = ds_eph.sel(time=slice(ds.time[0], ds.time[-1]))
 
-    # Slice the data to avoid out of range issue
-    ds_eph = ds_eph.chunk(chunks=chunks)
-    ds_eph.attrs.update(
+    # Combine back into main dataset
+    ds = (
+        ds.drop_dims("eph_time")
+        .drop_duplicates("time")
+        .sortby("time")
+        .merge(ds_eph)
+        .chunk(chunks=chunks)
+    )
+    ds.attrs.update(
         source=metadata["cdf_file_name"],
         probe=metadata["probe"],
-        start_date=str(ds_eph.time.values[0]),
-        end_date=str(ds_eph.time.values[-1]),
+        start_date=str(ds.time.values[0]),
+        end_date=str(ds.time.values[-1]),
     )
-    ds_eph.to_zarr(
-        mode="w",
-        store=metadata["ephemeris_group"],
-        consolidated=True,
-    )
+    ds.to_zarr(mode="w", store=metadata["group"], consolidated=True)
