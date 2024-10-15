@@ -42,20 +42,9 @@ class RankOneAccessor:
         r"""Return the magnitude of the vector."""
         return vector_norm(self._vector, dim="space_rank_1")
 
-    @property
-    def x(self) -> xr.DataArray:
-        r"""Return the x-component of the vector."""
-        return self._vector.sel(space_rank_1="x")
-
-    @property
-    def y(self) -> xr.DataArray:
-        r"""Return the y-component of the vector."""
-        return self._vector.sel(space_rank_1="y")
-
-    @property
-    def z(self) -> xr.DataArray:
-        r"""Return the z-component of the vector."""
-        return self._vector.sel(space_rank_1="z")
+    def component(self, component: str) -> xr.DataArray:
+        r"""Return the component of the vector."""
+        return self._vector.sel(space_rank_1=component)
 
 
 @xr.register_dataarray_accessor("rank_2")
@@ -99,3 +88,7 @@ class RankTwoAccessor:
             .drop_vars("space_rank_2")
             .transpose(..., "space_i", "space_j"),
         )
+
+    def component(self, component: str) -> xr.DataArray:
+        r"""Return the component of the vector."""
+        return self._matrix.sel(space_rank_2=component)
