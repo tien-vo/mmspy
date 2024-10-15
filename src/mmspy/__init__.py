@@ -15,14 +15,5 @@ __all__ = [
 ]
 __version__ = version("mmspy")
 
-import logging.config
-from os import environ
-
+from mmspy import logging
 from mmspy import api, computation, models, utils, xarray
-
-logging.captureWarnings(True)
-logging.basicConfig(
-    format="%(asctime)s [%(levelname)s]: %(message)s",
-    datefmt="%y-%b-%d %H:%M:%S",
-    level="INFO" if not bool(environ.get("DEBUG")) else "DEBUG",
-)
