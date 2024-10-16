@@ -53,7 +53,7 @@ class Query:
     valid_time_range = (pd.Timestamp("2015-09-01"), pd.Timestamp.today())
 
     # ---- Flags
-    shift_time_range: bool = field(default=True, repr=False, converter=bool)
+    shift_time_range: bool = field(default=False, repr=False, converter=bool)
     convert_data_rate: bool = field(default=True, repr=False, converter=bool)
 
     # ---- Query parameters
