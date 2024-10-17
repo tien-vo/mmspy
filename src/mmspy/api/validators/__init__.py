@@ -7,6 +7,7 @@ __all__ = [
     "convert_fgm_data_type",
     "convert_feeps_data_type",
     "convert_fpi_data_type",
+    "convert_mec_data_type",
 ]
 
 from ._edp import convert_edp_data_type
@@ -14,4 +15,5 @@ from ._feeps import convert_feeps_data_type
 from ._fgm import convert_fgm_data_type
 from ._fpi import convert_fpi_data_type
 from ._general import convert_data_rate, one_of
+from ._mec import convert_mec_data_type
 from ._time import time_in_range, time_range_is_valid

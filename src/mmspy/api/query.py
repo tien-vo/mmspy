@@ -16,6 +16,7 @@ from .validators import (
     convert_edp_data_type,
     convert_feeps_data_type,
     convert_fgm_data_type,
+    convert_mec_data_type,
     convert_fpi_data_type,
     one_of,
     time_in_range,
@@ -112,6 +113,7 @@ class Query:
         converter=optional(str),
         validator=[
             one_of(from_metadata=True),
+            convert_mec_data_type,
             convert_fgm_data_type,
             convert_edp_data_type,
             convert_fpi_data_type,
@@ -119,7 +121,7 @@ class Query:
         ],
         metadata={
             "options": {
-                "mec": ["epht89d", "epht89q", "ephts04d"],
+                "mec": ["t89d", "t89q", "ts04d"],
                 "fgm": ["bfield"],
                 "edp": ["efield", "potential"],
                 "fpi": [
