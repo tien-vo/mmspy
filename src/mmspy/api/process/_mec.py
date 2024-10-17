@@ -56,7 +56,7 @@ def process_mec(
     ds.attrs.update(
         source=metadata["cdf_file_name"],
         probe=metadata["probe"],
-        Data_verion=metadata["version"],
+        Data_version=metadata["version"],
         start_date=str(ds.time.values[0]),
         end_date=str(ds.time.values[-1]),
     )
