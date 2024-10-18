@@ -29,6 +29,7 @@ class Query:
     r"""Interface for query parameters.
 
     .. todo:: Clarify docstring.
+    .. todo:: Attributes need docstring.
 
     Parameters
     ----------
