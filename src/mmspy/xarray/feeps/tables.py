@@ -36,7 +36,7 @@ def get_energy_table(keep_bad_eyes: bool = False) -> xr.DataArray:
 
     """
     # Read json file
-    path = Path(__file__).parent / "resources" / "energy_table.json"
+    path = Path(__file__).parent / "data" / "energy_table.json"
     data = json.load(path.open("r"))
 
     # Create table
@@ -88,7 +88,7 @@ def get_flat_field_table(keep_bad_eyes: bool = False) -> xr.DataArray:
 
     """
     # Read json file
-    path = Path(__file__).parent / "resources" / "flat_field.json"
+    path = Path(__file__).parent / "data" / "flat_field.json"
     data = json.load(path.open("r"))
 
     # Create table
@@ -122,7 +122,7 @@ def get_time_dependent_bad_eye_table() -> xr.DataArray:
 
     """
     # Read json file
-    path = Path(__file__).parent / "resources" / "bad_eyes.json"
+    path = Path(__file__).parent / "data" / "bad_eyes.json"
     data = json.load(path.open("r"))
 
     # Create table
@@ -166,7 +166,7 @@ def get_time_independent_bad_eye_table() -> xr.DataArray:
 
     """
     # Read json file
-    path = Path(__file__).parent / "resources" / "bad_eyes.json"
+    path = Path(__file__).parent / "data" / "bad_eyes.json"
     data = json.load(path.open("r"))
 
     # Create table
@@ -207,7 +207,7 @@ def get_sun_contamination_table() -> xr.DataArray:
 
     """
     # Read json file
-    path = Path(__file__).parent / "resources" / "sun_contamination.json"
+    path = Path(__file__).parent / "data" / "sun_contamination.json"
     data = json.load(path.open("r"))
 
     # Create table
