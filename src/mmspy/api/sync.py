@@ -1,8 +1,6 @@
 r"""Provide interface for data synchronization."""
 
-__all__ = [
-    "Synchronizer",
-]
+__all__ = ["Synchronizer"]
 
 import logging
 from collections.abc import Callable

@@ -1,5 +1,7 @@
 r"""Provide interface for HTTPS data request."""
 
+__all__ = ["Request"]
+
 import logging
 from pathlib import Path
 from tempfile import NamedTemporaryFile

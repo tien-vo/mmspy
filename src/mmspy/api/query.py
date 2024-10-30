@@ -1,8 +1,6 @@
 r"""Provide interface for API query parameters."""
 
-__all__ = [
-    "Query",
-]
+__all__ = ["Query"]
 
 from itertools import product as cross
 
@@ -16,8 +14,8 @@ from .validators import (
     convert_edp_data_type,
     convert_feeps_data_type,
     convert_fgm_data_type,
-    convert_mec_data_type,
     convert_fpi_data_type,
+    convert_mec_data_type,
     one_of,
     time_in_range,
     time_range_is_valid,
