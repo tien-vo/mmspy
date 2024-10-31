@@ -33,11 +33,13 @@ def spherical_dot(
         Dot product of the two vectors
 
     """
-    t1 = angle_1[0].copy().units.to("rad")
-    t2 = angle_2[0].copy().units.to("rad")
-    p1 = angle_1[1].copy().units.to("rad")
-    p2 = angle_2[1].copy().units.to("rad")
-    return np.sin(t1) * np.sin(t2) * np.cos(p1 - p2) + np.cos(t1) * np.cos(t2)
+    t1 = angle_1[0].pint.quantify().to("rad")
+    t2 = angle_2[0].pint.quantify().to("rad")
+    p1 = angle_1[1].pint.quantify().to("rad")
+    p2 = angle_2[1].pint.quantify().to("rad")
+    return (
+        np.sin(t1) * np.sin(t2) * np.cos(p1 - p2) + np.cos(t1) * np.cos(t2)
+    ).pint.dequantify()
 
 
 def spherical_angle(vector: xr.DataArray) -> tuple[xr.DataArray, xr.DataArray]:
@@ -86,7 +88,7 @@ class FpiAccessor:
 
         """
         validate_dataset(ds, "FPI", ["DIS", "DES"])
-        self._ds = ds
+        self._ds = ds.pint.quantify()
 
     def correct_for_spacecraft_potential(
         self,
@@ -106,23 +108,20 @@ class FpiAccessor:
 
         """
         ds = self._ds.copy()
-        spacecraft_potential = spacecraft_potential.copy()
 
-        # Unpack species information
-        q = ds.species.charge
-        W_unit = ds.W.units.from_metadata
-        V_unit = spacecraft_potential.units.from_metadata
-        to_eV = (q * V_unit).to(W_unit).value
+        Phi = match_time_resolution(
+            spacecraft_potential.pint.dequantify(),
+            ds.time,
+        ).pint.quantify()
+        Phi = (ds.species.charge * Phi).pint.to(ds.W.pint.units)
 
-        Phi = match_time_resolution(spacecraft_potential, ds.time) * to_eV
-        with xr.set_options(keep_attrs=True):
-            if ds.species.name == "elc":
-                dims = ds.f.dims
-                f = xr.where(np.abs(Phi) < ds.W, ds.f, 0.0).transpose(*dims)
-                ds = ds.assign(f=(dims, f.data, ds.f.attrs))
+        if ds.species.name == "elc":
+            dims = ds.f.dims
+            f = xr.where(np.abs(Phi) < ds.W, ds.f, 0.0).transpose(*dims)
+            ds = ds.assign(f=(dims, f.data, ds.f.attrs))
 
-            ds = ds.assign(W=ds.W + Phi)
-            ds.W.attrs["VAR_NOTES"] += "; Adjusted for spacecraft potential"
+        ds = ds.assign(W=ds.W + Phi)
+        ds.W.attrs["VAR_NOTES"] += "; Adjusted for spacecraft potential"
 
         return ds
 
@@ -159,10 +158,13 @@ class FpiAccessor:
         ds = self._ds.copy()
 
         # Interpolate inputs onto ds time resolution
-        B = match_time_resolution(magnetic_field.copy(), ds.time)
+        B = match_time_resolution(
+            magnetic_field.pint.dequantify(),
+            ds.time,
+        )
         if "time" in reference_vector.dims:
             reference_vector = match_time_resolution(
-                reference_vector.copy(),
+                reference_vector.pint.dequantify(),
                 ds.time,
             )
 

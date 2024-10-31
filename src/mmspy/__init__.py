@@ -16,5 +16,8 @@ __all__ = [
 __version__ = version("mmspy")
 
 import pint_xarray
+import xarray as xr
+
+xr.set_options(keep_attrs=True)
 
 from mmspy import api, computation, logging, models, utils, xarray

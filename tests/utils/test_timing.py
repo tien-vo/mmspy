@@ -4,10 +4,10 @@ r"""Tests for functionality in `mmspy.utils.timing`.
     Add more tests
 """
 
-import astropy.units as u
 import numpy as np
 import pytest
 import xarray as xr
+from pint_xarray import unit_registry as u
 
 from mmspy.utils.timing import match_time_resolution
 

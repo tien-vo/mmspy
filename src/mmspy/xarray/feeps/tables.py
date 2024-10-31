@@ -70,7 +70,7 @@ def get_energy_table(keep_bad_eyes: bool = False) -> xr.DataArray:
         ),
         units="keV",
     )
-    return table
+    return table.pint.quantify()
 
 
 def get_flat_field_table(keep_bad_eyes: bool = False) -> xr.DataArray:

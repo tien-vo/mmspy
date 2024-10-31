@@ -8,11 +8,11 @@ __all__ = [
 
 from typing import Any
 
-import astropy.units as u
 import numpy as np
 import pandas as pd
 import xarray as xr
 from numpy.typing import NDArray
+from pint_xarray import unit_registry as u
 from xarray.core.types import T_Xarray
 
 
@@ -61,7 +61,7 @@ def match_time_resolution(
     data = data.copy()
 
     if not isinstance(target, (xr.DataArray, u.Quantity)):
-        msg = "'target' must be an xarray or astropy quantity."
+        msg = "'target' must be an xarray or pint quantity."
         raise ValueError(msg)
 
     if isinstance(target, xr.DataArray):
@@ -71,7 +71,7 @@ def match_time_resolution(
         time = target.time.reset_coords(drop=True)
 
     if isinstance(target, u.Quantity):
-        target_resolution = pd.Timedelta(int(target.to("ns").value), "ns")
+        target_resolution = pd.Timedelta(int(target.to("ns").magnitude), "ns")
         time = np.arange(
             data.time[0].values,
             data.time[-1].values + target_resolution,

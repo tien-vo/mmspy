@@ -6,9 +6,8 @@ __all__ = [
 
 from typing import Generic
 
-import astropy.constants.si as c
-import astropy.units as u
 import xarray as xr
+from pint_xarray import unit_registry as u
 from xarray.core.types import T_Xarray
 
 
@@ -36,8 +35,14 @@ class SpeciesAccessor(Generic[T_Xarray]):
     def species_options(self) -> dict[str, dict[str, u.Quantity]]:
         r"""Return supported species options."""
         return {
-            "ion": {"mass": +c.m_p, "charge": +c.e},
-            "elc": {"mass": +c.m_e, "charge": -c.e},
+            "ion": {
+                "mass": u.Quantity(1.0, "proton_mass"),
+                "charge": u.Quantity(1.0, "elementary_charge"),
+            },
+            "elc": {
+                "mass": u.Quantity(1.0, "electron_mass"),
+                "charge": u.Quantity(-1.0, "elementary_charge"),
+            },
         }
 
     @property
@@ -77,7 +82,7 @@ class SpeciesAccessor(Generic[T_Xarray]):
         self._name = name
 
     @property
-    def mass(self) -> u.Quantity[u.kg]:
+    def mass(self) -> u.Quantity:
         r"""Return the mass of the species."""
         if self.name not in self.species_options:
             msg = "Species unidentified."
@@ -86,7 +91,7 @@ class SpeciesAccessor(Generic[T_Xarray]):
         return self.species_options[self.name]["mass"]
 
     @property
-    def charge(self) -> u.Quantity[u.C]:
+    def charge(self) -> u.Quantity:
         r"""Return the charge of the species."""
         if self.name not in self.species_options:
             msg = "Species unidentified."

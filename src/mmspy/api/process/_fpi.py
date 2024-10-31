@@ -225,6 +225,9 @@ def process_fpi_moments(
     for variable, name in moments_standard_names.items():
         ds[variable].attrs.update(standard_name=name)
 
+    # Remove flag units attribute to make it compliant with `pint`
+    ds.flag.attrs.update(units="")
+
     # Force monotonic
     ds = ds.drop_duplicates("time").sortby("time")
 

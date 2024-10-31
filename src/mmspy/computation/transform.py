@@ -104,7 +104,7 @@ def cartesian_to_fac(
         xr.dot(M, da.rank_1.tensor, dim="space_j")
         .rename(space_i="space_rank_1")
         .assign_coords(space_rank_1=da.space_rank_1)
-        .assign_attrs(units=str(da.units.from_metadata))
+        .assign_attrs(da.attrs)
         .transpose(*da.dims)
     )
 
@@ -157,7 +157,7 @@ def fac_to_cartesian(
         xr.dot(M, da.rename(space_rank_1="space_j"), dim="space_j")
         .rename(space_i="space_rank_1")
         .assign_coords(space_rank_1=da.space_rank_1)
-        .assign_attrs(units=str(da.units.from_metadata))
+        .assign_attrs(da.attrs)
         .transpose(*da.dims)
     )
 

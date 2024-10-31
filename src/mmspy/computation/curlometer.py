@@ -60,19 +60,24 @@ def curlometer(
     _validate_input(position)
 
     # Get units and unpack variables
-    Q_unit = quantity[0].units.from_metadata
-    R_unit = position[0].units.from_metadata
-    Q1, Q2, Q3, Q4 = [da.units.to(Q_unit) for da in quantity]
-    R1, R2, R3, R4 = [da.units.to(R_unit) for da in position]
+    Q_unit = quantity[0].pint.quantify().units
+    R_unit = position[0].pint.quantify().units
+    Q1, Q2, Q3, Q4 = [
+        da.pint.quantify().to(Q_unit).pint.dequantify() for da in quantity
+    ]
+    R1, R2, R3, R4 = [
+        da.pint.quantify().to(R_unit).pint.dequantify() for da in position
+    ]
 
     # Interpolate every array onto q1 time
-    Q2 = match_time_resolution(Q2, Q1.time, average=False)
-    Q3 = match_time_resolution(Q3, Q1.time, average=False)
-    Q4 = match_time_resolution(Q4, Q1.time, average=False)
-    R1 = match_time_resolution(R1, Q1.time, average=False)
-    R2 = match_time_resolution(R2, Q1.time, average=False)
-    R3 = match_time_resolution(R3, Q1.time, average=False)
-    R4 = match_time_resolution(R4, Q1.time, average=False)
+    kw = {"target": Q1.time, "average": False}
+    Q2 = match_time_resolution(Q2, **kw)
+    Q3 = match_time_resolution(Q3, **kw)
+    Q4 = match_time_resolution(Q4, **kw)
+    R1 = match_time_resolution(R1, **kw)
+    R2 = match_time_resolution(R2, **kw)
+    R3 = match_time_resolution(R3, **kw)
+    R4 = match_time_resolution(R4, **kw)
 
     # Calculate separation
     R_12 = R2 - R1
@@ -94,46 +99,50 @@ def curlometer(
     k1 = -k2 - k3 - k4
 
     # Create resulting dataset
-    ds_clm = xr.Dataset()
+    ds_clm = xr.Dataset().pint.quantify()
 
     # Calculate barycentric quantities
     ds_clm = ds_clm.assign(
         {
-            "r_bc": 0.25 * (R1 + R2 + R3 + R4),
-            f"{name}_bc": 0.25 * (Q1 + Q2 + Q3 + Q4),
+            "r_bc": 0.25 * (R1 + R2 + R3 + R4).pint.quantify(R_unit),
+            f"{name}_bc": 0.25 * (Q1 + Q2 + Q3 + Q4).pint.quantify(Q_unit),
         },
     )
-    ds_clm["r_bc"].attrs.update(units=str(R_unit))
-    ds_clm[f"{name}_bc"].attrs.update(units=str(Q_unit))
 
     # Calculate gradients
-    G_unit = Q_unit / R_unit
     if "space_rank_1" in Q1.dims:
         kw = {"dim": "space_rank_1"}
         kw_i = {"space_rank_1": "space_i"}
         kw_j = {"space_rank_1": "space_j"}
         ds_clm = ds_clm.assign(
             {
-                f"grad_{name}": k1.rename(**kw_i) * Q1.rename(**kw_j)
-                + k2.rename(**kw_i) * Q2.rename(**kw_j)
-                + k3.rename(**kw_i) * Q3.rename(**kw_j)
-                + k4.rename(**kw_i) * Q4.rename(**kw_j),
-                f"div_{name}": xr.dot(k1, Q1, **kw)
-                + xr.dot(k2, Q2, **kw)
-                + xr.dot(k3, Q3, **kw)
-                + xr.dot(k4, Q4, **kw),
-                f"curl_{name}": xr.cross(k1, Q1, **kw)
-                + xr.cross(k2, Q2, **kw)
-                + xr.cross(k3, Q3, **kw)
-                + xr.cross(k4, Q4, **kw),
+                f"grad_{name}": (
+                    k1.rename(**kw_i) * Q1.rename(**kw_j)
+                    + k2.rename(**kw_i) * Q2.rename(**kw_j)
+                    + k3.rename(**kw_i) * Q3.rename(**kw_j)
+                    + k4.rename(**kw_i) * Q4.rename(**kw_j)
+                ).pint.quantify(Q_unit / R_unit),
+                f"div_{name}": (
+                    xr.dot(k1, Q1, **kw)
+                    + xr.dot(k2, Q2, **kw)
+                    + xr.dot(k3, Q3, **kw)
+                    + xr.dot(k4, Q4, **kw)
+                ).pint.quantify(Q_unit / R_unit),
+                f"curl_{name}": (  # type: ignore[union-attr]
+                    xr.cross(k1, Q1, **kw)
+                    + xr.cross(k2, Q2, **kw)
+                    + xr.cross(k3, Q3, **kw)
+                    + xr.cross(k4, Q4, **kw)
+                ).pint.quantify(Q_unit / R_unit),
             },
         )
-        for variable in ["grad", "div", "curl"]:
-            ds_clm[f"{variable}_{name}"].attrs.update(units=str(G_unit))
     else:
         ds_clm = ds_clm.assign(
-            {f"grad_{name}": k1 * Q1 + k2 * Q2 + k3 * Q3 + k4 * Q4},
+            {
+                f"grad_{name}": (
+                    k1 * Q1 + k2 * Q2 + k3 * Q3 + k4 * Q4
+                ).pint.quantify(Q_unit / R_unit),
+            },
         )
-        ds_clm[f"grad_{name}"].attrs.update(units=str(G_unit))
 
     return ds_clm
