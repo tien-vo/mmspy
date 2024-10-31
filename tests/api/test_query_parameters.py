@@ -5,7 +5,7 @@ from itertools import product as cross
 import pytest
 from attr import define, fields
 
-from mmspy import Query
+from mmspy.api import Query
 
 
 @define
@@ -74,7 +74,7 @@ data_rate_cases = (
 data_type_cases = (
     [
         Case("data_type", data_type, None, None, instrument="mec")
-        for data_type in ["epht89d", "epht89q", "ephts04d"]
+        for data_type in ["t89d", "t89q", "ts04d"]
     ]
     + [
         Case("data_type", data_type, ValueError, instrument="mec")
