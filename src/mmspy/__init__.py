@@ -15,5 +15,6 @@ __all__ = [
 ]
 __version__ = version("mmspy")
 
-from mmspy import logging
-from mmspy import api, computation, models, utils, xarray
+import pint_xarray
+
+from mmspy import api, computation, logging, models, utils, xarray

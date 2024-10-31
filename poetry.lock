@@ -50,6 +50,17 @@ test = ["anyio[trio]", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypo
 trio = ["trio (>=0.26.1)"]
 
 [[package]]
+name = "appdirs"
+version = "1.4.4"
+description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
+optional = false
+python-versions = "*"
+files = [
+    {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
+    {file = "appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41"},
+]
+
+[[package]]
 name = "appnope"
 version = "0.1.4"
 description = "Disable App Nap on macOS >= 10.9"
@@ -970,6 +981,40 @@ files = [
 
 [package.extras]
 devel = ["colorama", "json-spec", "jsonschema", "pylint", "pytest", "pytest-benchmark", "pytest-cache", "validictory"]
+
+[[package]]
+name = "flexcache"
+version = "0.3"
+description = "Saves and loads to the cache a transformed versions of a source object."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "flexcache-0.3-py3-none-any.whl", hash = "sha256:d43c9fea82336af6e0115e308d9d33a185390b8346a017564611f1466dcd2e32"},
+    {file = "flexcache-0.3.tar.gz", hash = "sha256:18743bd5a0621bfe2cf8d519e4c3bfdf57a269c15d1ced3fb4b64e0ff4600656"},
+]
+
+[package.dependencies]
+typing-extensions = "*"
+
+[package.extras]
+test = ["pytest", "pytest-cov", "pytest-mpl", "pytest-subtests"]
+
+[[package]]
+name = "flexparser"
+version = "0.3.1"
+description = "Parsing made fun ... using typing."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "flexparser-0.3.1-py3-none-any.whl", hash = "sha256:2e3e2936bec1f9277f777ef77297522087d96adb09624d4fe4240fd56885c013"},
+    {file = "flexparser-0.3.1.tar.gz", hash = "sha256:36f795d82e50f5c9ae2fde1c33f21f88922fdd67b7629550a3cc4d0b40a66856"},
+]
+
+[package.dependencies]
+typing-extensions = "*"
+
+[package.extras]
+test = ["pytest", "pytest-cov", "pytest-mpl", "pytest-subtests"]
 
 [[package]]
 name = "flox"
@@ -2663,6 +2708,51 @@ mic = ["olefile"]
 tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "packaging", "pyroma", "pytest", "pytest-cov", "pytest-timeout"]
 typing = ["typing-extensions"]
 xmp = ["defusedxml"]
+
+[[package]]
+name = "pint"
+version = "0.24.3"
+description = "Physical quantities module"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "Pint-0.24.3-py3-none-any.whl", hash = "sha256:d98667e46fd03a1b94694fbfa104ec30858684d8ab26952e2a348b48059089bb"},
+    {file = "pint-0.24.3.tar.gz", hash = "sha256:d54771093e8b94c4e0a35ac638c2444ddf3ef685652bab7675ffecfa0c5c5cdf"},
+]
+
+[package.dependencies]
+appdirs = ">=1.4.4"
+flexcache = ">=0.3"
+flexparser = ">=0.3"
+typing-extensions = "*"
+
+[package.extras]
+babel = ["babel (<=2.8)"]
+bench = ["pytest", "pytest-codspeed"]
+dask = ["dask"]
+mip = ["mip (>=1.13)"]
+numpy = ["numpy (>=1.23)"]
+pandas = ["pint-pandas (>=0.3)"]
+test = ["pytest", "pytest-benchmark", "pytest-cov", "pytest-mpl", "pytest-subtests"]
+testbase = ["pytest", "pytest-benchmark", "pytest-cov", "pytest-subtests"]
+uncertainties = ["uncertainties (>=3.1.6)"]
+xarray = ["xarray"]
+
+[[package]]
+name = "pint-xarray"
+version = "0.4"
+description = "Physical units interface to xarray using Pint"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "pint_xarray-0.4-py3-none-any.whl", hash = "sha256:dcbbd6e6257817828b5cf7915254a8031d7a1e94df110218d280f3a1b956d4f5"},
+    {file = "pint_xarray-0.4.tar.gz", hash = "sha256:b6b737a9c46dfb14a8598c27a71100496994c9d79dab61fd77f0d2685ae7065e"},
+]
+
+[package.dependencies]
+numpy = ">=1.23"
+pint = ">=0.21"
+xarray = ">=2022.06.0"
 
 [[package]]
 name = "platformdirs"
@@ -4450,4 +4540,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "f5a1d74c98368f8f277b7e13595cdcf3c1a29d331c7546fd23d884a2b7d263d4"
+content-hash = "aec1e74fde9b26d8ac757b30c859c0696b7ebd9d12350ce643d5d11766993fbc"
