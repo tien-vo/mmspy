@@ -1,10 +1,9 @@
 __all__ = ["stft", "xr_stft"]
 
-import astropy.units as u
 import numpy as np
 import xarray as xr
-from astropy.units.typing import QuantityLike
 from numpy.typing import NDArray
+from pint_xarray import unit_registry as u
 from scipy.signal import ShortTimeFFT, get_window
 
 from mmspy.utils.timing import sampling_information
@@ -12,9 +11,9 @@ from mmspy.utils.timing import sampling_information
 
 def stft(
     time: NDArray[np.datetime64],
-    signal: QuantityLike,
+    signal: u.Quantity,
     window_type: str | float | tuple = "hann",
-    window_length: u.Quantity[u.s] | None = None,
+    window_length: u.Quantity | None = None,
     normalization: str = "spectrum",
 ) -> tuple:
     r"""Short-time Fourier transform with `scipy.signal.ShortTimeFFT`.
@@ -62,7 +61,7 @@ def stft(
         )
         raise ValueError(msg)
 
-    Nw = int((window_length // sampling["period"]).decompose())
+    Nw = int(window_length / sampling["period"])
     Ns = sampling["number_of_samples"]
     fs = sampling["frequency"]
 
@@ -70,13 +69,13 @@ def stft(
     STFT = ShortTimeFFT(
         win=get_window(window_type, Nw),
         hop=Nw // 2,
-        fs=sampling["frequency"].value,
+        fs=sampling["frequency"].magnitude,
         scale_to="magnitude",
         fft_mode="onesided",
     )
     window_time = time[0] + (1e9 * STFT.t(Ns)).astype("timedelta64[ns]")
-    window_frequency = STFT.f[1:] * fs.unit
-    spectrum = STFT.stft(signal.value).T[:, 1:] * signal.unit
+    window_frequency = STFT.f[1:] * fs.units
+    spectrum = STFT.stft(signal.magnitude).T[:, 1:] * signal.units
     if normalization == "density":
         df = np.diff(window_frequency).mean().to("Hz")
         spectrum *= np.sqrt(1 / df)
@@ -87,7 +86,7 @@ def stft(
 def xr_stft(
     signal: xr.DataArray,
     window_type: str | float | tuple = "hann",
-    window_length: u.Quantity[u.s] | None = None,
+    window_length: u.Quantity | None = None,
     normalization: str = "spectrum",
 ) -> xr.DataArray:
     r"""Xarray wrapper for `mmsws.computation.time_frequency.stft` routine.
@@ -114,21 +113,17 @@ def xr_stft(
     """
     spectrum, window_time, window_frequency = stft(
         signal.time.values,
-        signal.values * signal.units.from_metadata,
+        signal.pint.quantify().compute().data,
         window_type=window_type,
         window_length=window_length,
         normalization=normalization,
     )
     return xr.DataArray(
-        data=spectrum.value,
+        data=spectrum,
         dims=("time", "frequency"),
         coords={
             "time": ("time", window_time),
-            "frequency": (
-                "frequency",
-                window_frequency.value,
-                {"units": str(window_frequency.unit)},
-            ),
+            "frequency": ("frequency", window_frequency.magnitude),
         },
-        attrs={"units": str(spectrum.unit), "normalization": normalization},
-    )
+        attrs={"normalization": normalization},
+    ).pint.quantify(frequency=str(window_frequency.units))

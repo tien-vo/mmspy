@@ -2,11 +2,10 @@ __all__ = ["fft", "xr_fft"]
 
 from typing import Union
 
-import astropy.units as u
 import numpy as np
 import xarray as xr
-from astropy.units.typing import QuantityLike
 from numpy.typing import NDArray
+from pint_xarray import unit_registry as u
 from scipy.signal import get_window
 
 from mmspy.utils.timing import sampling_information
@@ -14,7 +13,7 @@ from mmspy.utils.timing import sampling_information
 
 def fft(
     time: NDArray[np.datetime64],
-    signal: QuantityLike,
+    signal: u.Quantity,
     window_type: Union[str, float, tuple] = "hann",
     normalization: str = "spectrum",
 ) -> tuple:
@@ -43,6 +42,7 @@ def fft(
     """
     time = time.astype("datetime64[ns]")
     signal = u.Quantity(signal)
+    units = signal.units
 
     # Unpack sampling information
     sampling = sampling_information(time)
@@ -57,7 +57,7 @@ def fft(
     # Calculate spectrum and frequency
     window = get_window(window_type, Ns)
     f_twosided = np.fft.fftfreq(Ns, sampling["period"])
-    F_twosided = np.fft.fft(signal * window, norm="forward")
+    F_twosided = np.fft.fft(signal.magnitude * window, norm="forward") * units
 
     # Fold over the two-sided results
     frequency = f_twosided[positive_indices]
@@ -97,23 +97,16 @@ def xr_fft(
     """
     spectrum_positive, spectrum_negative, frequency = fft(
         signal.time.values,
-        signal.values * signal.units.from_metadata,
+        signal.pint.quantify().compute().data,
         window_type=window_type,
         normalization=normalization,
     )
     return xr.DataArray(
-        data=np.array([spectrum_positive.value, spectrum_negative.value]),
+        data=np.vstack([spectrum_positive, spectrum_negative]),
         dims=("type", "frequency"),
         coords={
             "type": ("type", ["positive", "negative"]),
-            "frequency": (
-                "frequency",
-                frequency.value,
-                {"units": str(frequency.unit)},
-            ),
+            "frequency": ("frequency", frequency.magnitude),
         },
-        attrs={
-            "units": str(spectrum_positive.unit),
-            "normalization": normalization,
-        },
-    )
+        attrs={"normalization": normalization},
+    ).pint.quantify(frequency=frequency.units)

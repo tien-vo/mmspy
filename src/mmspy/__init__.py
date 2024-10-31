@@ -19,5 +19,6 @@ import pint_xarray
 import xarray as xr
 
 xr.set_options(keep_attrs=True)
+pint_xarray.unit_registry.formatter.default_format = "~P"
 
 from mmspy import api, computation, logging, models, utils, xarray
