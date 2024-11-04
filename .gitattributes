@@ -1,0 +1,2 @@
+# Remove ipynb count
+*.ipynb -linguist-detectable
