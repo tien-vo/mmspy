@@ -50,7 +50,7 @@ flox = "^0.9.13"
 attrs = "^24.2.0"
 plotly = "^5.24.1"
 pint-xarray = "^0.4"
-cf-xarray = { git = "https://github.com/tien-vo/cf-xarray.git", branch = "bugfix/unit-alias-conflict" }
+cf-xarray = { git = "https://github.com/tien-vo/cf-xarray.git", branch = "hotfix/remove-unecessary-aliases" }
 
 [tool.poetry.group.develop]
 optional = true
