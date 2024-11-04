@@ -10,11 +10,12 @@ __all__ = [
     "api",
     "computation",
     "models",
-    "units",
     "utils",
+    "unit_registry",
 ]
 __version__ = version("mmspy")
 
+import mmspy.logging
 import mmspy.xarray
-from mmspy.pint import units
-from mmspy import api, computation, logging, models, utils
+from mmspy.pint import unit_registry
+from mmspy import api, computation, models, utils

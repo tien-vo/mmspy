@@ -1,9 +1,9 @@
 r"""Unit support with `pint`."""
 
-__all__ = ["units"]
+__all__ = ["unit_registry"]
 
 import cf_xarray.units  # noqa: F401
 import pint_xarray  # noqa: F401
-from pint import application_registry as units
+from pint import application_registry as unit_registry
 
-units.formatter.default_format = "cf"
+unit_registry.formatter.default_format = "cf"
