@@ -30,7 +30,7 @@ class RankOneAccessor:
             msg = "Cannot find a `space_rank_1` dimension."
             raise ValueError(msg)
 
-        self._vector = vector
+        self._vector = vector.pint.quantify()
 
     @property
     def tensor(self) -> xr.DataArray:
@@ -43,7 +43,7 @@ class RankOneAccessor:
         return vector_norm(
             self._vector.pint.dequantify(),
             dim="space_rank_1",
-        )
+        ).pint.quantify()
 
     def component(self, component: str) -> xr.DataArray:
         r"""Return the component of the vector."""
@@ -68,7 +68,7 @@ class RankTwoAccessor:
             msg = "Cannot find a `space_rank_2` dimension."
             raise ValueError(msg)
 
-        self._matrix = matrix
+        self._matrix = matrix.pint.quantify()
 
     @property
     def tensor(self) -> xr.DataArray:
