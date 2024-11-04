@@ -12,8 +12,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from numpy.typing import NDArray
-from pint_xarray import unit_registry as u
 from xarray.core.types import T_Xarray
+from pint import Quantity
 
 
 def force_odd(number: int) -> int:
@@ -35,8 +35,8 @@ def force_odd(number: int) -> int:
 
 def match_time_resolution(
     data: T_Xarray,
-    target: T_Xarray | u.Quantity,
-    average: bool = True,
+    target: T_Xarray | Quantity,
+    average: bool = False,
     kwargs: dict[str, Any] = {"fill_value": np.nan, "bounds_error": False},
 ) -> T_Xarray:
     r"""Match time resolution onto a target time resolution.
@@ -44,13 +44,13 @@ def match_time_resolution(
     Parameters
     ----------
     data : DataArray or Dataset
-        Data to interpolate
+        Data to interpolate.
     target : DataArray or Quantity
-        Target resolution in astropy Quantity or xarray with time coordinates
+        Target resolution.
     average : bool
-        Whether to perform a rolling average before interpolation
+        Whether to perform a rolling average before interpolation.
     kwargs : dict
-        Extra keywords for the interpolation routine
+        Extra keywords for the interpolation routine.
 
     Returns
     -------
@@ -60,7 +60,7 @@ def match_time_resolution(
     """
     data = data.copy()
 
-    if not isinstance(target, (xr.DataArray, u.Quantity)):
+    if not isinstance(target, (xr.DataArray, Quantity)):
         msg = "'target' must be an xarray or pint quantity."
         raise ValueError(msg)
 
@@ -70,7 +70,7 @@ def match_time_resolution(
         target_resolution = pd.Timedelta(target.time.diff("time").min().values)
         time = target.time.reset_coords(drop=True)
 
-    if isinstance(target, u.Quantity):
+    if isinstance(target, Quantity):
         target_resolution = pd.Timedelta(int(target.to("ns").magnitude), "ns")
         time = np.arange(
             data.time[0].values,
@@ -112,8 +112,8 @@ def sampling_information(time: NDArray[np.datetime64]) -> dict[str, Any]:
     time = np.array(time)
     unit = np.datetime_data(time.dtype)[0]
     time = time.astype(float)
-    window = u.Quantity(time[-1] - time[0], unit).to("s")
-    period = u.Quantity(np.diff(time).min(), unit).to("s")
+    window = Quantity(time[-1] - time[0], unit).to("s")
+    period = Quantity(np.diff(time).min(), unit).to("s")
     frequency = (1 / period).to("Hz")
     return {
         "number_of_samples": time.size,
