@@ -3,6 +3,7 @@ __all__ = [
     "process_potential",
 ]
 
+import numpy as np
 from cdflib.xarray import cdf_to_xarray
 
 from .cdf import process_cdf_epoch, process_cdf_metadata
@@ -42,10 +43,9 @@ def process_efield(
     attrs = ds.E_para.attrs
     E_para = ds.E_para.values
     ds = ds.assign(
-        E_para=("time", E_para[:, -1]),
-        E_para_err=("time", E_para[:, 0]),
+        E_para=("time", E_para[:, -1], attrs),
+        E_para_err=("time", E_para[:, 0], {"units": attrs["units"]}),
     )
-    ds.E_para.attrs.update(**attrs)
     ds = ds.rename_dims(dim0="space_rank_1").drop_dims("dim1")
     ds = ds.assign_coords(space_rank_1=["x", "y", "z"])
     ds = process_cdf_metadata(ds[["E_para_err", *variables.values()]])
@@ -82,13 +82,19 @@ def process_potential(
     ds = ds.reset_coords()
 
     # Rename variables and remove unwanted variables
-    ds = ds.drop_dims("dim0").rename(
-        variables := {
-            f"{prefix}_epoch_{suffix}": "time",
-            f"{prefix}_scpot_{suffix}": "V_sc",
-        },
+    ds = (
+        ds.rename_dims(dim0="probe")
+        .assign_coords(probe=np.arange(1, 7))
+        .rename(
+            variables := {
+                f"{prefix}_epoch_{suffix}": "time",
+                f"{prefix}_scpot_{suffix}": "V_sc",
+                f"{prefix}_dcv_{suffix}": "V_p",
+            },
+        )
     )
     ds.V_sc.attrs.update(standard_name="Spacecraft potential")
+    ds.V_p.attrs.update(standard_name="Probe potential")
 
     # Final metadata processing
     ds = process_cdf_metadata(ds[list(variables.values())])
