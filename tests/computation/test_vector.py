@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import quaternionic
 import xarray as xr
-from scipy.linalg import inv, norm
+import dask.array as da
 
 from mmspy.computation.vector import (
     inverse_matrix,
@@ -18,7 +18,7 @@ from mmspy.computation.vector import (
 def random_nd_vector(n):
     r"""Generate a random array of 100 nd vectors."""
     return xr.DataArray(
-        data=np.random.uniform(low=-10.0, high=10.0, size=(10, 10, n)),
+        data=da.random.uniform(low=-10.0, high=10.0, size=(10, 10, n)),
         dims=("dim_1", "dim_2", "space"),
     )
 
@@ -26,7 +26,7 @@ def random_nd_vector(n):
 def random_quaternion():
     r"""Generate a random array of 100 quaternions."""
     return xr.DataArray(
-        data=np.random.uniform(low=-10.0, high=10.0, size=(10, 10, 4)),
+        data=da.random.uniform(low=-10.0, high=10.0, size=(10, 10, 4)),
         dims=("dim_1", "dim_2", "quaternion"),
         coords={"quaternion": ["w", "x", "y", "z"]},
     )
@@ -35,7 +35,7 @@ def random_quaternion():
 def random_matrix(n):
     r"""Generate a random array of 100 nxn matrices."""
     return xr.DataArray(
-        data=np.random.uniform(low=-10.0, high=10.0, size=(10, 10, n, n)),
+        data=da.random.uniform(low=-10.0, high=10.0, size=(10, 10, n, n)),
         dims=("dim_1", "dim_2", "space_i", "space_j"),
     )
 
@@ -45,7 +45,7 @@ def test_nd_vector_norm(n):
     r"""Compare results from `xr.apply_ufunc` and manual calculations."""
     vector = random_nd_vector(n)
     norm_cal = vector_norm(vector, dim="space")
-    norm_ref = norm(vector.data, axis=-1)
+    norm_ref = da.linalg.norm(vector.data, axis=-1)
 
     assert (norm_cal == norm_ref).all()
 
@@ -58,7 +58,8 @@ def test_matrix_inversion(n):
 
     for i in range(M.sizes["dim_1"]):
         for j in range(M.sizes["dim_2"]):
-            M_inv_ref = inv(M.isel(dim_1=i, dim_2=j).data)
+            M_inv_ref = da.linalg.inv(M.isel(dim_1=i, dim_2=j).data)
+
             assert (M_inv_ref == M_inv_cal.isel(dim_1=i, dim_2=j)).all()
 
 

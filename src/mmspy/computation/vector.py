@@ -12,7 +12,6 @@ from typing import Sequence
 import numpy as np
 import xarray as xr
 from numpy.typing import NDArray
-from scipy.linalg import inv, norm
 from xarray.core.types import Dims
 
 
@@ -20,7 +19,6 @@ def vector_norm(
     vector: xr.DataArray,
     dim: Dims,
     order: int | float | str | None = None,
-    check_finite: bool = False,
 ) -> xr.DataArray:
     r"""Calculate the nth-order vector norm using `np.linalg.norm`.
 
@@ -32,8 +30,6 @@ def vector_norm(
         Which dimension to apply the function to
     order : non-zero int, inf, -inf, 'fro', 'nuc', optional
         Order of the norm. See documentation for `~numpy.linalg.norm`
-    check_finite : bool
-        Whether to check if all entries are finite
 
     Returns
     -------
@@ -42,10 +38,10 @@ def vector_norm(
 
     """
     return xr.apply_ufunc(
-        norm,
+        np.linalg.norm,
         vector,
         input_core_dims=[[dim]],
-        kwargs={"ord": order, "axis": -1, "check_finite": check_finite},
+        kwargs={"ord": order, "axis": -1},
         dask="allowed",
     )
 
@@ -82,18 +78,13 @@ def matrix_multiply(
     )
 
 
-def inverse_matrix(
-    matrix: xr.DataArray,
-    check_finite: bool = False,
-) -> xr.DataArray:
+def inverse_matrix(matrix: xr.DataArray) -> xr.DataArray:
     r"""Calculate the inverse of an nxn matrix using `np.linalg.inv`.
 
     Parameters
     ----------
     matrix : DataArray
         Matrix that has at least two dimensions of "space_i", "space_j"
-    check_finite : bool
-        Whether to check if all entries are finite
 
     Returns
     -------
@@ -103,7 +94,7 @@ def inverse_matrix(
     """
 
     def _inverse(data: NDArray) -> NDArray:
-        inversed_matrix = inv(data.squeeze(), check_finite=check_finite)
+        inversed_matrix = np.linalg.inv(data.squeeze())
         return np.expand_dims(inversed_matrix, axis=other_axes)
 
     matrix = matrix.copy()
