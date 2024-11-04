@@ -1,11 +1,9 @@
 __all__ = ["fft", "xr_fft"]
 
-from typing import Union
-
 import numpy as np
 import xarray as xr
 from numpy.typing import NDArray
-from pint_xarray import unit_registry as u
+from pint import Quantity
 from scipy.signal import get_window
 
 from mmspy.utils.timing import sampling_information
@@ -13,8 +11,8 @@ from mmspy.utils.timing import sampling_information
 
 def fft(
     time: NDArray[np.datetime64],
-    signal: u.Quantity,
-    window_type: Union[str, float, tuple] = "hann",
+    signal: Quantity,
+    window_type: str | float | tuple = "hann",
     normalization: str = "spectrum",
 ) -> tuple:
     r"""Fourier transform with `numpy.fft`.
@@ -41,7 +39,7 @@ def fft(
 
     """
     time = time.astype("datetime64[ns]")
-    signal = u.Quantity(signal)
+    signal = Quantity(signal)
     units = signal.units
 
     # Unpack sampling information
@@ -73,7 +71,7 @@ def fft(
 
 def xr_fft(
     signal: xr.DataArray,
-    window_type: Union[str, float, tuple] = "hann",
+    window_type: str | float | tuple = "hann",
     normalization: str = "spectrum",
 ) -> xr.DataArray:
     r"""Xarray wrapper for `mmsws.computation.time_frequency.fft` routine.

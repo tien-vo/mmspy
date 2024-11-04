@@ -3,7 +3,7 @@ __all__ = ["stft", "xr_stft"]
 import numpy as np
 import xarray as xr
 from numpy.typing import NDArray
-from pint_xarray import unit_registry as u
+from pint import Quantity
 from scipy.signal import ShortTimeFFT, get_window
 
 from mmspy.utils.timing import sampling_information
@@ -11,9 +11,9 @@ from mmspy.utils.timing import sampling_information
 
 def stft(
     time: NDArray[np.datetime64],
-    signal: u.Quantity,
+    signal: Quantity,
     window_type: str | float | tuple = "hann",
-    window_length: u.Quantity | None = None,
+    window_length: Quantity | None = None,
     normalization: str = "spectrum",
 ) -> tuple:
     r"""Short-time Fourier transform with `scipy.signal.ShortTimeFFT`.
@@ -45,7 +45,7 @@ def stft(
 
     """
     time = time.astype("datetime64[ns]")
-    signal = u.Quantity(signal)
+    signal = Quantity(signal)
 
     # Unpack and do sanity check on sampling information
     sampling = sampling_information(time)
@@ -86,7 +86,7 @@ def stft(
 def xr_stft(
     signal: xr.DataArray,
     window_type: str | float | tuple = "hann",
-    window_length: u.Quantity | None = None,
+    window_length: Quantity | None = None,
     normalization: str = "spectrum",
 ) -> xr.DataArray:
     r"""Xarray wrapper for `mmsws.computation.time_frequency.stft` routine.
