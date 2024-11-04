@@ -458,6 +458,27 @@ files = [
 ]
 
 [[package]]
+name = "cf_xarray"
+version = "0.1.dev441+gf1ec6e5"
+description = "A convenience wrapper for using CF attributes on xarray objects"
+optional = false
+python-versions = ">=3.10"
+files = []
+develop = false
+
+[package.dependencies]
+xarray = ">=2022.03.0"
+
+[package.extras]
+all = ["matplotlib", "pint (>=0.18,!=0.24.0)", "pooch", "regex", "rich", "shapely"]
+
+[package.source]
+type = "git"
+url = "https://github.com/tien-vo/cf-xarray.git"
+reference = "bugfix/unit-alias-conflict"
+resolved_reference = "f1ec6e5a54e89f2a6f14b48060baec09bab90d20"
+
+[[package]]
 name = "cffi"
 version = "1.17.1"
 description = "Foreign Function Interface for Python calling C code."
@@ -4540,4 +4561,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "aec1e74fde9b26d8ac757b30c859c0696b7ebd9d12350ce643d5d11766993fbc"
+content-hash = "fba3f918e14c58bbf07c433503f4a40d32f44eaab6a6a903cda89d024478bc90"
