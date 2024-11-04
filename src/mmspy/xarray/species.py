@@ -1,14 +1,14 @@
 r"""Provide xarray accessor for species information."""
 
-__all__ = [
-    "SpeciesAccessor",
-]
+__all__ = ["SpeciesAccessor"]
 
 from typing import Generic
 
 import xarray as xr
-from pint_xarray import unit_registry as u
 from xarray.core.types import T_Xarray
+from pint import Quantity
+
+from mmspy.pint import unit_registry as u
 
 
 @xr.register_dataset_accessor("species")
@@ -32,7 +32,7 @@ class SpeciesAccessor(Generic[T_Xarray]):
         self._name: str | None = None
 
     @property
-    def species_options(self) -> dict[str, dict[str, u.Quantity]]:
+    def species_options(self) -> dict[str, dict[str, Quantity]]:
         r"""Return supported species options."""
         return {
             "ion": {
@@ -82,7 +82,7 @@ class SpeciesAccessor(Generic[T_Xarray]):
         self._name = name
 
     @property
-    def mass(self) -> u.Quantity:
+    def mass(self) -> Quantity:
         r"""Return the mass of the species."""
         if self.name not in self.species_options:
             msg = "Species unidentified."
@@ -91,7 +91,7 @@ class SpeciesAccessor(Generic[T_Xarray]):
         return self.species_options[self.name]["mass"]
 
     @property
-    def charge(self) -> u.Quantity:
+    def charge(self) -> Quantity:
         r"""Return the charge of the species."""
         if self.name not in self.species_options:
             msg = "Species unidentified."
