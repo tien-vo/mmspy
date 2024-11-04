@@ -11,7 +11,26 @@ from collections.abc import Sequence
 import xarray as xr
 
 from mmspy.utils.timing import match_time_resolution
-from mmspy.xarray.units import has_equivalent_units
+
+
+def _has_equivalent_units(list_of_array: Sequence[xr.DataArray]) -> bool:
+    r"""Check if a sequence of `DataArray` has compatible units.
+
+    Parameters
+    ----------
+    list_of_array : sequence of DataArray
+        Sequence of arrays with units
+
+    Returns
+    -------
+    result : bool
+        True if all elements can be converted to one another
+
+    """
+    units = list_of_array[0].pint.units
+    return all(
+        array.pint.units.is_compatible_with(units) for array in list_of_array
+    )
 
 
 def _validate_input(list_of_xarrays: Sequence[xr.DataArray]) -> None:
@@ -24,7 +43,7 @@ def _validate_input(list_of_xarrays: Sequence[xr.DataArray]) -> None:
     if len(list_of_xarrays) != expected_length:
         msg = "Input quantity must be 4-point measurements"
         raise ValueError(msg)
-    if not has_equivalent_units(list_of_xarrays):
+    if not _has_equivalent_units(list_of_xarrays):
         msg = "Input quantity have incompatible units"
         raise ValueError(msg)
 
