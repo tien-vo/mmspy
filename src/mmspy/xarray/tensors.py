@@ -40,7 +40,10 @@ class RankOneAccessor:
     @property
     def magnitude(self) -> xr.DataArray:
         r"""Return the magnitude of the vector."""
-        return vector_norm(self._vector, dim="space_rank_1")
+        return vector_norm(
+            self._vector.pint.dequantify(),
+            dim="space_rank_1",
+        )
 
     def component(self, component: str) -> xr.DataArray:
         r"""Return the component of the vector."""

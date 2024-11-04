@@ -10,15 +10,11 @@ __all__ = [
     "api",
     "computation",
     "models",
+    "units",
     "utils",
-    "xarray",
 ]
 __version__ = version("mmspy")
 
-import pint_xarray
-import xarray as xr
-
-xr.set_options(keep_attrs=True)
-pint_xarray.unit_registry.formatter.default_format = "~P"
-
-from mmspy import api, computation, logging, models, utils, xarray
+import mmspy.xarray
+from mmspy.pint import units
+from mmspy import api, computation, logging, models, utils
