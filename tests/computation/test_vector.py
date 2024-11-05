@@ -13,12 +13,17 @@ from mmspy.computation.vector import (
 )
 
 
-def random_nd_vector(n):
+def random_vector(n):
     r"""Generate a random array of 100 nd vectors."""
     return xr.DataArray(
         data=da.random.uniform(low=-10.0, high=10.0, size=(10, 10, n)),
         dims=("dim_1", "dim_2", "space"),
     )
+
+
+def random_qvector(n):
+    r"""Generate a random quantified array of 100 nd vectors."""
+    return random_vector(n).pint.quantify("km")
 
 
 def random_quaternion():
@@ -38,10 +43,16 @@ def random_matrix(n):
     )
 
 
+def random_qmatrix(n):
+    r"""Generate a random quantified array of 100 nxn matrices."""
+    return random_matrix(n).pint.quantify("km")
+
+
 @pytest.mark.parametrize("n", range(1, 6))
-def test_nd_vector_norm(n):
+@pytest.mark.parametrize("generate", [random_vector, random_qvector])
+def test_vector_norm(n, generate):
     r"""Compare results from `xr.apply_ufunc` and manual calculations."""
-    vector = random_nd_vector(n)
+    vector = generate(n)
 
     norm_cal = vector_norm(vector, dim="space")
     norm_ref = da.linalg.norm(vector.data, axis=-1)
@@ -49,12 +60,13 @@ def test_nd_vector_norm(n):
 
 
 @pytest.mark.parametrize("n", range(3, 6))
-def test_matrix_multiplication(n):
+@pytest.mark.parametrize("generate", [random_matrix, random_qmatrix])
+def test_matrix_multiplication(n, generate):
     r"""Compare results with manual calculations using `np.matmul`."""
-    matrix_1 = random_matrix(n)
-    matrix_2 = random_matrix(n)
+    matrix_1 = generate(n)
+    matrix_2 = generate(n)
 
-    matrix_ref = da.matmul(matrix_1, matrix_2)
+    matrix_ref = np.matmul(matrix_1.data, matrix_2.data)
     matrix_cal = matrix_multiply(
         matrix_1,
         matrix_2,
