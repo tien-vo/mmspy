@@ -7,6 +7,7 @@ __all__ = [
     "interpolate_3d_distribution",
     "smooth_distribution",
     "cwt",
+    "cross",
     "fft",
     "icwt",
     "stft",
@@ -38,4 +39,10 @@ from .transform import (
     quaternion_rotate,
     rotation_matrix,
 )
-from .vector import matrix_multiply, quaternion_conjugate, quaternion_dot, vector_norm
+from .vector import (
+    cross,
+    matrix_multiply,
+    quaternion_conjugate,
+    quaternion_dot,
+    vector_norm,
+)

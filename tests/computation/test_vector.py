@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 from mmspy.computation.vector import (
+    cross,
     matrix_multiply,
     quaternion_conjugate,
     quaternion_dot,
@@ -46,6 +47,21 @@ def random_matrix(n):
 def random_qmatrix(n):
     r"""Generate a random quantified array of 100 nxn matrices."""
     return random_matrix(n).pint.quantify("km")
+
+
+@pytest.mark.parametrize("generate", [random_vector, random_qvector])
+def test_cross_product(generate):
+    r"""Compare results from `xr.apply_ufunc` and manual calculations."""
+    vector_1 = generate(3)
+    vector_2 = generate(3)
+
+    cross_cal = cross(vector_1, vector_2, dim="space")
+    cross_ref = np.cross(
+        vector_1.data.compute(),
+        vector_2.data.compute(),
+        axis=-1,
+    )
+    assert (cross_cal == cross_ref).all()
 
 
 @pytest.mark.parametrize("n", range(1, 6))

@@ -1,6 +1,7 @@
 r"""Provides functionality for vector-related calculations."""
 
 __all__ = [
+    "cross",
     "vector_norm",
     "matrix_multiply",
     "quaternion_dot",
@@ -13,6 +14,53 @@ import numpy as np
 import xarray as xr
 from xarray.core.types import Dims
 
+from mmspy.units import registry as u
+from mmspy.utils.units import is_quantified
+
+
+def cross(
+    vector_1: xr.DataArray,
+    vector_2: xr.DataArray,
+    dim: Dims,
+) -> xr.DataArray:
+    r"""Calculate the cross product using `np.cross`.
+
+    .. todo:: Open issue regarding pint units and dask.
+    .. todo:: Check input dimensions and coordinates.
+
+    Parameters
+    ----------
+    vector_1 : DataArray
+        Vector 1.
+    vector_2 : DataArray
+        Vector 2.
+    dim : Dims
+        Which dimension to apply the function to.
+
+    Returns
+    -------
+    cross : DataArray
+        Cross product of ``vector_1`` and ``vector_2``.
+
+    """
+    quantified = is_quantified(vector_1)
+    vector_1 = vector_1.pint.dequantify() if quantified else vector_1
+    vector_2 = vector_2.pint.dequantify() if quantified else vector_2
+    vector = xr.apply_ufunc(
+        np.cross,
+        vector_1,
+        vector_2,
+        input_core_dims=[[dim], [dim]],
+        output_core_dims=[[dim]],
+        dask="parallelized",
+        output_dtypes=[np.result_type(vector_1, vector_2)],
+    )
+    return (
+        vector.pint.quantify(u.Unit(vector_1.units) * u.Unit(vector_2.units))
+        if quantified
+        else vector
+    )
+
 
 def vector_norm(
     vector: xr.DataArray,
@@ -24,25 +72,29 @@ def vector_norm(
     Parameters
     ----------
     vector : DataArray
-        Vector
+        Vector.
     dim : Dims
-        Which dimension to apply the function to
+        Which dimension to apply the function to.
     order : non-zero int, inf, -inf, 'fro', 'nuc', optional
-        Order of the norm. See documentation for `~numpy.linalg.norm`
+        Order of the norm. See documentation for `~numpy.linalg.norm`.
 
     Returns
     -------
     norm : DataArray
-        Norm of the vector
+        Norm of ``vector``.
 
     """
-    return xr.apply_ufunc(
+    quantified = is_quantified(vector)
+    vector = vector.pint.dequantify() if quantified else vector
+    norm = xr.apply_ufunc(
         np.linalg.norm,
         vector,
         input_core_dims=[[dim]],
         kwargs={"ord": order, "axis": -1},
-        dask="allowed",
+        dask="parallelized",
+        output_dtypes=[vector.dtype],
     )
+    return norm.pint.quantify() if quantified else norm
 
 
 def matrix_multiply(
@@ -52,45 +104,56 @@ def matrix_multiply(
 ) -> xr.DataArray:
     r"""Multiply two matrices using `np.linalg.norm`.
 
+    .. todo:: Add logical check for matrix types and quantification.
+
     Parameters
     ----------
     matrix_1 : DataArray
-        Matrix
+        Matrix 1.
     matrix_2 : DataArray
-        Matrix
+        Matrix 2.
     dims : Dims
-        Which dimension to apply the function to
+        Which dimensions to apply the function to.
 
     Returns
     -------
     matrix : DataArray
-        Multiplication result
+        Multiplication between ``matrix_1`` and ``matrix_2``.
 
     """
-    return xr.apply_ufunc(
+    quantified = is_quantified(matrix_1)
+    matrix_1 = matrix_1.pint.dequantify() if quantified else matrix_1
+    matrix_2 = matrix_2.pint.dequantify() if quantified else matrix_2
+    matrix = xr.apply_ufunc(
         np.matmul,
         matrix_1,
         matrix_2,
         input_core_dims=[dims, dims],
         output_core_dims=[dims],
-        dask="allowed",
+        dask="parallelized",
+        output_dtypes=[np.result_type(matrix_1, matrix_2)],
+    )
+    return (
+        matrix.pint.quantify(u.Unit(matrix_1.units) * u.Unit(matrix_2.units))
+        if quantified
+        else matrix
     )
 
 
 def quaternion_dot(q1: xr.DataArray, q2: xr.DataArray) -> xr.DataArray:
     r"""Quaternion dot.
 
-    Compute the multiplication of two quaternions
+    Compute the multiplication of two quaternions.
 
     Parameters
     ----------
     q1, q2 : DataArray
-        Quaternions
+        Quaternions.
 
     Returns
     -------
     q : DataArray
-        Resulting quaternion
+        Resulting quaternion.
 
     """
     a1 = q1.sel(quaternion="w").reset_coords(drop=True)
