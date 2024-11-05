@@ -11,7 +11,6 @@ from typing import Sequence
 
 import numpy as np
 import xarray as xr
-from numpy.typing import NDArray
 from xarray.core.types import Dims
 
 
@@ -75,44 +74,6 @@ def matrix_multiply(
         input_core_dims=[dims, dims],
         output_core_dims=[dims],
         dask="allowed",
-    )
-
-
-def inverse_matrix(matrix: xr.DataArray) -> xr.DataArray:
-    r"""Calculate the inverse of an nxn matrix using `np.linalg.inv`.
-
-    Parameters
-    ----------
-    matrix : DataArray
-        Matrix that has at least two dimensions of "space_i", "space_j"
-
-    Returns
-    -------
-    inversed_matrix : DataArray
-        Inversed matrix
-
-    """
-
-    def _inverse(data: NDArray) -> NDArray:
-        inversed_matrix = np.linalg.inv(data.squeeze())
-        return np.expand_dims(inversed_matrix, axis=other_axes)
-
-    matrix = matrix.copy()
-    other_dims = tuple(
-        filter(lambda item: item not in ["space_i", "space_j"], matrix.dims),
-    )
-    matrix = matrix.transpose("space_i", "space_j", *other_dims)  # type: ignore
-    matrix = matrix.chunk({dim: 1 for dim in other_dims})
-    other_axes = matrix.get_axis_num(other_dims)
-
-    return xr.DataArray(
-        name=matrix.name,
-        data=matrix.data.map_blocks(
-            _inverse,
-            meta=np.array((), dtype=matrix.dtype),
-        ),
-        coords=matrix.coords,
-        attrs=matrix.attrs,
     )
 
 

@@ -1,13 +1,11 @@
 r"""Tests for vector-related computations."""
 
+import dask.array as da
 import numpy as np
 import pytest
-import quaternionic
 import xarray as xr
-import dask.array as da
 
 from mmspy.computation.vector import (
-    inverse_matrix,
     matrix_multiply,
     quaternion_conjugate,
     quaternion_dot,
@@ -51,19 +49,6 @@ def test_nd_vector_norm(n):
 
 
 @pytest.mark.parametrize("n", range(3, 6))
-def test_matrix_inversion(n):
-    r"""Compare results from `xr.apply_ufunc` and manual calculations."""
-    M = random_matrix(n)
-    M_inv_cal = inverse_matrix(M)
-
-    for i in range(M.sizes["dim_1"]):
-        for j in range(M.sizes["dim_2"]):
-            M_inv_ref = da.linalg.inv(M.isel(dim_1=i, dim_2=j).data)
-
-            assert (M_inv_ref == M_inv_cal.isel(dim_1=i, dim_2=j)).all()
-
-
-@pytest.mark.parametrize("n", range(3, 6))
 def test_matrix_multiplication(n):
     r"""Compare results with manual calculations using `np.matmul`."""
     M1 = random_matrix(n)
@@ -80,6 +65,8 @@ def test_matrix_multiplication(n):
 
 def test_quaternion_dot():
     r"""Compare results with manual calculations using `quaternionic`."""
+    quaternionic = pytest.importorskip("quaternionic")
+
     q1 = random_quaternion()
     q2 = random_quaternion()
     qdot_cal = quaternion_dot(q1, q2)
@@ -93,6 +80,8 @@ def test_quaternion_dot():
 
 def test_quaternion_conjugate():
     r"""Compare results with manual calculations using `quaternionic`."""
+    quaternionic = pytest.importorskip("quaternionic")
+
     q = random_quaternion()
 
     qconjugate_cal = quaternion_conjugate(q)
