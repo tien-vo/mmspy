@@ -10,7 +10,7 @@ __all__ = [
 import numpy as np
 import xarray as xr
 
-from mmspy.computation.vector import quaternion_conjugate, quaternion_dot
+from mmspy.computation.vector import cross, quaternion_conjugate, quaternion_dot
 from mmspy.utils.timing import match_time_resolution
 
 
@@ -20,8 +20,8 @@ def rotation_matrix(
 ) -> xr.DataArray:
     r"""Rotation matrix.
 
-    Construct a rotation matrix into a frame spanned by
-    B = {V1xV2, V2x(V1xV2), V2} basis elements
+    Construct a rotation matrix into a frame spanned by the basis
+    B = {V1xV2, V2x(V1xV2), V2}.
 
     Parameters
     ----------
@@ -33,16 +33,16 @@ def rotation_matrix(
     Returns
     -------
     matrix : DataArray
-        Rotation matrix A -> B
+        Rotation matrix to transform from frame A -> B.
 
     """
     vector_1 = vector_1.copy()
     vector_2 = vector_2.copy()
 
     e3 = vector_2 / vector_2.rank_1.magnitude
-    e1 = xr.cross(vector_1, vector_2, dim="space_rank_1")
+    e1 = cross(vector_1, vector_2, dim="space_rank_1")
     e1 = e1 / e1.rank_1.magnitude  # type: ignore
-    e2 = xr.cross(e3, e1, dim="space_rank_1")
+    e2 = cross(e3, e1, dim="space_rank_1")
 
     matrix = (
         xr.combine_nested(

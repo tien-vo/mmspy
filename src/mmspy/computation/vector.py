@@ -43,9 +43,12 @@ def cross(
         Cross product of ``vector_1`` and ``vector_2``.
 
     """
-    quantified = is_quantified(vector_1)
-    vector_1 = vector_1.pint.dequantify() if quantified else vector_1
-    vector_2 = vector_2.pint.dequantify() if quantified else vector_2
+    if quantified := is_quantified(vector_1) | is_quantified(vector_2):
+        vector_1 = vector_1.pint.dequantify()
+        vector_2 = vector_2.pint.dequantify()
+        unit_1 = u.Unit(getattr(vector_1, "units", ""))
+        unit_2 = u.Unit(getattr(vector_2, "units", ""))
+
     vector = xr.apply_ufunc(
         np.cross,
         vector_1,
@@ -55,11 +58,7 @@ def cross(
         dask="parallelized",
         output_dtypes=[np.result_type(vector_1, vector_2)],
     )
-    return (
-        vector.pint.quantify(u.Unit(vector_1.units) * u.Unit(vector_2.units))
-        if quantified
-        else vector
-    )
+    return vector.pint.quantify(unit_1 * unit_2) if quantified else vector
 
 
 def vector_norm(
@@ -85,7 +84,10 @@ def vector_norm(
 
     """
     quantified = is_quantified(vector)
-    vector = vector.pint.dequantify() if quantified else vector
+    if quantified := is_quantified(vector):
+        vector = vector.pint.dequantify()
+        unit = u.Unit(getattr(vector, "units", ""))
+
     norm = xr.apply_ufunc(
         np.linalg.norm,
         vector,
@@ -94,7 +96,7 @@ def vector_norm(
         dask="parallelized",
         output_dtypes=[vector.dtype],
     )
-    return norm.pint.quantify() if quantified else norm
+    return norm.pint.quantify(unit) if quantified else norm
 
 
 def matrix_multiply(
@@ -121,9 +123,12 @@ def matrix_multiply(
         Multiplication between ``matrix_1`` and ``matrix_2``.
 
     """
-    quantified = is_quantified(matrix_1)
-    matrix_1 = matrix_1.pint.dequantify() if quantified else matrix_1
-    matrix_2 = matrix_2.pint.dequantify() if quantified else matrix_2
+    if quantified := is_quantified(matrix_1) | is_quantified(matrix_2):
+        matrix_1 = matrix_1.pint.dequantify()
+        matrix_2 = matrix_2.pint.dequantify()
+        unit_1 = u.Unit(getattr(matrix_1, "units", ""))
+        unit_2 = u.Unit(getattr(matrix_2, "units", ""))
+
     matrix = xr.apply_ufunc(
         np.matmul,
         matrix_1,
@@ -133,11 +138,7 @@ def matrix_multiply(
         dask="parallelized",
         output_dtypes=[np.result_type(matrix_1, matrix_2)],
     )
-    return (
-        matrix.pint.quantify(u.Unit(matrix_1.units) * u.Unit(matrix_2.units))
-        if quantified
-        else matrix
-    )
+    return matrix.pint.quantify(unit_1 * unit_2) if quantified else matrix
 
 
 def quaternion_dot(q1: xr.DataArray, q2: xr.DataArray) -> xr.DataArray:
