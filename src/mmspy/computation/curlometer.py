@@ -10,6 +10,7 @@ from collections.abc import Sequence
 
 import xarray as xr
 
+from mmspy.computation.vector import cross
 from mmspy.utils.timing import match_time_resolution
 
 
@@ -104,15 +105,15 @@ def curlometer(
     R_14 = R4 - R1
 
     # Calculate reciprocal vectors
-    numerator = xr.cross(R_13, R_14, dim="space_rank_1")
+    numerator = cross(R_13, R_14, dim="space_rank_1")
     denumerator = xr.dot(R_12, numerator, dim="space_rank_1")
     k2 = numerator / denumerator
 
-    numerator = xr.cross(R_12, R_14, dim="space_rank_1")
+    numerator = cross(R_12, R_14, dim="space_rank_1")
     denumerator = xr.dot(R_13, numerator, dim="space_rank_1")
     k3 = numerator / denumerator
 
-    numerator = xr.cross(R_12, R_13, dim="space_rank_1")
+    numerator = cross(R_12, R_13, dim="space_rank_1")
     denumerator = xr.dot(R_14, numerator, dim="space_rank_1")
     k4 = numerator / denumerator
     k1 = -k2 - k3 - k4
@@ -148,10 +149,10 @@ def curlometer(
                     + xr.dot(k4, Q4, **kw)
                 ).pint.quantify(Q_unit / R_unit),
                 f"curl_{name}": (  # type: ignore[union-attr]
-                    xr.cross(k1, Q1, **kw)
-                    + xr.cross(k2, Q2, **kw)
-                    + xr.cross(k3, Q3, **kw)
-                    + xr.cross(k4, Q4, **kw)
+                    cross(k1, Q1, **kw)
+                    + cross(k2, Q2, **kw)
+                    + cross(k3, Q3, **kw)
+                    + cross(k4, Q4, **kw)
                 ).pint.quantify(Q_unit / R_unit),
             },
         )
