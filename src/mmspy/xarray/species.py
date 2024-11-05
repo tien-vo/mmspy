@@ -5,10 +5,10 @@ __all__ = ["SpeciesAccessor"]
 from typing import Generic
 
 import xarray as xr
-from xarray.core.types import T_Xarray
 from pint import Quantity
+from xarray.core.types import T_Xarray
 
-from mmspy.pint import unit_registry as u
+from mmspy.units import registry as u
 
 
 @xr.register_dataset_accessor("species")
