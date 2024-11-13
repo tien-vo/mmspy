@@ -1,0 +1,13 @@
+#+
+# Units related to the particle velocity distribution function and its moments
+# as defined in Table D.2 of Wuest et al. (2007), "Calibration of Particle
+# Instruments in Space Physics". ISSI Report, SR-007.
+#
+# Author: Tien Vo
+#-
+
+[number_density] = [] / [length]**3
+[number_flux] = [] / [area] / [time]
+[energy_flux] = [energy] * [] / [area] / [time]
+[fluence] = [] / [area]
+[phase_space_density] = [number_density] / [velocity]**3
