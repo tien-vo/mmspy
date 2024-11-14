@@ -66,6 +66,7 @@ def cartesian_to_fac(
     reference_vector: xr.DataArray = xr.DataArray(
         np.array([1, 0, 0], dtype="f4"),
         coords={"space_rank_1": ["x", "y", "z"]},
+        attrs={"units": ""},
     ),
     average: bool = True,
 ) -> xr.DataArray:
@@ -115,6 +116,7 @@ def fac_to_cartesian(
     reference_vector: xr.DataArray = xr.DataArray(
         np.array([1, 0, 0], dtype="f4"),
         coords={"space_rank_1": ["x", "y", "z"]},
+        attrs={"units": ""},
     ),
     average: bool = True,
 ) -> xr.DataArray:
