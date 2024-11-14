@@ -59,8 +59,6 @@ def match_time_resolution(
         Interpolated data that match the time resolution of `data_reference`
 
     """
-    data = data.copy()
-
     if not isinstance(target, (xr.DataArray, Quantity)):
         msg = "'target' must be an xarray or pint quantity."
         raise ValueError(msg)
@@ -79,6 +77,7 @@ def match_time_resolution(
             target_resolution,
         ).astype("datetime64[ns]")
 
+    data = data.copy()
     if quantified := is_quantified(data):
         data = data.pint.dequantify()
 
