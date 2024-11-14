@@ -12,10 +12,10 @@ from typing import Sequence
 
 import numpy as np
 import xarray as xr
+from pint import application_registry as u
 from xarray.core.types import Dims
 
-from mmspy.units import registry as u
-from mmspy.utils.units import is_quantified
+from mmspy.units import is_quantified
 
 
 def cross(
@@ -43,7 +43,7 @@ def cross(
         Cross product of ``vector_1`` and ``vector_2``.
 
     """
-    if quantified := is_quantified(vector_1) | is_quantified(vector_2):
+    if quantified := (is_quantified(vector_1) | is_quantified(vector_2)):
         vector_1 = vector_1.pint.dequantify()
         vector_2 = vector_2.pint.dequantify()
         unit_1 = u.Unit(getattr(vector_1, "units", ""))
