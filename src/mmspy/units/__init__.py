@@ -7,7 +7,6 @@ __all__ = [
     "registry",
 ]
 
-
 import pint
 import pint_xarray
 
