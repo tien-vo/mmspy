@@ -1,27 +1,19 @@
-r"""Define utility functions for unit registry definition."""
+r"""Preprocessors for unit strings."""
 
 __all__ = [
-    "_get_cache_path",
-    "_attach_exponential_symbol",
+    "_get_fits_units_processor",
 ]
 
 import functools
 import re
 from collections.abc import Callable
-from pathlib import Path
 
 
-def _get_cache_path() -> Path:
-    r"""Define and set up cache directory."""
-    path = Path("~").expanduser() / ".cache" / "mmspy" / "units"
-    path.mkdir(parents=True, exist_ok=True)
-    return path
-
-
-def _attach_exponential_symbol() -> Callable[[str], str]:
+def _get_fits_units_processor() -> Callable[[str], str]:
     r"""Attach '**' to unit strings.
 
-    Adopted from ``cf-xarray`` [1]_.
+    Adopted from ``cf-xarray`` [1]_. FITS-compliant unit strings, for
+    example, 'cm-2 s-1 keV-1' parses as 'cm**(-2) s**(-1) keV**(-1)'.
 
     References
     ----------

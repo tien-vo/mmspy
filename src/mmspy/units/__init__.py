@@ -1,20 +1,27 @@
 r"""Provide unit support with `pint`."""
 
-from importlib.resources import files
+__all__ = [
+    "CACHE_DIR",
+    "PARTICLE_UNITS",
+    "is_quantified",
+    "registry",
+]
+
 
 import pint
 import pint_xarray
 
-from mmspy.units._format import fits_formatter, latex_formatter
-from mmspy.units._utils import _attach_exponential_symbol, _get_cache_path
+import mmspy.units._formatters
+from mmspy.units._path import CACHE_DIR, PARTICLE_UNITS, is_quantified
+from mmspy.units._preprocessors import _get_fits_units_processor
 
 registry = pint.UnitRegistry(
     force_ndarray_like=True,
     autoconvert_offset_to_baseunit=True,
-    cache_folder=_get_cache_path(),
-    preprocessors=[_attach_exponential_symbol()],
+    cache_folder=CACHE_DIR,
+    preprocessors=[_get_fits_units_processor()],
 )
 registry.formatter.default_format = "fits"
 registry.setup_matplotlib()
-registry.load_definitions(str(files("mmspy.units") / "data" / "particle.txt"))
+registry.load_definitions(str(PARTICLE_UNITS))
 pint.set_application_registry(registry)
