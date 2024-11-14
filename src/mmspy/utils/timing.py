@@ -12,8 +12,9 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from numpy.typing import NDArray
-from xarray.core.types import T_Xarray
 from pint import Quantity
+
+from mmspy.units import is_quantified
 
 
 def force_odd(number: int) -> int:
@@ -34,11 +35,11 @@ def force_odd(number: int) -> int:
 
 
 def match_time_resolution(
-    data: T_Xarray,
-    target: T_Xarray | Quantity,
+    data: xr.DataArray,
+    target: xr.DataArray | Quantity,
     average: bool = False,
     kwargs: dict[str, Any] = {"fill_value": np.nan, "bounds_error": False},
-) -> T_Xarray:
+) -> xr.DataArray:
     r"""Match time resolution onto a target time resolution.
 
     Parameters
@@ -78,16 +79,24 @@ def match_time_resolution(
             target_resolution,
         ).astype("datetime64[ns]")
 
-    if not average:
-        return data.interp(time=time, kwargs=kwargs)
+    if quantified := is_quantified(data):
+        data = data.pint.dequantify()
 
-    data_resolution = pd.Timedelta(data.time.diff("time").min().values)
-    window_length = force_odd(max(1, int(data_resolution / target_resolution)))
+    if average:
+        data_resolution = pd.Timedelta(data.time.diff("time").min().values)
+        window = force_odd(max(1, int(data_resolution / target_resolution)))
+        interpolated_data = (
+            data.rolling(time=window, center=True)
+            .mean()
+            .interp(time=time, kwargs=kwargs)
+        )
+    else:
+        interpolated_data = data.interp(time=time, kwargs=kwargs)
 
     return (
-        data.rolling(time=window_length, center=True)
-        .mean()
-        .interp(time=time, kwargs=kwargs)
+        interpolated_data
+        if not quantified
+        else interpolated_data.pint.quantify()
     )
 
 
