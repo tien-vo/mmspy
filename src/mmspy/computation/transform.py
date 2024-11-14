@@ -12,6 +12,7 @@ import xarray as xr
 
 from mmspy.computation.vector import cross, quaternion_conjugate, quaternion_dot
 from mmspy.utils.timing import match_time_resolution
+from mmspy.units import is_quantified
 
 
 def rotation_matrix(
@@ -94,20 +95,21 @@ def cartesian_to_fac(
 
     """
     da = da.copy()
-    magnetic_field = match_time_resolution(
-        magnetic_field.copy(),
-        da,
-        average=average,
-    )
+    if quantified := is_quantified(da):
+        da = da.pint.dequantify()
+
+    magnetic_field = match_time_resolution(magnetic_field, da, average=average)
     M = rotation_matrix(reference_vector, magnetic_field)
 
-    return (
+    da_fac = (
         xr.dot(M, da.rank_1.tensor, dim="space_j")
         .rename(space_i="space_rank_1")
         .assign_coords(space_rank_1=da.space_rank_1)
         .assign_attrs(da.attrs)
         .transpose(*da.dims)
     )
+
+    return da_fac if not quantified else da_fac.pint.quantify()
 
 
 def fac_to_cartesian(
@@ -144,6 +146,9 @@ def fac_to_cartesian(
 
     """
     da = da.copy()
+    if quantified := is_quantified(da):
+        da = da.pint.dequantify()
+
     magnetic_field = match_time_resolution(
         magnetic_field.copy(),
         da.time,
@@ -155,13 +160,15 @@ def fac_to_cartesian(
         .transpose(..., "space_i", "space_j")
     )
 
-    return (
+    da_cartesian = (
         xr.dot(M, da.rename(space_rank_1="space_j"), dim="space_j")
         .rename(space_i="space_rank_1")
         .assign_coords(space_rank_1=da.space_rank_1)
         .assign_attrs(da.attrs)
         .transpose(*da.dims)
     )
+
+    return da_cartesian if not quantified else da_cartesian.pint.quantify()
 
 
 def quaternion_rotate(
