@@ -54,7 +54,9 @@ def process_fgm(
     # Extract ephemeris data, interpolate onto field data, and slice
     ds_eph = ds.drop_dims("time").rename(eph_time="time")
     ds_eph = ds_eph.drop_duplicates("time").sortby("time")
-    ds_eph = match_time_resolution(ds_eph, ds.time, average=False)
+    for variable in ds_eph:
+        ds_eph[variable] = match_time_resolution(ds_eph[variable], ds.time)
+
     ds_eph = ds_eph.sel(time=slice(ds.time[0], ds.time[-1]))
 
     # Combine back into main dataset
