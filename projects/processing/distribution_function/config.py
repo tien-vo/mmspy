@@ -27,3 +27,11 @@ periods = xr.Dataset.from_dataframe(
         parse_dates=["start_date", "end_date"],
     )
 ).rename(index="period")
+
+fpi_grid = mmspy.computation.particle.grid.ParticleGrid(
+    minimum_energy=1e0,
+    maximum_energy=5e4,
+    energy_resolution=39,   # log spacing ~ 0.1515
+    zenith_resolution=19,   # spacing = 11.25 deg
+    azimuth_resolution=33,  # spacing = 11.25 deg
+)
