@@ -6,10 +6,11 @@ __all__ = [
 
 import numpy as np
 import xarray as xr
+from pint import application_registry as u
 
+from mmspy.computation.vector import cross
 from mmspy.utils.timing import match_time_resolution
-
-from ._utils import validate_dataset
+from mmspy.xarray._utils import validate_dataset
 
 
 def spherical_dot(
@@ -33,13 +34,11 @@ def spherical_dot(
         Dot product of the two vectors
 
     """
-    t1 = angle_1[0].pint.quantify().to("rad")
-    t2 = angle_2[0].pint.quantify().to("rad")
-    p1 = angle_1[1].pint.quantify().to("rad")
-    p2 = angle_2[1].pint.quantify().to("rad")
-    return (
-        np.sin(t1) * np.sin(t2) * np.cos(p1 - p2) + np.cos(t1) * np.cos(t2)
-    ).pint.dequantify()
+    t1 = angle_1[0].pint.to("rad")
+    t2 = angle_2[0].pint.to("rad")
+    p1 = angle_1[1].pint.to("rad")
+    p2 = angle_2[1].pint.to("rad")
+    return np.sin(t1) * np.sin(t2) * np.cos(p1 - p2) + np.cos(t1) * np.cos(t2)
 
 
 def spherical_angle(vector: xr.DataArray) -> tuple[xr.DataArray, xr.DataArray]:
@@ -66,11 +65,7 @@ def spherical_angle(vector: xr.DataArray) -> tuple[xr.DataArray, xr.DataArray]:
     v_mag = np.sqrt(vx**2 + vy**2 + vz**2)
 
     theta = np.degrees(np.arccos(vz / v_mag))
-    theta.attrs.update(units="deg")
-
-    phi = np.degrees(np.arctan2(vy, vx)) % 360.0
-    phi.attrs.update(units="deg")
-
+    phi = np.degrees(np.arctan2(vy, vx)) % u("360.0 deg")
     return (theta, phi)
 
 
@@ -93,6 +88,7 @@ class FpiAccessor:
     def correct_for_spacecraft_potential(
         self,
         spacecraft_potential: xr.DataArray,
+        average: bool = True,
     ) -> xr.Dataset:
         r"""Subtract spacecraft potential from the recorded energy.
 
@@ -100,6 +96,8 @@ class FpiAccessor:
         ----------
         spacecraft_potential: DataArray
             Potential from EDP scpot data
+        average : bool
+            Whether to average the potential down to FPI resolution.
 
         Returns
         -------
@@ -109,18 +107,23 @@ class FpiAccessor:
         """
         ds = self._ds.copy()
 
-        Phi = match_time_resolution(
-            spacecraft_potential.pint.dequantify(),
+        V_sc = match_time_resolution(
+            spacecraft_potential,
             ds.time,
-        ).pint.quantify()
-        Phi = (ds.species.charge * Phi).pint.to(ds.W.pint.units)
+            average=average,
+        )
+        V_sc = xr.DataArray(
+            name=V_sc.name,
+            data=V_sc.data.to("energy_unit", species := ds.species.name),
+            dims=V_sc.dims,
+            coords=V_sc.coords,
+            attrs=V_sc.attrs,
+        )
 
-        if ds.species.name == "elc":
-            dims = ds.f.dims
-            f = xr.where(np.abs(Phi) < ds.W, ds.f, 0.0).transpose(*dims)
-            ds = ds.assign(f=(dims, f.data, ds.f.attrs))
+        if species == "elc":
+            ds = ds.assign(f=xr.where(np.abs(V_sc) < ds.W, ds.f, 0.0))
 
-        ds = ds.assign(W=ds.W + Phi)
+        ds = ds.assign(W=ds.W + V_sc)
         ds.W.attrs["VAR_NOTES"] += "; Adjusted for spacecraft potential"
 
         return ds
@@ -129,9 +132,10 @@ class FpiAccessor:
         self,
         magnetic_field: xr.DataArray,
         reference_vector: xr.DataArray = xr.DataArray(
-            np.array([1, 0, 0], dtype="f4"),
+            np.array([0, 1, 0], dtype="f4"),
             coords={"space_rank_1": ["x", "y", "z"]},
-        ),
+        ).pint.quantify("dimensionless"),
+        average: bool = True,
     ) -> xr.Dataset:
         r"""Add field aligned coordinates.
 
@@ -146,8 +150,8 @@ class FpiAccessor:
             A reference vector used to construct an orthogonal triad
             for FAC (typically one mostly perpendicular to the magnetic
             field)
-        spatial_dimension : str
-            Name of spatial dimension
+        average : bool
+            Whether to average the magnetic field down to FPI resolution.
 
         Returns
         -------
@@ -158,21 +162,16 @@ class FpiAccessor:
         ds = self._ds.copy()
 
         # Interpolate inputs onto ds time resolution
-        B = match_time_resolution(
-            magnetic_field.pint.dequantify(),
-            ds.time,
-        )
+        kw = {"target": ds.time, "average": average}
+        B = match_time_resolution(magnetic_field, **kw)
         if "time" in reference_vector.dims:
-            reference_vector = match_time_resolution(
-                reference_vector.pint.dequantify(),
-                ds.time,
-            )
+            reference_vector = match_time_resolution(reference_vector, **kw)
 
         # Construct unit vectors
         e3 = B / B.rank_1.magnitude
-        e1 = xr.cross(reference_vector, e3, dim="space_rank_1")
+        e1 = cross(reference_vector, e3, dim="space_rank_1")
         e1 = e1 / e1.rank_1.magnitude  # type: ignore
-        e2 = xr.DataArray(xr.cross(e3, e1, dim="space_rank_1"))
+        e2 = cross(e3, e1, dim="space_rank_1")
 
         # Calculate decomposition
         V_angle = (ds.theta_dbcs, ds.phi_dbcs)
@@ -180,13 +179,7 @@ class FpiAccessor:
         V_perp_2 = spherical_dot(V_angle, spherical_angle(e2))
         V_para = spherical_dot(V_angle, spherical_angle(e3))
 
-        ds = ds.assign(
-            B_avg=B,
-            theta_fac=np.degrees(np.arccos(V_para)),
-            phi_fac=np.degrees(np.arctan2(V_perp_2, V_perp_1)) % 360.0,
-        )
-        ds.B_avg.attrs.update(B.attrs)
-        ds.theta_fac.attrs.update(units="deg")
-        ds.phi_fac.attrs.update(units="deg")
+        theta = np.degrees(np.arccos(V_para))
+        phi = np.degrees(np.arctan2(V_perp_2, V_perp_1)) % u("360 deg")
 
-        return ds
+        return ds.assign(B_avg=B, theta_fac=theta, phi_fac=phi)
