@@ -13,7 +13,7 @@
 [phase_space_density] = [number_density] / [velocity]**3
 
 @group generic_space_plasma
-    angle_unit = rad
+    angle_unit = deg
     length_unit = km
     time_unit = s
     velocity_unit = km/s
