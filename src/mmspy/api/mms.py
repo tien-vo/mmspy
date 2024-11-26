@@ -7,7 +7,7 @@ from .request import Request
 from .sync import Synchronizer
 
 
-@define
+@define(repr=False)
 class MMS:
     r"""Manager for MMS data.
 

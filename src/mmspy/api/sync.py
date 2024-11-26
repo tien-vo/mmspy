@@ -90,6 +90,11 @@ class Synchronizer:
         query = self.query
         store_path = Path(self.store.path)
         cdf_file_list = self.request.cdf_file_list
+
+        if (number_of_files := len(cdf_file_list)) == 0:
+            msg = "Query results in zero file."
+            LOG.warning(msg)
+
         if dry_run:
             return
 
@@ -125,7 +130,7 @@ class Synchronizer:
                 f"Synchronizing {query.instrument} {query.data_type} "
                 f"({query.start_date} - {query.end_date})."
             ),
-            total=len(cdf_file_list),
+            total=number_of_files,
             position=0,
         )
         with ThreadPool(nodes=parallel) as pool, tqdm(**config) as bar:
