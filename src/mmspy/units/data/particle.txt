@@ -11,3 +11,16 @@
 [energy_flux] = [energy] * [] / [area] / [time]
 [fluence] = [] / [area]
 [phase_space_density] = [number_density] / [velocity]**3
+
+@group space_plasma
+    angle = rad
+    length = km
+    time = s
+    velocity = km/s
+    energy = eV
+    number_density = cm**(-3)
+    number_flux = cm**(-2) s**(-1)
+    energy_flux = cm**(-2) s**(-1) eV**(-1)
+    fluence = cm**(-2)
+    phase_space_density = cm**(-3) km**(-3) s**3
+@end

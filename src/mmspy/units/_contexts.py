@@ -32,6 +32,15 @@ def _get_species_properties(
     return charge, mass
 
 
+def voltage_to_energy(
+    registry: pint.UnitRegistry,
+    voltage: pint.Quantity,
+    species: str,
+) -> pint.Quantity:
+    charge, _ = _get_species_properties(species, registry)
+    return charge * voltage
+
+
 def energy_to_speed(
     registry: pint.UnitRegistry,
     energy: pint.Quantity,
@@ -92,6 +101,7 @@ ion_context = pint.Context("ion")
 elc_context = pint.Context("elc")
 
 transformations = [
+    ["[electric_potential]", "[energy]", voltage_to_energy],
     ["[energy]", "[speed]", energy_to_speed],
     ["[speed]", "[energy]", speed_to_energy],
     ["[magnetic_field]", "[frequency]", magnetic_field_to_cyclotron_frequency],
