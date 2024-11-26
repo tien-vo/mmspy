@@ -1,5 +1,7 @@
 r""".. todo:: Write docstring."""
 
+from pathlib import Path
+
 import xarray as xr
 from attr import define
 
@@ -20,7 +22,7 @@ class MMS:
     request: Request = Request(query)
     sync: Synchronizer = Synchronizer(query, request)
 
-    def load(
+    def load_dataset(
         self,
         parallel: int = 1,
         dry_run: bool = False,
@@ -43,15 +45,14 @@ class MMS:
         Returns
         -------
         ds : Dataset
-            Dataset from an MMS instrument.
+            Loaded dataset.
 
         """
-        for parameter, value in kwargs.items():
-            if value is None:
-                continue
-            setattr(self.query, parameter, value)
-
-        datasets = self.sync.sync(parallel=parallel, dry_run=dry_run)
+        datasets = self.gather_path(
+            parallel=parallel,
+            dry_run=dry_run,
+            **kwargs,
+        )
         if not bool(datasets):
             return xr.Dataset()
 
@@ -60,3 +61,33 @@ class MMS:
             return ds.pint.quantify()
 
         return ds
+
+    def gather_path(
+        self,
+        parallel: int = 1,
+        dry_run: bool = False,
+        **kwargs,
+    ) -> list[Path]:
+        r"""Gather a list of paths to datasets from an MMS instrument.
+
+        Parameters
+        ----------
+        parallel : int
+            Number of parallel threads to run the synchronizer.
+        dry_run : bool
+            Whether to stop after querying the file list.
+        kwargs : dict
+            Keyword arguments for `mmspy.api.query.Query`.
+
+        Returns
+        -------
+        paths : list of Path
+            Paths to datasets.
+
+        """
+        for parameter, value in kwargs.items():
+            if value is None:
+                continue
+            setattr(self.query, parameter, value)
+
+        return self.sync.sync(parallel=parallel, dry_run=dry_run)
