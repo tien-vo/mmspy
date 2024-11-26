@@ -72,7 +72,7 @@ def center_timestamps(ds: xr.Dataset) -> xr.Dataset:
     # dt = np.int64(0.5e9 * (ds.Epoch_plus_var - ds.Epoch_minus_var).values)
     dt = pd.Timedelta(
         0.5 * (ds.Epoch_plus_var - ds.Epoch_minus_var).values,
-        unit=ds.Epoch_plus_var.units.from_metadata.to_string(),
+        unit=ds.Epoch_plus_var.units,
     )
     with xr.set_options(keep_attrs=True):
         ds = ds.assign_coords(Epoch=ds.Epoch + dt)
@@ -324,6 +324,10 @@ def process_fpi_partial_moments(
     ds = process_cdf_metadata(ds[["P_dbcs", "P_gse", *variables.values()]])
     for variable, name in partial_moments_standard_names.items():
         ds[variable].attrs.update(standard_name=name)
+
+    # Remove flag and index units attribute to make it compliant with `pint`
+    ds.flag.attrs.update(units="")
+    ds.index.attrs.update(units="")
 
     # Force monotonic and transpose data
     ds = (

@@ -42,9 +42,9 @@ class Synchronizer:
     .. todo:: Expose API to mirror file structure exactly.
     """
 
-    query: Query
+    query: Query = field(repr=False)
 
-    request: Request
+    request: Request = field(repr=False)
 
     store: Store = field(
         default="./data.zarr",
@@ -85,38 +85,42 @@ class Synchronizer:
 
         raise NotImplementedError
 
-    def sync(self, parallel: int = 1, dry_run: bool = True) -> None:
+    def sync(self, parallel: int = 1, dry_run: bool = False) -> list[Path]:
         r"""Sync data store."""
         query = self.query
         store_path = Path(self.store.path)
         cdf_file_list = self.request.cdf_file_list
+        groups: list[Path] = []
 
         if (number_of_files := len(cdf_file_list)) == 0:
             msg = "Query results in zero file."
             LOG.warning(msg)
 
         if dry_run:
-            return
+            return groups
 
-        def _helper(cdf_file_name: str) -> None:
+        def _helper(cdf_file_name: str) -> Path | None:
             metadata = consolidate_metadata(
                 query.metadata,
                 parse_metadata_from_file_name(cdf_file_name, query.instrument),
                 store_path,
             )
 
-            if not self.update and dataset_is_updated(metadata):
-                msg = f"{cdf_file_name} is up-to-date."
-                LOG.info(msg)
-                return
+            if self.update or not dataset_is_updated(metadata):
+                temporary_file = self.request.download_file(cdf_file_name)
+                if temporary_file is None:
+                    return None
 
-            temporary_file = self.request.download_file(cdf_file_name)
-            if temporary_file is not None:
                 self.process_file(temporary_file, metadata)
                 Path(temporary_file).unlink(missing_ok=True)
 
-                msg = f"Processed {cdf_file_name}."
+                msg = f"Processed {cdf_file_name}"
                 LOG.info(msg)
+            else:
+                msg = f"{cdf_file_name} is up-to-date."
+                LOG.info(msg)
+
+            return Path(metadata["group"])
 
         for parameter in ["start_date", "end_date"]:
             if getattr(query, parameter) is None:
@@ -134,5 +138,10 @@ class Synchronizer:
             position=0,
         )
         with ThreadPool(nodes=parallel) as pool, tqdm(**config) as bar:
-            for _ in pool.uimap(_helper, cdf_file_list):
+            for group in pool.uimap(_helper, cdf_file_list):
+                if group is not None:
+                    groups.append(group)
+
                 bar.update()
+
+        return groups

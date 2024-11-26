@@ -24,7 +24,7 @@ class Request:
     .. todo:: Write docstring
     """
 
-    query: Query
+    query: Query = field(repr=False)
 
     session = requests.Session()
 
