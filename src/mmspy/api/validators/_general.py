@@ -74,7 +74,7 @@ def one_of(
 def convert_data_rate(
     query: "Query",
     attribute: Attribute,
-    data_rate: str,
+    value: str,
 ) -> None:
     r"""Convert `srvy` data rate to `fast` for selected instruments.
 
@@ -84,22 +84,27 @@ def convert_data_rate(
         `~mmspy.Query` instance in which ``time`` is defined.
     attribute : Attribute
         ``Attribute`` of ``query``.
-    data_rate : str
-        Input data rate value.
+    value : str
+        Input value for attribute.
 
     """
-    is_data_rate = attribute.name == "data_rate"
+    match attribute.name:
+        case "instrument":
+            data_rate = getattr(query, "data_rate")
+            is_edp_or_fpi = value in ["edp", "fpi"]
+        case "data_rate":
+            data_rate = value
+            is_edp_or_fpi = getattr(query, "instrument") in ["edp", "fpi"]
+        case _:
+            raise NotImplementedError
+
     is_srvy = data_rate == "srvy"
-    is_edp_or_fpi = getattr(query, "instrument") in ["edp", "fpi"]
     setattr(
         query,
         "_data_rate",
         (
             "fast"
-            if is_data_rate
-            and is_srvy
-            and is_edp_or_fpi
-            and query.convert_data_rate
+            if is_srvy and is_edp_or_fpi and query.convert_data_rate
             else data_rate
         ),
     )

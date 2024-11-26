@@ -72,7 +72,10 @@ class Query:
     instrument: str = field(
         default=None,
         converter=optional(str),
-        validator=one_of(["mec", "fgm", "edp", "fpi", "feeps"]),
+        validator=[
+            one_of(["mec", "fgm", "edp", "fpi", "feeps"]),
+            _convert_data_rate,
+        ],
     )
 
     _data_rate: str = field(
