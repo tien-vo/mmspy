@@ -32,7 +32,7 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.12,<3.13"
 tvolib = { git = "https://github.com/tien-vo/tvolib.git", rev = "4e24c30" }
 ssqueezepy = { git = "https://github.com/OverLordGoldDragon/ssqueezepy.git", rev = "fa4c720" }
 xarray = "^2024.9.0"
@@ -50,6 +50,7 @@ flox = "^0.9.13"
 attrs = "^24.2.0"
 plotly = "^5.24.1"
 pint-xarray = "^0.4"
+mip = "^1.15.0"
 
 [tool.poetry.group.develop]
 optional = true
