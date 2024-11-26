@@ -21,6 +21,7 @@ registry = pint.UnitRegistry(
     cache_folder=CACHE_DIR,
     preprocessors=[_get_fits_units_processor()],
 )
+registry.preprocessors.insert(0, str)
 registry.formatter.default_format = "fits"
 registry.setup_matplotlib()
 registry.load_definitions(str(PARTICLE_UNITS))

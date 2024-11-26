@@ -18,6 +18,7 @@
     time_unit = s
     velocity_unit = km/s
     energy_unit = eV
+    pressure_unit = nPa
     number_density_unit = cm**(-3)
     number_flux_unit = cm**(-2) s**(-1)
     energy_flux_unit = cm**(-2) s**(-1) eV**(-1)
