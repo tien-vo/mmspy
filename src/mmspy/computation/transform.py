@@ -65,7 +65,7 @@ def cartesian_to_fac(
     da: xr.DataArray,
     magnetic_field: xr.DataArray,
     reference_vector: xr.DataArray = xr.DataArray(
-        np.array([1, 0, 0], dtype="f4"),
+        np.array([0, 1, 0], dtype="f4"),
         coords={"space_rank_1": ["x", "y", "z"]},
         attrs={"units": ""},
     ),
@@ -116,7 +116,7 @@ def fac_to_cartesian(
     da: xr.DataArray,
     magnetic_field: xr.DataArray,
     reference_vector: xr.DataArray = xr.DataArray(
-        np.array([1, 0, 0], dtype="f4"),
+        np.array([0, 1, 0], dtype="f4"),
         coords={"space_rank_1": ["x", "y", "z"]},
         attrs={"units": ""},
     ),
