@@ -144,4 +144,4 @@ class Synchronizer:
 
                 bar.update()
 
-        return groups
+        return sorted(groups)
