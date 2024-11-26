@@ -2,11 +2,10 @@ r"""Provide interface for API query parameters."""
 
 __all__ = ["Query"]
 
-from itertools import product as cross
-
 import pandas as pd
 from attr import define, field
 from attr.converters import optional, pipe
+from pandas.core.tools.datetimes import DatetimeScalar
 
 from .converters import shift_date
 from .validators import convert_data_rate as _convert_data_rate
@@ -28,6 +27,7 @@ class Query:
 
     .. todo:: Clarify docstring.
     .. todo:: Attributes need docstring.
+    .. todo:: Validate query payload together, instead of separately.
 
     Parameters
     ----------
@@ -86,18 +86,9 @@ class Query:
         default=None,
         converter=optional(str),
         validator=[
-            one_of(from_metadata=True),
+            one_of(["brst", "srvy", "fast", "slow"]),
             _convert_data_rate,
         ],
-        metadata={
-            "options": {
-                "mec": ["brst", "srvy"],
-                "fgm": ["brst", "srvy"],
-                "edp": ["brst", "srvy", "fast", "slow"],
-                "fpi": ["brst", "srvy", "fast"],
-                "feeps": ["brst", "srvy"],
-            },
-        },
     )
 
     _data_type: str = field(
@@ -111,28 +102,28 @@ class Query:
         default=None,
         converter=optional(str),
         validator=[
-            one_of(from_metadata=True),
+            one_of(
+                [
+                    "bfield",
+                    "efield",
+                    "potential",
+                    "t89d",
+                    "t89q",
+                    "ts04d",
+                    "ion_distribution",
+                    "ion_moments",
+                    "ion_partial_moments",
+                    "elc_distribution",
+                    "elc_moments",
+                    "elc_partial_moments",
+                ],
+            ),
             convert_mec_data_type,
             convert_fgm_data_type,
             convert_edp_data_type,
             convert_fpi_data_type,
             convert_feeps_data_type,
         ],
-        metadata={
-            "options": {
-                "mec": ["t89d", "t89q", "ts04d"],
-                "fgm": ["bfield"],
-                "edp": ["efield", "potential"],
-                "fpi": [
-                    f"{i}_{j}"
-                    for i, j in cross(
-                        ["ion", "elc"],
-                        ["distribution", "moments", "partial_moments"],
-                    )
-                ],
-                "feeps": ["ion_distribution", "elc_distribution"],
-            },
-        },
     )
 
     data_level: str = field(
@@ -147,16 +138,15 @@ class Query:
         validator=one_of([]),
     )
 
-    start_date: pd.Timestamp = field(
+    start_date: DatetimeScalar = field(
         default=None,
         converter=pipe(optional(pd.to_datetime), shift_date),  # type: ignore[misc]
         validator=[
             time_in_range,
-            time_range_is_valid,
         ],
     )
 
-    end_date: pd.Timestamp = field(
+    end_date: DatetimeScalar = field(
         default=None,
         converter=pipe(optional(pd.to_datetime), shift_date),  # type: ignore[misc]
         validator=[
@@ -168,17 +158,17 @@ class Query:
     @property
     def payload(self) -> dict[str, str | None]:
         r"""HTTP payload constructed from query parameters."""
-        fmt = "%Y-%m-%d-%H-%M-%S"
+        fmt = "%Y-%m-%d-%H-%M-%S" if self.data_rate == "brst" else "%Y-%m-%d"
         return {
             "start_date": (
                 self.start_date
                 if self.start_date is None
-                else self.start_date.strftime(fmt)
+                else self.start_date.strftime(fmt)  # type: ignore[union-attr]
             ),
             "end_date": (
                 self.end_date
                 if self.end_date is None
-                else self.end_date.strftime(fmt)
+                else self.end_date.strftime(fmt)  # type: ignore[union-attr]
             ),
             "sc_id": self.probe,
             "instrument_id": self.instrument,
@@ -201,3 +191,24 @@ class Query:
             "data_level": self.data_level,
             "product": self.product,
         }
+
+    def __repr__(self) -> str:
+        r"""Repr for query class."""
+
+        def _or_na(arg):  # noqa: ANN001,ANN202
+            if arg is None:
+                return "N/A"
+
+            return arg
+
+        return (
+            "Query parameters:\n"
+            f"  * start_date  : {_or_na(self.start_date)}\n"
+            f"  * end_date    : {_or_na(self.end_date)}\n"
+            f"  * probe       : {_or_na(self.probe)}\n"
+            f"  * instrument  : {_or_na(self.instrument)}\n"
+            f"  * data_rate   : {_or_na(self.data_rate)}\n"
+            f"  * data_type   : {_or_na(self.data_type)}\n"
+            f"  * data_level  : {_or_na(self.data_level)}\n"
+            f"  * product     : {_or_na(self.product)}"
+        )
