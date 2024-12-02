@@ -106,7 +106,7 @@ class Request:
                         total=remote_size,
                         unit="B",
                         unit_scale=True,
-                        leave=False,
+                        position=1,
                     ),
                 ) as bar:
                     for data in response.iter_content(self.request_chunk_size):
