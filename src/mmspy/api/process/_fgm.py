@@ -51,22 +51,20 @@ def process_fgm(
     for variable, name in standard_names.items():
         ds[variable].attrs.update(standard_name=name)
 
-    # Extract ephemeris data, interpolate onto field data, and slice
-    ds_eph = ds.drop_dims("time").rename(eph_time="time")
-    ds_eph = ds_eph.drop_duplicates("time").sortby("time")
-    for variable in ds_eph:
-        ds_eph[variable] = match_time_resolution(ds_eph[variable], ds.time)
-
-    ds_eph = ds_eph.sel(time=slice(ds.time[0], ds.time[-1]))
-
-    # Combine back into main dataset
-    ds = (
-        ds.drop_dims("eph_time")
+    # Extract ephemeris data and interpolate onto field data
+    ds_eph = (
+        ds.drop_dims("time")
+        .rename(eph_time="time")
         .drop_duplicates("time")
         .sortby("time")
-        .merge(ds_eph)
-        .chunk(chunks=chunks)
     )
+
+    # Combine back into main dataset
+    ds = ds.drop_dims("eph_time").drop_duplicates("time").sortby("time")
+    for variable in ds_eph:
+        ds[variable] = match_time_resolution(ds_eph[variable], ds.time)
+
+    ds = ds.chunk(chunks=chunks)
     ds.attrs.update(
         source=metadata["cdf_file_name"],
         probe=metadata["probe"],
