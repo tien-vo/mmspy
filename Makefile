@@ -22,7 +22,7 @@ install: pyproject.toml ${POETRY_LOCK} ${CONDA_LOCK}
 		--name ${NAME} \
 		--file ${CONDA_LOCK}
 	@echo "Poetry: Installing packages from ${POETRY_LOCK} ..."
-	@${MICROMAMBA} run -n ${NAME} poetry install
+	@${MICROMAMBA} run -n ${NAME} poetry install --with=develop,docs,tests
 	@echo "Done installation!"
 
 .PHONY: clean
