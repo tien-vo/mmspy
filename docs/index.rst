@@ -1,13 +1,15 @@
-.. module:: mmspy
-
 MmsPy documentation
 ===================
 
-Intro text bla bla bla lorem ipsum bla bla.
-
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :hidden:
-   :caption: For users
 
-   API Reference <api>
+   Getting Started <getting-started/index>
+   User Guide <user/index>
+   Tutorials <tutorial/index>
+   API Reference <reference/index>
+
+**Version**: |version|
+
+Intro text here.

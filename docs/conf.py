@@ -1,13 +1,16 @@
+# ruff: noqa
 # mmspy documentation build configuration file
+
+import re
 
 import mmspy
 
 # -- Project information -----------------------------------------------------
 project = "mmspy"
-copyright = "2024, Tien Vo"
-author = "Tien Vo"
+author = "MmsPy Developers"
+copyright = f"2024, {author}"
 release = mmspy.__version__
-version = mmspy.__version__[0]
+version = re.sub(r"(\d+\.\d+)\.\d+(.*)", r"\1\2", release)
 
 # -- General configuration ---------------------------------------------------
 source_suffix = ".rst"
@@ -96,19 +99,14 @@ napoleon_type_aliases = {
 todo_include_todos = False
 
 # -- Options for HTML output -------------------------------------------------
-html_theme = "sphinx_book_theme"
+html_theme = "pydata_sphinx_theme"
 html_title = ""
 
 html_theme_options = {
-    "repository_url": "https://github.com/tien-vo/mmspy",
-    "repository_branch": "main",
-    "navigation_with_keys": False,
-    "navigation_depth": 4,
-    "path_to_docs": "docs",
-    "use_edit_page_button": True,
-    "use_repository_button": True,
-    "use_issues_button": True,
-    "home_page_in_toc": True,
+    "github_url": "https://github.com/tien-vo/mmspy",
+    "collapse_navigation": True,
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
+    "show_version_warning_banner": True,
 }
 
-html_static_path = []
+html_static_path = ["_static"]
