@@ -5,10 +5,9 @@ MmsPy documentation
    :maxdepth: 1
    :hidden:
 
-   Getting Started <getting-started/index>
-   User Guide <user/index>
-   Tutorials <tutorial/index>
-   API Reference <reference/index>
+   User Guide <user-guide/index>
+   Examples <examples/index>
+   API Reference <api-reference/index>
 
 **Version**: |version|
 
