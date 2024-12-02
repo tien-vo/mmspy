@@ -1,4 +1,4 @@
-MmsPy documentation
+mmspy documentation
 ===================
 
 .. toctree::
@@ -7,8 +7,7 @@ MmsPy documentation
 
    User Guide <user-guide/index>
    Examples <examples/index>
-   API Reference <api-reference/index>
 
 **Version**: |version|
 
-Intro text here.
+Introduction text for the package.

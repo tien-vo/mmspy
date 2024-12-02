@@ -1,11 +1,12 @@
 .. _user_guide:
 
-MmsPy user guide
+mmspy user guide
 ================
 
 .. toctree::
     :caption: Getting started
     :maxdepth: 1
 
-    what-is-mmspy
-    Installation <install>
+    What is mmspy? <getting-started/what-is-mmspy>
+    Installation <getting-started/install>
+

@@ -7,7 +7,7 @@ import mmspy
 
 # -- Project information -----------------------------------------------------
 project = "mmspy"
-author = "MmsPy Developers"
+author = "mmspy Developers"
 copyright = f"2024, {author}"
 release = mmspy.__version__
 version = re.sub(r"(\d+\.\d+)\.\d+(.*)", r"\1\2", release)
@@ -25,6 +25,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinx_automodapi.automodapi",
 ]
 templates_path = [
     "_templates",
