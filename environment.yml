@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python=3.12
   - poetry
+  - graphviz
 platforms:
   - linux-64
   - osx-64
