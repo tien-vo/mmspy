@@ -1,0 +1,4 @@
+notebooks-examples:
+  - title: Time-frequency analysis
+    path: examples/time-frequency-analysis.html
+    thumbnail: _static/examples/time-frequency-analysis/ergun+20_overview.png

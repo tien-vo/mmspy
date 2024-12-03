@@ -1,5 +1,3 @@
-.. _user_guide:
-
 mmspy user guide
 ================
 

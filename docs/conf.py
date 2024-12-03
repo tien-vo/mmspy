@@ -1,9 +1,17 @@
 # ruff: noqa
 # mmspy documentation build configuration file
 
+import logging
+import pathlib
 import re
+from textwrap import dedent, indent
+
+import yaml
+from sphinx.application import Sphinx
 
 import mmspy
+
+LOG = logging.getLogger("conf")
 
 # -- Project information -----------------------------------------------------
 project = "mmspy"
@@ -11,9 +19,10 @@ author = "mmspy Developers"
 copyright = f"2024, {author}"
 release = mmspy.__version__
 version = re.sub(r"(\d+\.\d+)\.\d+(.*)", r"\1\2", release)
+github_url = "https://github.com/tien-vo/mmspy"
 
 # -- General configuration ---------------------------------------------------
-source_suffix = ".rst"
+source_suffix = [".rst", ".md"]
 root_doc = "index"
 default_role = "py:obj"
 pygments_style = "sphinx"
@@ -25,7 +34,11 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinxcontrib.bibtex",
     "sphinx_automodapi.automodapi",
+    "nbsphinx",
+    "sphinx_copybutton",
+    "sphinx_design",
 ]
 templates_path = [
     "_templates",
@@ -99,15 +112,78 @@ napoleon_type_aliases = {
 # sphinx.ext.todo
 todo_include_todos = False
 
+# sphinxcontrib.bibtex
+bibtex_bibfiles = ["refs.bib"]
+
+# nbsphinx
+nbsphinx_timeout = 600
+nbsphinx_execute = "always"
+nbsphinx_prolog = f"""
+{{% set docname = env.doc2path(env.docname, base=None) %}}
+
+You can also view this notebook `on Github <{github_url}/blob/main/docs/{{{{ docname }}}}>`_.
+"""
+autosummary_generate = True
+autodoc_typehints = "none"
+
+# sphinx-copybutton
+copybutton_prompt_text = (
+    r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.{3,}: | {5,8}: "
+)
+copybutton_prompt_is_regexp = True
+
 # -- Options for HTML output -------------------------------------------------
 html_theme = "pydata_sphinx_theme"
 html_title = ""
 
 html_theme_options = {
-    "github_url": "https://github.com/tien-vo/mmspy",
+    "github_url": github_url,
     "collapse_navigation": True,
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
     "show_version_warning_banner": True,
 }
 
 html_static_path = ["_static"]
+html_css_files = ["style.css"]
+
+
+def update_gallery(app: Sphinx):
+    """Update the gallery page.
+
+    Copied from xarray.
+    """
+
+    LOG.info("Updating gallery page...")
+    gallery = yaml.safe_load(
+        pathlib.Path(app.srcdir, "gallery.yml").read_bytes()
+    )
+    for key in gallery:
+        items = [
+            f"""
+.. grid-item-card::
+    :text-align: center
+    :link: {item['path']}
+
+    .. image:: {item['thumbnail']}
+        :alt: {item['title']}
+    +++
+    {item['title']}
+            """
+            for item in gallery[key]
+        ]
+
+        items_md = indent(dedent("\n".join(items)), prefix="    ")
+        markdown = f"""
+.. grid:: 1 2 2 2
+    :gutter: 2
+
+    {items_md}
+        """
+        pathlib.Path(app.srcdir, f"{key}-gallery.txt").write_text(markdown)
+        LOG.info(f"{key} gallery page updated.")
+    LOG.info("Gallery page updated.")
+
+
+def setup(app: Sphinx):
+    """Copied from xarray."""
+    app.connect("builder-inited", update_gallery)

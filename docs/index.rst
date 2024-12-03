@@ -6,7 +6,7 @@ mmspy documentation
    :hidden:
 
    User Guide <user-guide/index>
-   Examples <examples/index>
+   Examples <gallery>
 
 **Version**: |version|
 

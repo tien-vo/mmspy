@@ -1,3 +1,8 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
 [tool.poetry]
 name = "mmspy"
 version = "0.1.0"
@@ -62,17 +67,22 @@ isort = "^5.13.2"
 pandas-stubs = "^2.2.2.240909"
 types-requests = "^2.32.0.20240914"
 types-tqdm = "^4.66.0.20240417"
-jupyterlab = "^4.2.5"
-jupyterlab-vim = "^4.1.4"
+types-pyyaml = "^6.0.12.20240917"
 
 [tool.poetry.group.docs]
 optional = true
 
 [tool.poetry.group.docs.dependencies]
+jupyterlab = "^4.2.5"
+jupyterlab-vim = "^4.1.4"
 sphinx = "^8.0.2"
 sphinx-autobuild = "^2024.10.3"
 pydata-sphinx-theme = "^0.16.0"
 sphinx-automodapi = "^0.18.0"
+nbsphinx = "^0.9.5"
+sphinx-copybutton = "^0.5.2"
+sphinx-design = "^0.6.1"
+sphinxcontrib-bibtex = "^2.6.3"
 
 [tool.poetry.group.tests]
 optional = true
@@ -81,15 +91,8 @@ optional = true
 pytest = "^8.3.3"
 quaternionic = "^1.0.12"
 
-
 [tool.black]
 line-length = 79
 
-
 [tool.isort]
 profile = "black"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
