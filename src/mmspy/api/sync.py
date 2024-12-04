@@ -13,23 +13,23 @@ from pathos.threading import ThreadPool
 from tqdm.contrib.logging import tqdm_logging_redirect as tqdm
 from zarr._storage.store import Store
 
-from ._utils import bar_config
-from .process._edp import process_efield, process_potential
-from .process._feeps import process_feeps_distribution
-from .process._fgm import process_fgm
-from .process._fpi import (
+from mmspy.api._utils import bar_config
+from mmspy.api.process._edp import process_efield, process_potential
+from mmspy.api.process._feeps import process_feeps_distribution
+from mmspy.api.process._fgm import process_fgm
+from mmspy.api.process._fpi import (
     process_fpi_distribution,
     process_fpi_moments,
     process_fpi_partial_moments,
 )
-from .process._mec import process_mec
-from .process.metadata import (
+from mmspy.api.process._mec import process_mec
+from mmspy.api.process.metadata import (
     consolidate_metadata,
     dataset_is_updated,
     parse_metadata_from_file_name,
 )
-from .query import Query
-from .request import Request
+from mmspy.api.query import Query
+from mmspy.api.request import Request
 
 LOG = logging.getLogger(__name__)
 

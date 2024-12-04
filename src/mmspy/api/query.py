@@ -7,9 +7,9 @@ from attr import define, field
 from attr.converters import optional, pipe
 from pandas.core.tools.datetimes import DatetimeScalar
 
-from .converters import shift_date
-from .validators import convert_data_rate as _convert_data_rate
-from .validators import (
+from mmspy.api.converters import shift_date
+from mmspy.api.validators import convert_data_rate as _convert_data_rate
+from mmspy.api.validators import (
     convert_edp_data_type,
     convert_feeps_data_type,
     convert_fgm_data_type,
