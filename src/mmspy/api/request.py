@@ -41,7 +41,7 @@ class Request:
 
     number_of_attempts: int = field(default=3, converter=int)
 
-    request_chunk_size: Quantity = field(
+    request_chunk_size: int = field(
         default=u("0.5 MB"),
         converter=lambda x: int(x.to("B").magnitude),
     )
