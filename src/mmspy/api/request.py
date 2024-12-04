@@ -10,7 +10,6 @@ from tempfile import NamedTemporaryFile
 import pandas as pd
 import requests
 from attr import define, field
-from pint import Quantity
 from pint import application_registry as u
 from tqdm.contrib.logging import tqdm_logging_redirect as tqdm
 
