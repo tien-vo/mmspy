@@ -3,16 +3,19 @@ r"""Provide interface for HTTPS data request."""
 __all__ = ["Request"]
 
 import logging
+from bisect import bisect_left
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-import astropy.units as u
+import pandas as pd
 import requests
 from attr import define, field
+from pint import Quantity
+from pint import application_registry as u
 from tqdm.contrib.logging import tqdm_logging_redirect as tqdm
 
-from ._utils import bar_config
-from .query import Query
+from mmspy.api._utils import bar_config
+from mmspy.api.query import Query
 
 LOG = logging.getLogger(__name__)
 
@@ -38,9 +41,9 @@ class Request:
 
     number_of_attempts: int = field(default=3, converter=int)
 
-    request_chunk_size: u.Quantity = field(
-        default=0.5 * u.MB,
-        converter=lambda x: int(x.to("B").value),
+    request_chunk_size: Quantity = field(
+        default=u("0.5 MB"),
+        converter=lambda x: int(x.to("B").magnitude),
     )
 
     @property
@@ -61,7 +64,23 @@ class Request:
         )
         response.raise_for_status()
 
-        cdf_info = response.json()["files"]
+        cdf_info = sorted(
+            response.json()["files"],
+            key=lambda file: pd.to_datetime(file["timetag"]),
+        )
+
+        # Find truncated list based on query.start_date
+        idx = max(
+            0,
+            bisect_left(
+                [pd.to_datetime(file["timetag"]) for file in cdf_info],
+                self.query.start_date,
+            )
+            - 1,
+        )
+        cdf_info = cdf_info[idx:]
+
+        # Extract info
         cdf_list = [item["file_name"] for item in cdf_info]
         cdf_size = 1e-9 * sum([item["file_size"] for item in cdf_info])  # GB
 
