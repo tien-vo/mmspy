@@ -166,7 +166,7 @@ class Query:
             "start_date": (
                 self.start_date
                 if self.start_date is None
-                else self.start_date.strftime(fmt)  # type: ignore[union-attr]
+                else self.start_date.strftime("%Y-%m-%d")  # type: ignore[union-attr]
             ),
             "end_date": (
                 self.end_date

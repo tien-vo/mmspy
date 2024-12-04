@@ -26,6 +26,7 @@ class MMS:
         self,
         parallel: int = 1,
         dry_run: bool = False,
+        time_clip: bool = True,
         quantify: bool = True,
         **kwargs,
     ) -> xr.Dataset:
@@ -37,6 +38,8 @@ class MMS:
             Number of parallel threads to run the synchronizer.
         dry_run : bool
             Whether to stop after querying the file list.
+        time_clip : bool
+            Whether to clip the final dataset to queried time range.
         quantify : bool
             Whether to quantify the returned dataset.
         kwargs : dict
@@ -57,6 +60,10 @@ class MMS:
             return xr.Dataset()
 
         ds = xr.open_mfdataset(datasets, engine="zarr")
+
+        if time_clip:
+            ds = ds.sel(time=slice(self.query.start_date, self.query.end_date))
+
         if quantify:
             return ds.pint.quantify()
 
