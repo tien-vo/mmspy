@@ -65,7 +65,7 @@ def magnetic_field_to_cyclotron_frequency(
     species: str,
 ) -> pint.Quantity:
     charge, mass = _get_species_properties(species, registry)
-    return (charge / mass) * magnetic_field / 2 / np.pi
+    return np.abs(charge / mass) * magnetic_field / 2 / np.pi
 
 
 def cyclotron_frequency_to_magnetic_field(
@@ -74,7 +74,7 @@ def cyclotron_frequency_to_magnetic_field(
     species: str,
 ) -> pint.Quantity:
     charge, mass = _get_species_properties(species, registry)
-    return 2 * np.pi * frequency * (mass / charge)
+    return 2 * np.pi * frequency * np.abs(mass / charge)
 
 
 def density_to_plasma_frequency(
@@ -93,7 +93,7 @@ def plasma_frequency_to_density(
     species: str,
 ) -> pint.Quantity:
     charge, mass = _get_species_properties(species, registry)
-    eps0 = registry.eps_0
+    eps0 = registry.eps0
     return (eps0 * mass / charge**2) * (2 * np.pi * frequency) ** 2
 
 
@@ -106,8 +106,8 @@ transformations = [
     ["[speed]", "[energy]", speed_to_energy],
     ["[magnetic_field]", "[frequency]", magnetic_field_to_cyclotron_frequency],
     ["[frequency]", "[magnetic_field]", cyclotron_frequency_to_magnetic_field],
-    ["[density]", "[frequency]", density_to_plasma_frequency],
-    ["[frequency]", "[density]", plasma_frequency_to_density],
+    ["[number_density]", "[frequency]", density_to_plasma_frequency],
+    ["[frequency]", "[number_density]", plasma_frequency_to_density],
 ]
 for context in [ion_context, elc_context]:
     for from_unit, to_unit, transformation in transformations:
