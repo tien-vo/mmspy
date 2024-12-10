@@ -83,7 +83,7 @@ def density_to_plasma_frequency(
     species: str,
 ) -> pint.Quantity:
     charge, mass = _get_species_properties(species, registry)
-    eps0 = registry.eps0
+    eps0 = registry.eps_0
     return np.sqrt(charge**2 * density / eps0 / mass) / 2 / np.pi
 
 
@@ -93,7 +93,7 @@ def plasma_frequency_to_density(
     species: str,
 ) -> pint.Quantity:
     charge, mass = _get_species_properties(species, registry)
-    eps0 = registry.eps0
+    eps0 = registry.eps_0
     return (eps0 * mass / charge**2) * (2 * np.pi * frequency) ** 2
 
 
