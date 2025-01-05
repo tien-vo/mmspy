@@ -44,6 +44,7 @@ def fft(
 
     # Unpack sampling information
     sampling = sampling_information(time)
+    df = (1 / sampling["window"]).to("Hz")
     Ns = sampling["number_of_samples"]
     if Ns % 2 == 0:
         positive_indices = slice(1, Ns // 2)
@@ -62,9 +63,8 @@ def fft(
     spectrum_positive = F_twosided[positive_indices]
     spectrum_negative = F_twosided[negative_indices][::-1]
     if normalization == "density":
-        df = np.diff(frequency).mean().to("Hz")
-        spectrum_positive *= np.sqrt(2 / df)
-        spectrum_negative *= np.sqrt(2 / df)
+        spectrum_positive /= np.sqrt(df)
+        spectrum_negative /= np.sqrt(df)
 
     return (spectrum_positive, spectrum_negative, frequency)
 
