@@ -38,7 +38,7 @@ moments_standard_names = {
     "T_perp": "Perpendicular temperature",
     "Q_dbcs": "DBCS heat flux",
     "Q_gse": "GSE heat flux",
-    "F_omni": "Omni-directional energy flux",
+    "j_omni": "Omni-directional energy flux",
     "W": "Energy",
 }
 partial_moments_standard_names = {
@@ -121,7 +121,7 @@ def process_fpi_distribution(
             f"{prefix}_dist_{suffix}": "f",
             f"{prefix}_disterr_{suffix}": "f_err",
         },
-    )
+    ).set_coords(["W", "theta_dbcs", "phi_dbcs"])
     ds = process_cdf_metadata(ds[list(variables.values())])
     for variable, name in distribution_standard_names.items():
         ds[variable].attrs.update(standard_name=name)
@@ -208,7 +208,7 @@ def process_fpi_moments(
         variables := {
             "Epoch": "time",
             f"{prefix}_errorflags_{suffix}": "flag",
-            f"{prefix}_energyspectr_omni_{suffix}": "F_omni",
+            f"{prefix}_energyspectr_omni_{suffix}": "j_omni",
             f"{prefix}_numberdensity_{suffix}": "N",
             f"{prefix}_bulkv_dbcs_{suffix}": "V_dbcs",
             f"{prefix}_bulkv_gse_{suffix}": "V_gse",
@@ -220,7 +220,7 @@ def process_fpi_moments(
             f"{prefix}_tempperp_{suffix}": "T_perp",
             f"{prefix}_energy_{suffix}": "W",
         },
-    )
+    ).set_coords("W")
     ds = process_cdf_metadata(ds[["P_dbcs", "P_gse", *variables.values()]])
     for variable, name in moments_standard_names.items():
         ds[variable].attrs.update(standard_name=name)
@@ -320,7 +320,7 @@ def process_fpi_partial_moments(
             f"{prefix}_scpmean_{suffix}": "V_sc",
             f"{prefix}_bhat_dbcs_{suffix}": "b_dbcs",
         },
-    )
+    ).set_coords("W")
     ds = process_cdf_metadata(ds[["P_dbcs", "P_gse", *variables.values()]])
     for variable, name in partial_moments_standard_names.items():
         ds[variable].attrs.update(standard_name=name)
