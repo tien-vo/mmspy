@@ -160,6 +160,7 @@ def process_feeps_distribution(
     ds_reindex.percent_error.attrs.update(units="%")
     ds_reindex = (
         process_cdf_metadata(ds_reindex)
+        .set_coords(["W", "theta_fac"])
         .transpose("time", "sensor", "eye", "energy_channel", "spin_sector")
         .chunk(chunks=chunks)
     )
