@@ -125,6 +125,7 @@ class Request:
                         unit="B",
                         unit_scale=True,
                         position=1,
+                        leave=False,
                     ),
                 ) as bar:
                     for data in response.iter_content(self.request_chunk_size):
