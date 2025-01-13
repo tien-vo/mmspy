@@ -182,4 +182,14 @@ class FpiAccessor:
         theta = np.degrees(np.arccos(V_para))
         phi = np.degrees(np.arctan2(V_perp_2, V_perp_1)) % u("360 deg")
 
-        return ds.assign(B_avg=B, theta_fac=theta, phi_fac=phi)
+        ds = ds.assign(B_avg=B, theta_fac=theta, phi_fac=phi)
+        ds = ds.set_coords(["theta_fac", "phi_fac"])
+        ds = ds.transpose(
+            "time",
+            "energy_channel",
+            "azimuthal_sector",
+            "zenith_sector",
+            ...,
+        )
+
+        return ds
