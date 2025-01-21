@@ -11,8 +11,8 @@ import numpy as np
 import xarray as xr
 
 from mmspy.computation.vector import cross, quaternion_conjugate, quaternion_dot
-from mmspy.utils.timing import match_time_resolution
 from mmspy.units import is_quantified
+from mmspy.utils.timing import match_time_resolution
 
 
 def rotation_matrix(
@@ -40,24 +40,20 @@ def rotation_matrix(
     vector_1 = vector_1.copy()
     vector_2 = vector_2.copy()
 
-    e3 = vector_2 / vector_2.rank_1.magnitude
-    e1 = cross(vector_1, vector_2, dim="space_rank_1")
-    e1 = e1 / e1.rank_1.magnitude  # type: ignore
-    e2 = cross(e3, e1, dim="space_rank_1")
+    e3 = vector_2 / vector_2.tensor.magnitude
+    e1 = cross(vector_1, vector_2, dim="rank_1")
+    e1 = e1 / e1.tensor.magnitude  # type: ignore
+    e2 = cross(e3, e1, dim="rank_1")
 
     matrix = (
         xr.combine_nested(
-            [
-                e1.rank_1.tensor,  # type: ignore
-                e2.rank_1.tensor,  # type: ignore
-                e3.rank_1.tensor,  # type: ignore
-            ],
-            concat_dim="space_i",
+            [e1.tensor(), e2.tensor(), e3.tensor()],
+            concat_dim="i",
         )
-        .chunk(space_i=3, space_j=3)
-        .transpose(..., "space_i", "space_j")
+        .chunk(i=3, j=3)
+        .transpose(..., "i", "j")
     )
-    matrix = matrix.assign_coords(space_i=matrix.space_j.values)
+    matrix = matrix.assign_coords(i=matrix.j.values)
     return xr.DataArray(matrix)
 
 
@@ -66,7 +62,7 @@ def cartesian_to_fac(
     magnetic_field: xr.DataArray,
     reference_vector: xr.DataArray = xr.DataArray(
         np.array([0, 1, 0], dtype="f4"),
-        coords={"space_rank_1": ["x", "y", "z"]},
+        coords={"rank_1": ["x", "y", "z"]},
         attrs={"units": ""},
     ),
     average: bool = True,
@@ -79,7 +75,7 @@ def cartesian_to_fac(
     Parameters
     ----------
     da : DataArray
-        Vector with a 'space_rank_1' dimension
+        Vector with a 'rank_1' dimension
     magnetic_field : DataArray
         Magnetic field
     reference_vector: DataArray
@@ -102,9 +98,9 @@ def cartesian_to_fac(
     M = rotation_matrix(reference_vector, magnetic_field)
 
     da_fac = (
-        xr.dot(M, da.rank_1.tensor, dim="space_j")
-        .rename(space_i="space_rank_1")
-        .assign_coords(space_rank_1=da.space_rank_1)
+        xr.dot(M, da.tensor(), dim="j")
+        .rename(i="rank_1")
+        .assign_coords(rank_1=da.rank_1)
         .assign_attrs(da.attrs)
         .transpose(*da.dims)
     )
@@ -117,7 +113,7 @@ def fac_to_cartesian(
     magnetic_field: xr.DataArray,
     reference_vector: xr.DataArray = xr.DataArray(
         np.array([0, 1, 0], dtype="f4"),
-        coords={"space_rank_1": ["x", "y", "z"]},
+        coords={"rank_1": ["x", "y", "z"]},
         attrs={"units": ""},
     ),
     average: bool = True,
@@ -130,7 +126,7 @@ def fac_to_cartesian(
     Parameters
     ----------
     da : DataArray
-        Vector with a 'space_rank_1' dimension
+        Vector with a 'rank_1' dimension
     magnetic_field : DataArray
         Magnetic field
     reference_vector: DataArray
@@ -156,14 +152,14 @@ def fac_to_cartesian(
     )
     M = (
         rotation_matrix(reference_vector, magnetic_field)
-        .rename(space_i="space_j", space_j="space_i")
-        .transpose(..., "space_i", "space_j")
+        .rename(i="j", j="i")
+        .transpose(..., "i", "j")
     )
 
     da_cartesian = (
-        xr.dot(M, da.rename(space_rank_1="space_j"), dim="space_j")
-        .rename(space_i="space_rank_1")
-        .assign_coords(space_rank_1=da.space_rank_1)
+        xr.dot(M, da.rename(rank_1="j"), dim="j")
+        .rename(i="rank_1")
+        .assign_coords(rank_1=da.rank_1)
         .assign_attrs(da.attrs)
         .transpose(*da.dims)
     )
@@ -207,7 +203,7 @@ def quaternion_rotate(
 
     # ---- Sanity checks
     assert (
-        "space_rank_1" in vector.coords
+        "rank_1" in vector.coords
     ), "Input vector must have spatial coordinates"
     assert (
         "quaternion" in quaternion.coords
@@ -219,8 +215,8 @@ def quaternion_rotate(
     quaternion = quaternion.copy()
     vector = (
         vector.copy()
-        .reindex({"space_rank_1": ["w", "x", "y", "z"]}, fill_value=0.0)
-        .rename(space_rank_1="quaternion")
+        .reindex({"rank_1": ["w", "x", "y", "z"]}, fill_value=0.0)
+        .rename(rank_1="quaternion")
     )
 
     if inverse:
@@ -235,7 +231,7 @@ def quaternion_rotate(
             ),
         )
         .sel(quaternion=["x", "y", "z"])
-        .rename(quaternion="space_rank_1")
+        .rename(quaternion="rank_1")
     )
     rotated_vector.attrs.update(
         vector.attrs,

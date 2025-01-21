@@ -24,9 +24,9 @@ def process_mec(
     ds = cdf_to_xarray(temporary_file, to_datetime=True, fillval_to_nan=True)
     ds = process_cdf_epoch(ds, epoch_variables=["Epoch"])
     ds = ds.reset_coords()
-    ds = ds.rename_dims(dim0="quaternion", dim2="space_rank_1")
+    ds = ds.rename_dims(dim0="quaternion", dim2="rank_1")
     ds = ds.assign_coords(
-        space_rank_1=["x", "y", "z"],
+        rank_1=["x", "y", "z"],
         quaternion=["x", "y", "z", "w"],
     )
 

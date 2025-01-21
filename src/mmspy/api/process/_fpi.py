@@ -156,14 +156,14 @@ def process_fpi_moments(
     # Rename dimensions
     ds = ds.swap_dims(
         {
-            "dim0": "space_rank_1",
+            "dim0": "rank_1",
             f"{prefix}_energy_{suffix}_dim": "energy_channel",
         },
     )
     ds = ds.assign_coords(
-        space_rank_1=("space_rank_1", ["x", "y", "z"]),
-        space_rank_2=(
-            "space_rank_2",
+        rank_1=("rank_1", ["x", "y", "z"]),
+        rank_2=(
+            "rank_2",
             ["xx", "yy", "zz", "xy", "xz", "yz"],
         ),
         energy_channel=("energy_channel", np.arange(32, dtype="i1")),
@@ -184,7 +184,7 @@ def process_fpi_moments(
                     P_dbcs.values[:, 1, 2],
                 ],
             ).T,
-            dims=("time", "space_rank_2"),
+            dims=("time", "rank_2"),
             attrs=P_dbcs.attrs,
         ),
         P_gse=xr.DataArray(
@@ -198,7 +198,7 @@ def process_fpi_moments(
                     P_gse.values[:, 1, 2],
                 ],
             ).T,
-            dims=("time", "space_rank_2"),
+            dims=("time", "rank_2"),
             attrs=P_gse.attrs,
         ),
     )
@@ -258,14 +258,14 @@ def process_fpi_partial_moments(
     # Rename dimensions
     ds = ds.swap_dims(
         {
-            "dim0": "space_rank_1",
+            "dim0": "rank_1",
             f"{prefix}_energy_{suffix}_dim": "energy_channel",
         },
     )
     ds = ds.assign_coords(
-        space_rank_1=("space_rank_1", ["x", "y", "z"]),
-        space_rank_2=(
-            "space_rank_2",
+        rank_1=("rank_1", ["x", "y", "z"]),
+        rank_2=(
+            "rank_2",
             ["xx", "yy", "zz", "xy", "xz", "yz"],
         ),
         energy_channel=("energy_channel", np.arange(32, dtype="i1")),
@@ -286,7 +286,7 @@ def process_fpi_partial_moments(
                     P_dbcs.values[:, :, 1, 2],
                 ],
             ),
-            dims=("space_rank_2", "time", "energy_channel"),
+            dims=("rank_2", "time", "energy_channel"),
             attrs=P_dbcs.attrs,
         ),
         P_gse=xr.DataArray(
@@ -300,7 +300,7 @@ def process_fpi_partial_moments(
                     P_gse.values[:, :, 1, 2],
                 ],
             ),
-            dims=("space_rank_2", "time", "energy_channel"),
+            dims=("rank_2", "time", "energy_channel"),
             attrs=P_gse.attrs,
         ),
     )
@@ -333,7 +333,7 @@ def process_fpi_partial_moments(
     ds = (
         ds.drop_duplicates("time")
         .sortby("time")
-        .transpose("time", "space_rank_1", "space_rank_2", "energy_channel")
+        .transpose("time", "rank_1", "rank_2", "energy_channel")
     )
 
     # Save

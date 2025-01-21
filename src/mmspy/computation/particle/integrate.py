@@ -74,7 +74,7 @@ def integrate_distribution(
     Vz_avg = (f_phi * V_para * dV * dtheta).integrate(dims) / N
     V_avg = xr.combine_nested(
         [Vx_avg, Vy_avg, Vz_avg],
-        concat_dim=[pd.Index(["x", "y", "z"], name="space_rank_1")],
+        concat_dim=[pd.Index(["x", "y", "z"], name="rank_1")],
     ).pint.to("velocity_unit")
 
     # Pressure
@@ -88,8 +88,7 @@ def integrate_distribution(
         - N * Vy_avg * Vy_avg
     )
     Pzz = mass * (
-        (f_phi * V_para**2 * dV * dtheta).integrate(dims)
-        - N * Vx_avg * Vx_avg
+        (f_phi * V_para**2 * dV * dtheta).integrate(dims) - N * Vx_avg * Vx_avg
     )
     Pxy = mass * (
         (fxy_phi * V_perp**2 * dV * dtheta).integrate(dims)
@@ -106,10 +105,7 @@ def integrate_distribution(
     P = xr.combine_nested(
         [Pxx, Pyy, Pzz, Pxy, Pxz, Pyz],
         concat_dim=[
-            pd.Index(
-                ["xx", "yy", "zz", "xy", "xz", "yz"],
-                name="space_rank_2",
-            ),
+            pd.Index(["xx", "yy", "zz", "xy", "xz", "yz"], name="rank_2"),
         ],
     ).pint.to("pressure_unit")
 
@@ -143,7 +139,7 @@ def integrate_distribution(
     #  Vz_avg = (f * Vz * dOmega).integrate(dims) / N
     #  V_avg = xr.combine_nested(
     #      [Vx_avg, Vy_avg, Vz_avg],
-    #      concat_dim=[pd.Index(["x", "y", "z"], name="space_rank_1")],
+    #      concat_dim=[pd.Index(["x", "y", "z"], name="rank_1")],
     #  ).pint.to("velocity_unit")
 
 
@@ -188,7 +184,7 @@ def integrate_distribution(
 #      Vz_avg = (f * Vz * dOmega).integrate(dims) / N
 #      V_avg = xr.combine_nested(
 #          [Vx_avg, Vy_avg, Vz_avg],
-#          concat_dim=[pd.Index(["x", "y", "z"], name="space_rank_1")],
+#          concat_dim=[pd.Index(["x", "y", "z"], name="rank_1")],
 #      ).pint.to("velocity_unit")
 #
 #      # Pressure tensor
@@ -222,7 +218,7 @@ def integrate_distribution(
 #          concat_dim=[
 #              pd.Index(
 #                  ["xx", "yy", "zz", "xy", "xz", "yz"],
-#                  name="space_rank_2",
+#                  name="rank_2",
 #              ),
 #          ],
 #      ).pint.to("pressure_unit")
