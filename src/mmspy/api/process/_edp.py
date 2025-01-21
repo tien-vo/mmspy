@@ -46,8 +46,8 @@ def process_efield(
         E_para=("time", E_para[:, -1], attrs),
         E_para_err=("time", E_para[:, 0], {"units": attrs["units"]}),
     )
-    ds = ds.rename_dims(dim0="space_rank_1").drop_dims("dim1")
-    ds = ds.assign_coords(space_rank_1=["x", "y", "z"])
+    ds = ds.rename_dims(dim0="rank_1").drop_dims("dim1")
+    ds = ds.assign_coords(rank_1=["x", "y", "z"])
     ds = process_cdf_metadata(ds[["E_para_err", *variables.values()]])
     for variable, name in standard_names.items():
         ds[variable].attrs.update(standard_name=name)

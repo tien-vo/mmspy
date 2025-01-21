@@ -19,7 +19,7 @@ def random_3d_vector(n):
         data=np.random.uniform(low=-10.0, high=10.0, size=(n, 3)),
         coords={
             "time": pd.date_range("2024-01-01", "2024-01-02", n),
-            "space_rank_1": ["x", "y", "z"],
+            "rank_1": ["x", "y", "z"],
         },
         attrs={"units": ""},
     )
@@ -39,7 +39,7 @@ def test_identity_transformation():
     r"""Check an identity transformation with `cartesian_to_fac`."""
     V = random_3d_vector(1000)
 
-    coords = {"space_rank_1": ["x", "y", "z"]}
+    coords = {"rank_1": ["x", "y", "z"]}
     e2 = xr.DataArray([0, 1, 0], coords=coords)
     e3 = (
         xr.DataArray([0, 0, 1], coords=coords)
@@ -117,7 +117,7 @@ def test_unit_vector_rotation(case):
     V = random_3d_vector(3)
     V[...] = case["V"]
 
-    coords = {"space_rank_1": ["x", "y", "z"]}
+    coords = {"rank_1": ["x", "y", "z"]}
     e2 = xr.DataArray(case["e2"], coords=coords)
     e3 = (
         xr.DataArray(case["e3"], coords=coords)
@@ -134,11 +134,9 @@ def test_orthogonality():
     V1 = random_3d_vector(1000)
     V2 = random_3d_vector(1000)
     M = rotation_matrix(V1, V2)
-    Mt = M.rename(space_i="space_j", space_j="space_i").transpose(
-        ..., "space_i", "space_j"
-    )
-    left = matrix_multiply(M, Mt, dims=["space_i", "space_j"])
-    right = matrix_multiply(Mt, M, dims=["space_i", "space_j"])
+    Mt = M.rename(i="j", j="i").transpose(..., "i", "j")
+    left = matrix_multiply(M, Mt, dims=["i", "j"])
+    right = matrix_multiply(Mt, M, dims=["i", "j"])
     for i in range(M.sizes["time"]):
         assert np.isclose(np.identity(3), left.isel(time=i)).all()
         assert np.isclose(np.identity(3), right.isel(time=i)).all()

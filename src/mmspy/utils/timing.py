@@ -85,7 +85,7 @@ def match_time_resolution(
         data_resolution = pd.Timedelta(data.time.diff("time").min().values)
         window = force_odd(max(1, int(data_resolution / target_resolution)))
         interpolated_data = (
-            data.rolling(time=window, center=True)
+            data.rolling(time=window, min_periods=1, center=True)
             .mean()
             .interp(time=time, kwargs=kwargs)
         )

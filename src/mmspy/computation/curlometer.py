@@ -63,7 +63,7 @@ def curlometer(
     ----------
     quantity : Sequence of DataArray
         4-point measurements of a scalar or vector quantity. If `quantity`
-        is a vector field, it must have a rectangular (x, y, z) 'space_rank_1'
+        is a vector field, it must have a rectangular (x, y, z) 'rank_1'
         dimension.
     position : Sequence of DataArray
         Corresponding positions of the measurements.
@@ -105,16 +105,16 @@ def curlometer(
     R_14 = R4 - R1
 
     # Calculate reciprocal vectors
-    numerator = cross(R_13, R_14, dim="space_rank_1")
-    denumerator = xr.dot(R_12, numerator, dim="space_rank_1")
+    numerator = cross(R_13, R_14, dim="rank_1")
+    denumerator = xr.dot(R_12, numerator, dim="rank_1")
     k2 = numerator / denumerator
 
-    numerator = cross(R_12, R_14, dim="space_rank_1")
-    denumerator = xr.dot(R_13, numerator, dim="space_rank_1")
+    numerator = cross(R_12, R_14, dim="rank_1")
+    denumerator = xr.dot(R_13, numerator, dim="rank_1")
     k3 = numerator / denumerator
 
-    numerator = cross(R_12, R_13, dim="space_rank_1")
-    denumerator = xr.dot(R_14, numerator, dim="space_rank_1")
+    numerator = cross(R_12, R_13, dim="rank_1")
+    denumerator = xr.dot(R_14, numerator, dim="rank_1")
     k4 = numerator / denumerator
     k1 = -k2 - k3 - k4
 
@@ -130,10 +130,10 @@ def curlometer(
     )
 
     # Calculate gradients
-    if "space_rank_1" in Q1.dims:
-        kw = {"dim": "space_rank_1"}
-        kw_i = {"space_rank_1": "space_i"}
-        kw_j = {"space_rank_1": "space_j"}
+    if "rank_1" in Q1.dims:
+        kw = {"dim": "rank_1"}
+        kw_i = {"rank_1": "i"}
+        kw_j = {"rank_1": "j"}
         ds_clm = ds_clm.assign(
             {
                 f"grad_{name}": (

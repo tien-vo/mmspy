@@ -59,9 +59,9 @@ def spherical_angle(vector: xr.DataArray) -> tuple[xr.DataArray, xr.DataArray]:
 
     """
     vector = vector.copy()
-    vx = vector.sel(space_rank_1="x")
-    vy = vector.sel(space_rank_1="y")
-    vz = vector.sel(space_rank_1="z")
+    vx = vector.sel(rank_1="x")
+    vy = vector.sel(rank_1="y")
+    vz = vector.sel(rank_1="z")
     v_mag = np.sqrt(vx**2 + vy**2 + vz**2)
 
     theta = np.degrees(np.arccos(vz / v_mag))
@@ -133,7 +133,7 @@ class FpiAccessor:
         magnetic_field: xr.DataArray,
         reference_vector: xr.DataArray = xr.DataArray(
             np.array([0, 1, 0], dtype="f4"),
-            coords={"space_rank_1": ["x", "y", "z"]},
+            coords={"rank_1": ["x", "y", "z"]},
         ).pint.quantify("dimensionless"),
         average: bool = True,
     ) -> xr.Dataset:
@@ -169,9 +169,9 @@ class FpiAccessor:
 
         # Construct unit vectors
         e3 = B / B.rank_1.magnitude
-        e1 = cross(reference_vector, e3, dim="space_rank_1")
+        e1 = cross(reference_vector, e3, dim="rank_1")
         e1 = e1 / e1.rank_1.magnitude  # type: ignore
-        e2 = cross(e3, e1, dim="space_rank_1")
+        e2 = cross(e3, e1, dim="rank_1")
 
         # Calculate decomposition
         V_angle = (ds.theta_dbcs, ds.phi_dbcs)

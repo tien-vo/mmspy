@@ -12,83 +12,66 @@ import xarray as xr
 from mmspy.computation.vector import vector_norm
 
 
-@xr.register_dataarray_accessor("rank_1")
-@xr.register_dataset_accessor("rank_1")
-class RankOneAccessor:
-    r"""Accessor for rank-1 tensors (n-d vectors)."""
+@xr.register_dataarray_accessor("tensor")
+class TensorAccessor:
+    r"""Accessor for rank-n tensors."""
 
-    def __init__(self, vector: xr.DataArray) -> None:
-        r"""Entry to rank_1 accessor.
+    def __init__(self, tensor: xr.DataArray) -> None:
+        r"""Entry to tensor accessor.
 
         Parameters
         ----------
-        vector : DataArray
-            Xarray object with a `space_rank_1` dimension
+        tensor : DataArray or Dataset
+            Xarray object with a `rank_*` dimension
 
         """
-        if "space_rank_1" not in vector.dims:
-            msg = "Cannot find a `space_rank_1` dimension."
-            raise ValueError(msg)
+        self._tensor = tensor
+        # Extract rank
+        ranks = [
+            int(dim.strip("rank_"))
+            for dim in tensor.dims
+            if dim.startswith("rank_")
+        ]
+        self._rank = 0 if len(ranks) == 0 else min(ranks)
 
-        self._vector = vector
-
-    @property
-    def tensor(self) -> xr.DataArray:
-        r"""Return the object as a column vector."""
-        return self._vector.rename(space_rank_1="space_j")
+    def __call__(self) -> xr.DataArray:
+        """Return the object as a tensor."""
+        match self._rank:
+            case 0:
+                return self._tensor
+            case 1:
+                return self._tensor.rename(rank_1="j")
+            case 2:
+                xx = self._tensor.sel(rank_2="xx")
+                yy = self._tensor.sel(rank_2="yy")
+                zz = self._tensor.sel(rank_2="zz")
+                xy = self._tensor.sel(rank_2="xy")
+                xz = self._tensor.sel(rank_2="xz")
+                yz = self._tensor.sel(rank_2="yz")
+                return xr.DataArray(
+                    xr.combine_nested(
+                        [[xx, xy, xz], [xy, yy, yz], [xz, yz, zz]],
+                        concat_dim=[
+                            pd.Index(["x", "y", "z"], name="i"),
+                            pd.Index(["x", "y", "z"], name="j"),
+                        ],
+                        combine_attrs="identical",
+                    )
+                    .drop_vars("rank_2")
+                    .transpose(..., "i", "j"),
+                )
+            case _:
+                msg = "Currently only supporting rank 0, 1 and 2." ""
+                raise NotImplementedError(msg)
 
     @property
     def magnitude(self) -> xr.DataArray:
-        r"""Return the magnitude of the vector."""
-        return vector_norm(self._vector, dim="space_rank_1")
-
-    def component(self, component: str) -> xr.DataArray:
-        r"""Return the component of the vector."""
-        return self._vector.sel(space_rank_1=component)
-
-
-@xr.register_dataarray_accessor("rank_2")
-@xr.register_dataset_accessor("rank_2")
-class RankTwoAccessor:
-    r"""Accessor for rank-2 tensors (mxn matrices)."""
-
-    def __init__(self, matrix: xr.DataArray) -> None:
-        r"""Entry to rank_2 accessor.
-
-        Parameters
-        ----------
-        matrix : DataArray
-            Xarray object with a `space_rank_2` dimension
-
-        """
-        if "space_rank_2" not in matrix.dims:
-            msg = "Cannot find a `space_rank_2` dimension."
-            raise ValueError(msg)
-
-        self._matrix = matrix
-
-    @property
-    def tensor(self) -> xr.DataArray:
-        r"""Return the object as a matrix."""
-        xx = self._matrix.sel(space_rank_2="xx")
-        yy = self._matrix.sel(space_rank_2="yy")
-        zz = self._matrix.sel(space_rank_2="zz")
-        xy = self._matrix.sel(space_rank_2="xy")
-        xz = self._matrix.sel(space_rank_2="xz")
-        yz = self._matrix.sel(space_rank_2="yz")
-        return xr.DataArray(
-            xr.combine_nested(
-                [[xx, xy, xz], [xy, yy, yz], [xz, yz, zz]],
-                concat_dim=[
-                    pd.Index(["x", "y", "z"], name="space_i"),
-                    pd.Index(["x", "y", "z"], name="space_j"),
-                ],
-                combine_attrs="identical",
-            )
-            .drop_vars("space_rank_2")
-            .transpose(..., "space_i", "space_j"),
-        )
-
-    def component(self, component: str) -> xr.DataArray:
-        r"""Return the component of the vector."""
-        return self._matrix.sel(space_rank_2=component)
+        """Return the magnitude of the tensor."""
+        match self._rank:
+            case 0:
+                return self._tensor
+            case 1:
+                return vector_norm(self._tensor, dim="rank_1")
+            case _:
+                msg = "Currently only supporting rank 0 and 1." ""
+                raise NotImplementedError(msg)

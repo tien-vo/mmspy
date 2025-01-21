@@ -31,9 +31,9 @@ def process_fgm(
     ds = ds.reset_coords()
 
     # Rename dimensions and drop magnitude
-    ds = ds.rename_dims(dim0="space_rank_1")
-    ds = ds.assign_coords(space_rank_1=["x", "y", "z", "mag"])
-    ds = ds.drop_sel(space_rank_1="mag")
+    ds = ds.rename_dims(dim0="rank_1")
+    ds = ds.assign_coords(rank_1=["x", "y", "z", "mag"])
+    ds = ds.drop_sel(rank_1="mag")
 
     # Rename and remove unwanted data variables
     ds = ds.rename(
