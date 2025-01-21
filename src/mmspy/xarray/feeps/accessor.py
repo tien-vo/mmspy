@@ -6,7 +6,7 @@ __all__ = [
 
 import numpy as np
 import xarray as xr
-from pint_xarray import unit_registry as u
+from pint import application_registry as u
 
 from mmspy.xarray._utils import validate_dataset
 
@@ -106,7 +106,7 @@ class FeepsAccessor:
         self,
         keep_bad_eyes: bool = False,
         remove_one_count: bool = True,
-        error_tolerance: u.Quantity = u.Quantity(100, "%"),
+        error_tolerance: u.Quantity = u("100 %"),
     ) -> xr.Dataset:
         r"""Mask dataset using all tables."""
         ds = self._ds.copy()

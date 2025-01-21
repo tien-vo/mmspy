@@ -6,9 +6,8 @@ from typing import Generic
 
 import xarray as xr
 from pint import Quantity
+from pint import application_registry as u
 from xarray.core.types import T_Xarray
-
-from mmspy.units import registry as u
 
 
 @xr.register_dataset_accessor("species")
