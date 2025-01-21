@@ -168,9 +168,9 @@ class FpiAccessor:
             reference_vector = match_time_resolution(reference_vector, **kw)
 
         # Construct unit vectors
-        e3 = B / B.rank_1.magnitude
+        e3 = B / B.tensor.magnitude
         e1 = cross(reference_vector, e3, dim="rank_1")
-        e1 = e1 / e1.rank_1.magnitude  # type: ignore
+        e1 = e1 / e1.tensor.magnitude  # type: ignore
         e2 = cross(e3, e1, dim="rank_1")
 
         # Calculate decomposition
