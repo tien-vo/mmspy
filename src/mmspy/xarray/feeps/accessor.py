@@ -58,18 +58,17 @@ def _apply_time_dependent_table(
 
         this_table = this_table.reset_coords(drop=True)
         next_table = next_table.reset_coords(drop=True)
-        with xr.set_options(keep_attrs=True):
-            for variable in ["n", "R"]:
-                ds[variable] = xr.where(
-                    left,
-                    ds[variable] * this_table,
-                    ds[variable],
-                )
-                ds[variable] = xr.where(
-                    right,
-                    ds[variable] * next_table,
-                    ds[variable],
-                )
+        for variable in ["n", "R"]:
+            ds[variable] = xr.where(
+                left,
+                ds[variable] * this_table,
+                ds[variable],
+            )
+            ds[variable] = xr.where(
+                right,
+                ds[variable] * next_table,
+                ds[variable],
+            )
 
     return ds
 
@@ -105,8 +104,8 @@ class FeepsAccessor:
     def mask_data(
         self,
         keep_bad_eyes: bool = False,
-        remove_one_count: bool = True,
-        error_tolerance: u.Quantity = u.Quantity(100, "%"),
+        remove_one_count: bool = False,
+        error_tolerance: u.Quantity = u("100 %"),
     ) -> xr.Dataset:
         r"""Mask dataset using all tables."""
         ds = self._ds.copy()
@@ -116,14 +115,22 @@ class FeepsAccessor:
         ds = ds.feeps.apply_flat_field_correction(keep_bad_eyes)
         ds = ds.feeps.remove_bad_eyes()
         ds = ds.feeps.remove_sun_contamination()
+
+        # Remove non-sensical error
+        for variable in ["n", "R"]:
+            ds[variable] = xr.where(
+                ds.sigma > 0,
+                ds[variable],
+                np.nan,
+            )
+            
         if remove_one_count:
-            with xr.set_options(keep_attrs=True):
-                for variable in ["n", "R"]:
-                    ds[variable] = xr.where(
-                        ds.sigma < error_tolerance,
-                        ds[variable],
-                        np.nan,
-                    )
+            for variable in ["n", "R"]:
+                ds[variable] = xr.where(
+                    ds.sigma < error_tolerance,
+                    ds[variable],
+                    np.nan,
+                )
 
         return ds
 
@@ -284,9 +291,8 @@ class FeepsAccessor:
             left_mask = (left & (this_bad == 1)).sel(**kw)
             right_mask = (right & (next_bad == 1)).sel(**kw)
 
-            with xr.set_options(keep_attrs=True):
-                for variable in ["n", "R", "sigma"]:
-                    ds[variable] = xr.where(~left_mask, ds[variable], np.nan)
-                    ds[variable] = xr.where(~right_mask, ds[variable], np.nan)
+            for variable in ["n", "R", "sigma"]:
+                ds[variable] = xr.where(~left_mask, ds[variable], np.nan)
+                ds[variable] = xr.where(~right_mask, ds[variable], np.nan)
 
         return ds
