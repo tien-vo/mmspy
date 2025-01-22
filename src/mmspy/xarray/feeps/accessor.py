@@ -111,19 +111,16 @@ class FeepsAccessor:
         ds = self._ds.copy()
         ds = ds.isel(energy_channel=slice(1, -1))
 
+        # Remove non-sensical error
+        mask = ds.sigma >= 0
+        for variable in ["n", "R", "sigma"]:
+            ds[variable] = xr.where(mask, ds[variable], np.nan)
+
         ds = ds.feeps.apply_energy_correction_table(keep_bad_eyes)
         ds = ds.feeps.apply_flat_field_correction(keep_bad_eyes)
         ds = ds.feeps.remove_bad_eyes()
         ds = ds.feeps.remove_sun_contamination()
 
-        # Remove non-sensical error
-        for variable in ["n", "R"]:
-            ds[variable] = xr.where(
-                ds.sigma > 0,
-                ds[variable],
-                np.nan,
-            )
-            
         if remove_one_count:
             for variable in ["n", "R"]:
                 ds[variable] = xr.where(
