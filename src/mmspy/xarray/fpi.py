@@ -88,7 +88,7 @@ class FpiAccessor:
     def correct_for_spacecraft_potential(
         self,
         spacecraft_potential: xr.DataArray,
-        average: bool = True,
+        average: bool = False,
     ) -> xr.Dataset:
         r"""Subtract spacecraft potential from the recorded energy.
 
@@ -135,7 +135,7 @@ class FpiAccessor:
             np.array([0, 1, 0], dtype="f4"),
             coords={"rank_1": ["x", "y", "z"]},
         ).pint.quantify("dimensionless"),
-        average: bool = True,
+        average: bool = False,
     ) -> xr.Dataset:
         r"""Add field aligned coordinates.
 
