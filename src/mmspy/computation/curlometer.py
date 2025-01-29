@@ -83,10 +83,10 @@ def curlometer(
     Q_unit = quantity[0].pint.quantify().pint.units
     R_unit = position[0].pint.quantify().pint.units
     Q1, Q2, Q3, Q4 = [
-        da.pint.quantify().to(Q_unit).pint.dequantify() for da in quantity
+        da.pint.quantify().pint.to(Q_unit).pint.dequantify() for da in quantity
     ]
     R1, R2, R3, R4 = [
-        da.pint.quantify().to(R_unit).pint.dequantify() for da in position
+        da.pint.quantify().pint.to(R_unit).pint.dequantify() for da in position
     ]
 
     # Interpolate every array onto q1 time
