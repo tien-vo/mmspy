@@ -1,6 +1,7 @@
 r"""Provide `xarray` accessors to datasets."""
 
 __all__ = [
+    "EdpAccessor",
     "FeepsAccessor",
     "FgmAccessor",
     "FpiAccessor",
@@ -12,6 +13,7 @@ import xarray as xr
 
 xr.set_options(keep_attrs=True)
 
+from .edp import EdpAccessor  # noqa: E402
 from .feeps.accessor import FeepsAccessor  # noqa: E402
 from .fgm import FgmAccessor  # noqa: E402
 from .fpi import FpiAccessor  # noqa: E402
