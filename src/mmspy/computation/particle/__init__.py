@@ -7,11 +7,9 @@ __all__ = [
     "reduce_distribution",
 ]
 
+from mmspy.computation.particle.grid import ParticleGrid
 from mmspy.computation.particle.integrate import (
     integrate_distribution,
     reduce_distribution,
 )
-from mmspy.computation.particle.interpolate import (
-    ParticleGrid,
-    interpolate_distribution,
-)
+from mmspy.computation.particle.interpolate import interpolate_distribution
