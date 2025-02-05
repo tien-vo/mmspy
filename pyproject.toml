@@ -64,7 +64,6 @@ optional = true
 mypy = "^1.11.2"
 black = "^24.8.0"
 isort = "^5.13.2"
-flake8 = "^7.1.1"
 pandas-stubs = "^2.2.2.240909"
 types-requests = "^2.32.0.20240914"
 types-tqdm = "^4.66.0.20240417"
