@@ -9,7 +9,6 @@ from importlib.metadata import version
 __all__ = [
     "api",
     "computation",
-    "models",
     "utils",
 ]
 __version__ = version("mmspy")
@@ -17,4 +16,4 @@ __version__ = version("mmspy")
 import mmspy.logging
 import mmspy.xarray
 import mmspy.units
-from mmspy import api, computation, models, utils
+from mmspy import api, computation, utils
