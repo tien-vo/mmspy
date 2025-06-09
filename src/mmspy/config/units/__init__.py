@@ -12,7 +12,7 @@ from mmspy.config.directories import CACHE_DIR
 from mmspy.config.units.contexts import elc_context, ion_context
 from mmspy.config.units.preprocessors import _get_fits_units_processor
 
-config = str(files("mmspy.config.units") / "data" / "particle.txt")
+config = str(files("mmspy.data") / "particle-unit-definitions.txt")
 
 
 def configure_units(config=config, cache_dir=CACHE_DIR / "units"):
