@@ -3,7 +3,7 @@ channels:
   - nodefaults
 dependencies:
   - python=3.12
-  - poetry
+  - uv
   - graphviz
 platforms:
   - linux-64

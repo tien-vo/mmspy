@@ -1,21 +1,36 @@
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-
-[tool.poetry]
+[project]
 name = "mmspy"
 version = "0.1.0"
 description = "A Python package for querying and analysing data from the NASA Magnetospheric Multiscale (MMS) mission."
-authors = [
-    "Tien Vo <tvo.work@proton.me>"
-]
-license = "GPL-3.0-only"
+authors = [{ name = "tien-vo", email = "tvo.work@proton.me" }]
+requires-python = ">=3.11"
 readme = "README.md"
-packages = [
-    { include = "mmspy", from = "src", to = "mmspy" }
+license = { text = "GPL-3.0-only" }
+keywords = [
+    "space plasma",
+    "heliophysics",
+    "plasma",
+    "plasma physics",
+    "science",
+    "magnetospheric multiscale mission",
 ]
-repository = "https://github.com/tien-vo/mmspy"
+dependencies = [
+    "numpy>=2.2.6",
+    "scipy>=1.15.3",
+    "cdflib (>=1.3.4,<2.0.0)",
+    "xarray (>=2025.4.0,<2026.0.0)",
+    "dask (>=2025.5.1,<2026.0.0)",
+    "zarr==2.18.5",
+    "attrs (>=25.3.0,<26.0.0)",
+    "pint-xarray (>=0.4,<0.5)",
+    "anytree (>=2.13.0,<3.0.0)",
+    "tqdm (>=4.67.1,<5.0.0)",
+    "matplotlib>=3.10.3",
+    "requests>=2.32.3",
+    "pathos>=0.3.4",
+    "bigtree>=0.29.2",
+    "bs4>=0.0.2",
+]
 classifiers = [
     "Development Status :: 1 - Planning",
     "Intended Audience :: Science/Research",
@@ -27,69 +42,45 @@ classifiers = [
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering :: Physics",
 ]
-keywords = [
-    "space plasma",
-    "heliophysics",
-    "plasma",
-    "plasma physics",
-    "science",
-    "magnetospheric multiscale mission",
+
+[project.urls]
+Repository = "https://github.com/tien-vo/mmspy"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.16.0,<2",
+    "black>=25.1.0,<26",
+    "isort>=6.0.1,<7",
+    "pandas-stubs>=2.2.3.250527,<3",
+    "types-requests>=2.32.0.20250602,<3",
+    "types-pyyaml>=6.0.12.20250516,<7",
+    "types-tqdm>=4.67.0.20250516,<5",
+]
+docs = [
+    "jupyterlab>=4.2.5,<5",
+    "jupyterlab-vim>=4.1.4,<5",
+    "sphinx>=8.0.2,<9",
+    "sphinx-autobuild>=2024.10.3,<2025",
+    "pydata-sphinx-theme>=0.16.0,<0.17",
+    "sphinx-automodapi>=0.18.0,<0.19",
+    "nbsphinx>=0.9.5,<0.10",
+    "sphinx-copybutton>=0.5.2,<0.6",
+    "sphinx-design>=0.6.1,<0.7",
+    "sphinxcontrib-bibtex>=2.6.3,<3",
+]
+tests = [
+    "pytest>=8.3.3,<9",
+    "quaternionic>=1.0.12,<2",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.12,<3.13"
-tvolib = { git = "https://github.com/tien-vo/tvolib.git", rev = "4e24c30" }
-ssqueezepy = { git = "https://github.com/OverLordGoldDragon/ssqueezepy.git", rev = "fa4c720" }
-xarray = "^2024.9.0"
-dask = { version = "^2024.9.1", extras = ["distributed"] }
-zarr = "^2.18.3"
-cdflib = "^1.3.1"
-pathos = "^0.3.3"
-tqdm = "^4.66.5"
-xhistogram = "^0.3.2"
-shapely = "^2.0.6"
-pyfftw = "^0.14.0"
-bottleneck = "^1.4.0"
-opt-einsum = "^3.4.0"
-flox = "^0.9.13"
-attrs = "^24.2.0"
-plotly = "^5.24.1"
-pint-xarray = "^0.4"
-mip = "^1.15.0"
-
-[tool.poetry.group.develop]
-optional = true
-
-[tool.poetry.group.develop.dependencies]
-mypy = "^1.11.2"
-black = "^24.8.0"
-isort = "^5.13.2"
-pandas-stubs = "^2.2.2.240909"
-types-requests = "^2.32.0.20240914"
-types-tqdm = "^4.66.0.20240417"
-types-pyyaml = "^6.0.12.20240917"
-
-[tool.poetry.group.docs]
-optional = true
-
-[tool.poetry.group.docs.dependencies]
-jupyterlab = "^4.2.5"
-jupyterlab-vim = "^4.1.4"
-sphinx = "^8.0.2"
-sphinx-autobuild = "^2024.10.3"
-pydata-sphinx-theme = "^0.16.0"
-sphinx-automodapi = "^0.18.0"
-nbsphinx = "^0.9.5"
-sphinx-copybutton = "^0.5.2"
-sphinx-design = "^0.6.1"
-sphinxcontrib-bibtex = "^2.6.3"
-
-[tool.poetry.group.tests]
-optional = true
-
-[tool.poetry.group.tests.dependencies]
-pytest = "^8.3.3"
-quaternionic = "^1.0.12"
+[tool.uv]
+default-groups = [
+    "dev"
+]
 
 [tool.black]
 line-length = 79
