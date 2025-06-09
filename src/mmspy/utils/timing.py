@@ -14,7 +14,7 @@ import xarray as xr
 from numpy.typing import NDArray
 from pint import Quantity
 
-from mmspy.units import is_quantified
+from mmspy.utils.units import is_quantified
 
 
 def force_odd(number: int) -> int:
