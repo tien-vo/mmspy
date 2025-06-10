@@ -8,19 +8,22 @@ from importlib.metadata import version as _version
 
 __all__ = [
     "api",
-    "computation",
+    "config",
     "CACHE_DIR",
     "DATA_DIR",
     "STATE_DIR",
 ]
 __version__ = _version("mmspy")
 
-from mmspy.config.directories import CACHE_DIR, DATA_DIR, STATE_DIR
-from mmspy.config.logging import configure_logger
-from mmspy.config.units import configure_units
+from mmspy.utils.config import config
+from mmspy.utils.directories import CACHE_DIR, DATA_DIR, STATE_DIR
+from mmspy.utils.logging import configure_logger
+from mmspy.utils.pint import configure_units
 
 configure_logger(CACHE_DIR)
 units = configure_units()
+
+from mmspy import api
 
 #  import mmspy.xarray
 #  from mmspy import api, computation, utils
