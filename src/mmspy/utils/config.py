@@ -1,55 +1,94 @@
-__all__ = ["config"]
+"""Provide config object for the package."""
 
-import collections.abc
-import tomllib
+__all__ = ["Config", "config"]
+
+import json
+import logging
 from importlib.resources import files
 from pathlib import Path
+from tempfile import NamedTemporaryFile
+from typing import IO, Any, Union
 
-import zarr
+from benedict import benedict
 
+from mmspy.utils.paths import CACHE_DIR, DATA_DIR, STATE_DIR
 
-def create_table(dictionary):
-    def create_node(parent, children):
-        if isinstance(children, str):
-            parent.attrs.update(value=children)
-            return
-        for key, value in children.items():
-            child = parent.require_group(key)
-            create_node(child, value)
-
-    root = zarr.group()
-    create_node(root, dictionary)
-    return root
+log = logging.getLogger(__name__)
 
 
-def nested_update(d, u):
-    for k, v in u.items():
-        if isinstance(v, collections.abc.Mapping):
-            d[k] = nested_update(d.get(k, {}), v)
-        else:
-            d[k] = v
+class Config(benedict):
+    _file: IO[Any] | None = None
+    _file_name: str = ""
 
-    return d
+    def __init__(
+        self,
+        file_name: str | None = None,
+        load_default: bool = False,
+        format="toml",
+        keypath_separator="/",
+        **kwargs,
+    ):
+        if file_name is None:
+            file_name = self.get_temporary_file()
+
+        self._file_name = file_name
+        super().__init__(
+            file_name,
+            format=format,
+            keypath_separator=keypath_separator,
+            **kwargs,
+        )
+
+        if load_default:
+            self.update(str(files("mmspy.data") / "default-config.toml"))
+
+    def write_content(self):
+        with open(self._file_name, "w") as file:
+            file.write(self.to_toml())
+
+    def update(
+        self,
+        config: Union[None, str, dict, "Config"] = None,
+        **kwargs,
+    ):
+        if config is not None:
+            if isinstance(config, str):
+                config = Config(config)
+
+            self.merge(config)
+
+        self.merge(kwargs)
+        self.write_content()
+
+    def get_temporary_file(self):
+        self._file = NamedTemporaryFile(delete=False, mode="a", dir=STATE_DIR)
+        return self._file.name
+
+    def get(self, key, default=None):
+        if default is None:
+            default = {}
+
+        value = super(Config, self).get(key, default=default)
+        if value == default == "raise":
+            msg = (
+                f"{key!r} is not available in the configuration file. "
+                "This is breaking, please check your configuration."
+            )
+            raise ValueError(msg)
+
+        return value
+
+    def __del__(self) -> None:
+        r"""Close request session."""
+        if self._file is not None:
+            Path(self._file.name).unlink(missing_ok=True)
+
+    def __repr__(self) -> str:
+        return json.dumps(self, sort_keys=True, indent=2, default=str)
 
 
-default_config = files("mmspy.data") / "default-config.toml"
-
-
-class Config:
-    def __init__(self, config_file: Path = Path(str(default_config))):
-        with open(config_file, "rb") as f:
-            self.data = tomllib.load(f)
-
-    def update(self, data: Path | dict):
-        if not isinstance(data, dict):
-            with open(data, "rb") as f:
-                data = tomllib.load(f)
-
-        self.data = nested_update(self.data, data)
-
-    @property
-    def table(self) -> zarr.Group:
-        return create_table(self.data)
-
-
-config = Config()
+config = Config(load_default=True)
+log.debug(f"Config path: {config._file_name}")
+log.debug(f"Cache directory: {CACHE_DIR}")
+log.debug(f"State directory: {STATE_DIR}")
+log.debug(f"Data directory: {DATA_DIR}")

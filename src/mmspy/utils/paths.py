@@ -1,4 +1,4 @@
-r"""Set up base directories."""
+"""Set up base directories."""
 
 __all__ = ["CACHE_DIR", "STATE_DIR", "DATA_DIR"]
 

@@ -1,23 +1,42 @@
-r"""Set up `logging`."""
-
-__all__ = ["configure_logger"]
+"""Set up `logging`."""
 
 import logging
 import sys
 
+import pandas as pd
 
-def configure_logger(cache_directory):
+from mmspy.utils.paths import CACHE_DIR
+
+log = logging.getLogger(__name__)
+
+
+def _configure_logging(current_time):
     logging.captureWarnings(True)
 
-    file_handler = logging.FileHandler(cache_directory / "log", mode="a")
+    file_formatter = logging.Formatter(
+        fmt="%(asctime)s [%(levelname)s] (%(name)s): %(message)s",
+        datefmt="%y-%b-%d %H:%M:%S",
+    )
+    file_name = CACHE_DIR / f"{current_time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
+    file_handler = logging.FileHandler(file_name, mode="w")
     file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(file_formatter)
 
+    stream_formatter = logging.Formatter(
+        fmt="%(asctime)s [%(levelname)s] (mmspy): %(message)s",
+        datefmt="%y-%b-%d %H:%M:%S",
+    )
     stream_handler = logging.StreamHandler(sys.stdout)
     stream_handler.setLevel(logging.INFO)
+    stream_handler.setFormatter(stream_formatter)
 
     logging.basicConfig(
-        format="%(asctime)s [%(levelname)s]: %(message)s",
-        datefmt="%y-%b-%d %H:%M:%S",
         level=logging.DEBUG,
         handlers=[file_handler, stream_handler],
     )
+
+    log.info(f"Log path: {file_name}")
+    return file_name
+
+
+_configure_logging(pd.Timestamp.today())
