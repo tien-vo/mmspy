@@ -1,9 +1,8 @@
 """Provide config object for the package."""
 
-__all__ = ["Config", "config"]
+__all__ = ["Config", "config", "default_config_file"]
 
 import json
-import logging
 from importlib.resources import files
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -11,9 +10,7 @@ from typing import IO, Any, Union
 
 from benedict import benedict
 
-from mmspy.utils.paths import CACHE_DIR, DATA_DIR, STATE_DIR
-
-log = logging.getLogger(__name__)
+from mmspy.utils.paths import STATE_DIR
 
 
 class Config(benedict):
@@ -40,7 +37,7 @@ class Config(benedict):
         )
 
         if load_default:
-            self.update(str(files("mmspy.data") / "default-config.toml"))
+            self.update(default_config_file)
 
     def write_content(self):
         with open(self._file_name, "w") as file:
@@ -87,8 +84,5 @@ class Config(benedict):
         return json.dumps(self, sort_keys=True, indent=2, default=str)
 
 
+default_config_file = str(files("mmspy.data") / "default-config.toml")
 config = Config(load_default=True)
-log.debug(f"Config path: {config._file_name}")
-log.debug(f"Cache directory: {CACHE_DIR}")
-log.debug(f"State directory: {STATE_DIR}")
-log.debug(f"Data directory: {DATA_DIR}")
