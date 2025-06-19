@@ -1,0 +1,349 @@
+[query]
+use_alias = false
+base_api_url = "https://lasp.colorado.edu/mms/sdc/public/files/api/v1"
+
+[store]
+sync_store = "local"
+update_local = false
+parallel = 1
+download_chunk_size = "0.5 MB"
+
+[store.chunk]
+time = "1 MB"
+ephemeris_time = "1 MB"
+rank_1 = 1
+rank_2 = 1
+
+[species.ion]
+mass = "1.0 proton_mass"
+charge = "1.0 elementary_charge"
+
+[species.electron]
+mass = "1.0 electron_mass"
+charge = "-1.0 elementary_charge"
+
+[aliases.instrument]
+mec = "magnetic_ephemeris_coordinates"
+fgm = "flux_gate_magnetometer"
+scm = "search_coil_magnetometer"
+fsm = "merged_magnetometer"
+edp = "electric_double_probes"
+
+[aliases.data_level]
+l2 = "level_2"
+l3 = "level_3"
+
+[mec]
+variables = "all"
+
+[mec.aliases.data_type]
+epht89d = "tsyganenko_1989d_model"
+epht89q = "tsyganenko_1989q_model"
+ephts04d = "tsyganenko_sitnov_2004d_model"
+
+[mec.aliases.data_rate]
+srvy = "survey"
+brst = "burst"
+
+[mec.aliases.variable]
+mlt = "magnetic_local_time"
+r_moon_de421_eci = "eci_moon_position"
+r_sun_de421_eci = "eci_sun_position"
+r_sm = "sm_position"
+r_eci = "eci_position"
+r_geo = "geo_position"
+r_gse = "gse_position"
+r_gsm = "gsm_position"
+r_gse2000 = "gse2000_position"
+v_sm = "sm_velocity"
+v_eci = "eci_velocity"
+v_geo = "geo_velocity"
+v_gse = "gse_velocity"
+v_gsm = "gsm_velocity"
+v_gse2000 = "gse2000_velocity"
+quat_eci_to_bcs = "eci_to_bcs_quaternion"
+quat_eci_to_dbcs = "eci_to_dbcs_quaternion"
+quat_eci_to_dmpa = "eci_to_dmpa_quaternion"
+quat_eci_to_dsl = "eci_to_dsl_quaternion"
+quat_eci_to_geo = "eci_to_geo_quaternion"
+quat_eci_to_gse = "eci_to_gse_quaternion"
+quat_eci_to_gse2000 = "eci_to_gse2000_quaternion"
+quat_eci_to_gsm = "eci_to_gsm_quaternion"
+quat_eci_to_sm = "eci_to_sm_quaternion"
+quat_eci_to_smpa = "eci_to_smpa_quaternion"
+quat_eci_to_ssl = "eci_to_ssl_quaternion"
+mlat = "magnetic_latitude"
+mlon = "magnetic_longitude"
+geod_lat = "geodetic_latitude"
+geod_lon = "geodetic_longitude"
+geod_height = "geodetic_height"
+loss_cone_angle_n = "northern_loss_cone_angle"
+loss_cone_angle_s = "southern_loss_cone_angle"
+l_dipole = "dipole_l_shell"
+kp = "kp_index"
+dst = "dst_index"
+int_model = "internal_magnetic_field_model"
+ext_model = "external_magnetic_field_model"
+gmst = "greenwich_mean_sidereal_time"
+bsc_gsm = "gsm_magnetic_field"
+pfn_geod_latlon = "geodetic_northern_footpoint_attitude"
+pfs_geod_latlon = "geodetic_southern_footpoint_attitude"
+pfn_gsm = "gsm_northern_footpoint_position"
+pfs_gsm = "gsm_southern_footpoint_position"
+pmin_gsm = "gsm_minimum_field_position"
+bmin_gsm = "gsm_minimum_field_magnetic_field"
+bfn_gsm = "gsm_northern_footpoint_magnetic_field"
+bfs_gsm = "gsm_southern_footpoint_magnetic_field"
+L_phase = "angular_momentum_phase"
+L_vec = "angular_momentum_attitude"
+P_phase = "major_principal_axis_phase"
+P_vec = "major_principal_axis_attitude"
+Z_phase = "body_Z_axis_phase"
+Z_vec = "body_Z_axis_attitude"
+
+[fgm]
+alias_local_data_type = true
+interpolate_ephemeris_dataset = false
+split_ephemeris_dataset = false
+variables = "all"
+
+[fgm.aliases.data_type]
+None = "bfield"
+
+[fgm.aliases.data_rate]
+srvy = "survey"
+brst = "burst"
+
+[fgm.aliases.variable]
+b_dmpa = "dmpa_magnetic_field"
+b_bcs = "bcs_magnetic_field"
+b_gse = "gse_magnetic_field"
+b_gsm = "gsm_magnetic_field"
+r_gse = "gse_position"
+r_gsm = "gsm_position"
+hirange = "dynamical_range"
+bdeltahalf = "center_time_offset"
+rdeltahalf = "ephemeris_center_time_offset"
+etemp = "electronics_temperature"
+stemp = "sensor_temperature"
+mode = "instrument_mode"
+
+[scm]
+variables = "all"
+
+[scm.aliases.data_type]
+scsrvy = "survey_bfield"
+scb = "slow_burst_bfield"
+schb = "fast_burst_bfield"
+
+[scm.aliases.data_rate]
+srvy = "survey"
+brst = "burst"
+
+[scm.aliases.variable]
+Epoch_delta = "timestamp_half_width"
+acb_gse = "gse_magnetic_field"
+qf_scm123 = "flag"
+
+[fsm]
+variables = "all"
+
+[fsm.aliases.data_type]
+8khz = "bfield"
+
+[fsm.aliases.data_rate]
+brst = "burst"
+
+[fsm.aliases.variable]
+b_gse = "gse_magnetic_field"
+r_gse = "gse_position"
+epoch_delta = "timestamp_half_width"
+hirange = "dynamical_range"
+bdeltahalf = "center_time_offset"
+rdeltahalf = "ephemeris_center_time_offset"
+etemp = "electronics_temperature"
+stemp = "sensor_temperature"
+mode = "instrument_mode"
+
+[edp]
+variables = "all"
+
+[edp.aliases.data_type]
+dce = "efield"
+scpot = "spacecraft_potential"
+
+[edp.aliases.data_rate]
+brst = "burst"
+fast = "survey"
+
+[edp.aliases.variable]
+dce_dsl = "dsl_electric_field"
+dce_gse = "gse_electric_field"
+dce_par_epar = "parallel_electric_field"
+dce_par_epar_err = "parallel_electric_field_error"
+deltap = "timestamp_half_width"
+dcv = "probe_potential" 
+psp = "probe_to_spacecraft_potential" 
+scpot = "spacecraft_potential" 
+time_stamp_halfwidth = "timestamp_half_width"
+
+[fpi]
+variables = "all"
+
+[fpi.aliases.data_type]
+dis-dist = "ion_distribution"
+des-dist = "electron_distribution"
+dis-moms = "ion_moments"
+des-moms = "electron_moments"
+dis-partmoms = "ion_partial_moments"
+des-partmoms = "electron_partial_moments"
+
+[fpi.aliases.data_rate]
+brst = "burst"
+fast = "survey"
+
+[fpi.aliases.variable]
+Epoch_minus_var = "delta_start_time"
+Epoch_plus_var = "delta_stop_time"
+errorflags = "flag"
+
+# Burst distribution
+compressionloss = "compression_loss"
+dist = "phase_space_density"
+disterr = "phase_space_density_error"
+energy = "energy"
+energy_delta = "energy_width"
+phi = "azimuthal_angle"
+phi_delta = "azimuthal_angle_width"
+theta = "zenith_angle"
+theta_delta = "zenith_angle_width"
+sector_despinp = "despin_p_value"
+startdelphi_angle = "spin_phase_angle"
+startdelphi_count = "spin_phase_count"
+steptable_parity = "step_table_parity"
+
+# Survey distribution
+avgf1counts = "average_omnidirectional_phase_space_density"
+
+# Burst moments
+bulkv_dbcs = "dbcs_bulk_velocity"
+bulkv_err = "dbcs_bulk_velocity_error"
+bulkv_gse = "gse_bulk_velocity"
+bulkv_spintone_dbcs = "dbcs_spintone_velocity"
+bulkv_spintone_gse = "gse_spintone_velocity"
+densityextrapolation_high = "high_energy_extrapolated_density"
+densityextrapolation_low = "low_energy_extrapolated_density"
+energyspectr_px = "positive_x_energy_spectrum"
+energyspectr_py = "positive_y_energy_spectrum"
+energyspectr_pz = "positive_z_energy_spectrum"
+energyspectr_mx = "negative_x_energy_spectrum"
+energyspectr_my = "negative_y_energy_spectrum"
+energyspectr_mz = "negative_z_energy_spectrum"
+energyspectr_omni = "omnidirectional_energy_spectrum"
+heatq_dbcs = "dbcs_heat_flux"
+heatq_err = "dbcs_heat_flux_error"
+heatq_gse = "gse_heat_flux"
+numberdensity = "number_density"
+numberdensity_err = "number_density_error"
+numberdensity_bg = "background_number_density"
+pres_bg = "background_pressure"
+prestensor_dbcs = "dbcs_pressure_tensor"
+prestensor_err = "dbcs_pressure_tensor_error"
+prestensor_gse = "gse_pressure_tensor"
+spectr_bg = "background_energy_spectrum"
+temppara = "parallel_temperature"
+tempperp = "perpendicular_temperature"
+temptensor_dbcs = "dbcs_temperature_tensor"
+temptensor_err = "dbcs_temperature_tensor_error"
+temptensor_gse = "gse_temperature_tensor"
+
+# Partial moments
+bhat_dbcs = "dbcs_unit_magnetic_field"
+gse_xform = "gse_transformation_matrix"
+part_index = "partial_index"
+scpmean = "average_spacecraft_potential"
+numberdensity_part = "partial_number_density"
+bulkv_part_dbcs = "dbcs_partial_bulk_velocity"
+bulkv_part_gse = "gse_partial_bulk_velocity"
+prestensor_part_dbcs = "dbcs_partial_pressure_tensor"
+prestensor_part_gse = "gse_partial_pressure_tensor"
+temptensor_part_dbcs = "dbcs_partial_temperature_tensor"
+temptensor_part_gse = "gse_partial_temperature_tensor"
+temppara_part = "partial_parallel_temperature"
+tempperp_part = "partial_perpendicular_temperature"
+
+[feeps]
+variables = "all"
+
+[feeps.aliases.data_type]
+ion = "ion_distribution"
+electron = "electron_distribution"
+
+[feeps.aliases.data_rate]
+brst = "burst"
+srvy = "survey"
+
+[feeps.aliases.variable]
+l_dipole = "dipole_l_shell"
+lat_gse = "gse_latitude"
+lat_gsm = "gsm_latitude"
+lon_gse = "gse_longitude"
+lon_gsm = "gsm_longitude"
+moon_position_gse = "gse_moon_position"
+radius = "radial_distance"
+scpos_ec_gse = "gse_position"
+scx_vec_gse = "x_geocentric_position"
+scy_vec_gse = "y_geocentric_position"
+scz_vec_gse = "z_geocentric_position"
+spin = "spin_number"
+spinsectnum = "spin_sector_number"
+
+[hpca]
+variables = "all"
+
+[hpca.aliases.data_type]
+ion = "ion_distribution"
+moments = "ion_moments"
+tof-counts = "time_of_flight_counts"
+
+[hpca.aliases.data_rate]
+brst = "burst"
+srvy = "survey"
+
+[hpca.aliases.variable]
+B_GSE_spin_avg = "gse_magnetic_field"
+B_GSM_spin_avg = "gsm_magnetic_field"
+hplus_ion_bulk_velocity = "hplus_dbcs_bulk_velocity"
+hplus_ion_bulk_velocity_GSM = "hplus_gsm_bulk_velocity"
+hplus_tparallel = "hplus_parallel_temperature"
+hplus_tperp = "hplus_perpendicular_temperature"
+hplus_vparallel = "hplus_dbcs_parallel_velocity"
+hplus_vparallel_GSM = "hplus_gsm_parallel_velocity"
+hplus_vperp = "hplus_dbcs_perpendicular_velocity"
+hplus_vperp_GSM = "hplus_gsm_perpendicular_velocity"
+heplus_ion_bulk_velocity = "heplus_dbcs_bulk_velocity"
+heplus_ion_bulk_velocity_GSM = "heplus_gsm_bulk_velocity"
+heplus_tparallel = "heplus_parallel_temperature"
+heplus_tperp = "heplus_perpendicular_temperature"
+heplus_vparallel = "heplus_dbcs_parallel_velocity"
+heplus_vparallel_GSM = "heplus_gsm_parallel_velocity"
+heplus_vperp = "heplus_dbcs_perpendicular_velocity"
+heplus_vperp_GSM = "heplus_gsm_perpendicular_velocity"
+heplusplus_ion_bulk_velocity = "heplusplus_dbcs_bulk_velocity"
+heplusplus_ion_bulk_velocity_GSM = "heplusplus_gsm_bulk_velocity"
+heplusplus_tparallel = "heplusplus_parallel_temperature"
+heplusplus_tperp = "heplusplus_perpendicular_temperature"
+heplusplus_vparallel = "heplusplus_dbcs_parallel_velocity"
+heplusplus_vparallel_GSM = "heplusplus_gsm_parallel_velocity"
+heplusplus_vperp = "heplusplus_dbcs_perpendicular_velocity"
+heplusplus_vperp_GSM = "heplusplus_gsm_perpendicular_velocity"
+oplus_ion_bulk_velocity = "oplus_dbcs_bulk_velocity"
+oplus_ion_bulk_velocity_GSM = "oplus_gsm_bulk_velocity"
+oplus_tparallel = "oplus_parallel_temperature"
+oplus_tperp = "oplus_perpendicular_temperature"
+oplus_vparallel = "oplus_dbcs_parallel_velocity"
+oplus_vparallel_GSM = "oplus_gsm_parallel_velocity"
+oplus_vperp = "oplus_dbcs_perpendicular_velocity"
+oplus_vperp_GSM = "oplus_gsm_perpendicular_velocity"
+Epoch_MINUS = "delta_start_time"
+Epoch_PLUS = "delta_stop_time"
