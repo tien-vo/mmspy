@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 @define
 class Query:
-    """Dataclass for handling query parameters for the MMS SDC.
+    """API parameters for querying the MMS SDC.
 
     .. todo:: Add examples.
 
