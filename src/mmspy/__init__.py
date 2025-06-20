@@ -1,29 +1,85 @@
 """MMS in Python.
 
-MmsPy is an open source Python package for plasma research with data
+mmspy is an open source Python package for plasma research with data
 from the NASA Magnetospheric Multiscale (MMS) mission.
 """
 
 from importlib.metadata import version as _version
+from typing import TYPE_CHECKING
+
+from mmspy.config import (
+    Config,
+    config,
+    configure_matplotlib,
+    enable_diagnostics,
+    enable_log,
+    units,
+)
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from mmspy.api import Query, Store
+
+    query: Query
+    store: Store
+    load: Callable
+
+from mmspy.api import load, query, store
+from mmspy.compute import (
+    ParticleGrid,
+    cartesian_to_fac,
+    cross,
+    curlometer,
+    fac_to_cartesian,
+    integrate_distribution,
+    interpolate_distribution,
+    lowpass_filter,
+    matrix_multiply,
+    quaternion_conjugate,
+    quaternion_dot,
+    quaternion_rotate,
+    reduce_distribution,
+    rotation_matrix,
+    smooth_distribution,
+    vector_norm,
+)
+from mmspy.compute.utils import (
+    is_quantified,
+    match_time_resolution,
+    sampling_information,
+    to_regular_time,
+)
 
 __all__ = [
-    "api",
+    "Config",
     "config",
-    "CACHE_DIR",
-    "DATA_DIR",
-    "STATE_DIR",
+    "configure_matplotlib",
+    "enable_diagnostics",
+    "enable_log",
+    "units",
+    "load",
+    "query",
+    "store",
+    "ParticleGrid",
+    "cartesian_to_fac",
+    "cross",
+    "curlometer",
+    "fac_to_cartesian",
+    "integrate_distribution",
+    "interpolate_distribution",
+    "lowpass_filter",
+    "matrix_multiply",
+    "quaternion_conjugate",
+    "quaternion_dot",
+    "quaternion_rotate",
+    "reduce_distribution",
+    "rotation_matrix",
+    "smooth_distribution",
+    "vector_norm",
+    "is_quantified",
+    "match_time_resolution",
+    "sampling_information",
+    "to_regular_time",
 ]
 __version__ = _version("mmspy")
-
-from mmspy.utils.config import config
-from mmspy.utils.directories import CACHE_DIR, DATA_DIR, STATE_DIR
-from mmspy.utils.logging import configure_logger
-from mmspy.utils.pint import configure_units
-
-configure_logger(CACHE_DIR)
-units = configure_units()
-
-from mmspy import api
-
-#  import mmspy.xarray
-#  from mmspy import api, computation, utils
