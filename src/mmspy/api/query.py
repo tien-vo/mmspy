@@ -1,217 +1,297 @@
-r"""Provide interface for API query parameters."""
+"""Provide dataclass for API query parameters."""
 
-__all__ = ["Query"]
+__all__ = ["Query", "query"]
+
+import logging
 
 import pandas as pd
-from attr import define, field
-from attr.converters import optional, pipe
-from pandas.core.tools.datetimes import DatetimeScalar
+from attrs import asdict, define, field
 
-from mmspy.api.converters import shift_date
-from mmspy.api.validators import convert_data_rate as _convert_data_rate
-from mmspy.api.validators import (
-    convert_edp_data_type,
-    convert_feeps_data_type,
-    convert_fgm_data_type,
-    convert_fpi_data_type,
-    convert_mec_data_type,
-    one_of,
-    time_in_range,
-    time_range_is_valid,
-)
+from mmspy.api.utils.alias import AliasedString, make_aliased_string
+from mmspy.api.utils.file import parse_species
+from mmspy.config.config import config
+from mmspy.types import Date
+
+log = logging.getLogger(__name__)
 
 
 @define
 class Query:
-    r"""Interface for query parameters.
+    """Dataclass for handling query parameters for the MMS SDC.
 
-    .. todo:: Clarify docstring.
-    .. todo:: Attributes need docstring.
-    .. todo:: Validate query payload together, instead of separately.
+    .. todo:: Add examples.
 
-    Parameters
+    For details on the web services and the API query parameters, see the
+    `SDC website`_. For usage examples, see the ``Attributes`` and
+    ``Examples`` sections below.
+
+    .. _`SDC website`: https://lasp.colorado.edu/mms/sdc/public/about/how-to/
+
+    Attributes
     ----------
-    data : {'science', 'ancillary', 'hk'}, optional
-        Type of query.
-    probe : {'mms1', 'mms2', 'mms3', 'mms4'}, optional
-        Probe name (API equivalence: sc_id)
-    instrument: {'mec', 'fgm', 'edp', 'fpi', 'feeps'}, optional
-        Instrument name (API equivalence: instrument_id)
-    data_rate: {'brst', 'srvy', 'fast', 'slow'}, optional
-        Data rate mode (API equivalence: data_rate_mode)
-    data_type: str, optional
-        Data descriptor (API equivalence: descriptor)
-    data_level: str, optional
-        Data level (API equivalence: data_level)
-    product: str, optional
-        Ancillary product (API equivalence: product)
-    start_date, end_date : date_like, optional
-        Query start and end dates (API equivalence: start_date, end_date)
+    start_time : date_like, optional
+        Query start time in acceptable format for `~pandas.Timestamp`, e.g.,
+        YYYY-MM-DD, YYYY-MM-DD/hh:mm:ss, or YYYY-MM-DDThh:mm:ss.ssssss
+        (API equivalence: ``start_date``).
+    stop_time : date_like, optional
+        Query stop time in acceptable format for `~pandas.Timestamp`, e.g.,
+        YYYY-MM-DD, YYYY-MM-DD/hh:mm:ss, or YYYY-MM-DDThh:mm:ss.ssssss
+        (API equivalence: ``end_date``).
+    probe : str, optional
+        Probe name (API equivalence: ``sc_id``).
+    instrument : str, optional
+        Instrument name (API equivalence: ``instrument_id``).
+    data_rate : str, optional
+        Data rate mode (API equivalence: ``data_rate_mode``).
+    data_type : str, optional
+        Data descriptor (API equivalence: ``descriptor``).
+    data_level : str, optional
+        Data level (API equivalence: ``data_level``).
+    ancillary_product : str, optional
+        Ancillary product (API equivalence: ``product``). Note: This is for
+        ancillary data queries only, i.e., ``.get_url(data='ancillary')``.
 
     """
 
-    valid_time_range = (pd.Timestamp("2015-09-01"), pd.Timestamp.today())
+    start_time: Date = field(default=None, converter=pd.Timestamp)
+    """: Examples: `'2015-10-16'`, `'2015-10-16T08:00:00'`"""
 
-    # ---- Flags
-    shift_time_range: bool = field(default=False, repr=False, converter=bool)
-    convert_data_rate: bool = field(default=True, repr=False, converter=bool)
+    stop_time: Date = field(default=None, converter=pd.Timestamp)
+    """: Examples: `'2015-10-17'`, `'2015-10-16T14:00:00'`"""
 
-    # ---- Query parameters
-    data: str = field(
-        default=None,
-        converter=optional(str),
-        validator=one_of(["science"]),
-    )
+    probe: str = field(default=None, converter=str)
+    """: Examples: `'mms1'`, `'mms2'`, `'mms3'`, `'mms4'`"""
 
-    probe: str = field(
-        default=None,
-        converter=optional(str),
-        validator=one_of(["mms1", "mms2", "mms3", "mms4"]),
-    )
+    instrument: str = field(default=None, converter=str)
+    """: Examples: `'aspoc'`, `'dsp'`, `'edi'`, `'edp'`, `'epd'`,
+    `'epd-eis'`, `'feeps'`, `'fgm'`, `'fpi'`, `'fsm'`, `'hpca'`,
+    `'mec'`, `'scm'`
+    """
 
-    instrument: str = field(
-        default=None,
-        converter=optional(str),
-        validator=[
-            one_of(["mec", "fgm", "edp", "fpi", "feeps"]),
-            _convert_data_rate,
-        ],
-    )
+    data_rate: str = field(default=None, converter=str)
+    """: Examples: `'srvy'`, `'brst'`, `'slow'`, `'fast'`"""
 
-    _data_rate: str = field(
-        init=False,
-        repr=False,
-        default=None,
-        converter=optional(str),
-    )
+    data_type: str = field(default=None, converter=str)
+    """: Examples: `'epht89d'`, `'epht89q'`, `'ephts04d'` (for MEC),
+    `'dce'`, `'scpot'` (for EDP), `'scsrvy'`, `'scb'`, `'schb'` (for SCM),
+    `'dis-dist'`, `'dis-moms'`, `'dis-partmoms'`, `'des-dist'`,
+    `'des-moms'`, `'des-partmoms'` (for FPI),
+    `'ion'`, `'electron'` (for FEEPS)
+    """
 
-    data_rate: str = field(
-        default=None,
-        converter=optional(str),
-        validator=[
-            one_of(["brst", "srvy", "fast", "slow"]),
-            _convert_data_rate,
-        ],
-    )
+    data_level: str = field(default=None, converter=str)
+    """: Examples: `'l2'`, `'l3'`"""
 
-    _data_type: str = field(
-        init=False,
-        repr=False,
-        default=None,
-        converter=optional(str),
-    )
+    ancillary_product: str = field(default=None, converter=str)
+    """: Examples: `'defeph'`, `'defatt'`, `'predatt'`, `'predeph'`,
+    `'radpred'`, `'manplan'`, `'timeline'`"""
 
-    data_type: str = field(
-        default=None,
-        converter=optional(str),
-        validator=[
-            one_of(
-                [
-                    "bfield",
-                    "efield",
-                    "potential",
-                    "t89d",
-                    "t89q",
-                    "ts04d",
-                    "ion_distribution",
-                    "ion_moments",
-                    "ion_partial_moments",
-                    "elc_distribution",
-                    "elc_moments",
-                    "elc_partial_moments",
-                ],
-            ),
-            convert_mec_data_type,
-            convert_fgm_data_type,
-            convert_edp_data_type,
-            convert_fpi_data_type,
-            convert_feeps_data_type,
-        ],
-    )
-
-    data_level: str = field(
-        default=None,
-        converter=optional(str),
-        validator=one_of(["l2"]),
-    )
-
-    product: str = field(
-        default=None,
-        converter=optional(str),
-        validator=one_of([]),
-    )
-
-    start_date: DatetimeScalar = field(
-        default=None,
-        converter=pipe(optional(pd.to_datetime), shift_date),  # type: ignore[misc]
-        validator=[
-            time_in_range,
-        ],
-    )
-
-    end_date: DatetimeScalar = field(
-        default=None,
-        converter=pipe(optional(pd.to_datetime), shift_date),  # type: ignore[misc]
-        validator=[
-            time_in_range,
-            time_range_is_valid,
-        ],
-    )
+    _state: dict = field(default={}, init=False, repr=False)
 
     @property
-    def payload(self) -> dict[str, str | None]:
-        r"""HTTP payload constructed from query parameters."""
-        fmt = "%Y-%m-%d-%H-%M-%S" if self.data_rate == "brst" else "%Y-%m-%d"
-        return {
-            "start_date": (
-                self.start_date
-                if self.start_date is None
-                else self.start_date.strftime("%Y-%m-%d")  # type: ignore[union-attr]
-            ),
-            "end_date": (
-                self.end_date
-                if self.end_date is None
-                else self.end_date.strftime(fmt)  # type: ignore[union-attr]
-            ),
-            "sc_id": self.probe,
-            "instrument_id": self.instrument,
-            "data_rate_mode": self._data_rate,
-            "descriptor": self._data_type,
-            "data_level": self.data_level,
-            "product": self.product,
-        }
+    def _start_time(self) -> pd.Timestamp:
+        """`start_time` adjusted for query."""
+        return pd.Timestamp(self.start_time) - pd.Timedelta(1, "d")
+
+    @property
+    def _stop_time(self) -> pd.Timestamp:
+        """`stop_time` adjusted for query."""
+        return pd.Timestamp(self.stop_time) + pd.Timedelta(1, "d")
+
+    @property
+    def _probe(self) -> AliasedString:
+        return make_aliased_string(self.probe, "aliases/probe")
+
+    @property
+    def _instrument(self) -> AliasedString:
+        return make_aliased_string(self.instrument, "aliases/instrument")
+
+    @property
+    def _data_rate(self) -> AliasedString:
+        path = f"{self._instrument.true_value}/aliases/data_rate"
+        return make_aliased_string(self.data_rate, path)
+
+    @property
+    def _data_type(self) -> AliasedString:
+        path = f"{self._instrument.true_value}/aliases/data_type"
+        return make_aliased_string(self.data_type, path)
+
+    @property
+    def _data_level(self) -> AliasedString:
+        return make_aliased_string(self.data_level, "aliases/data_level")
+
+    @property
+    def _ancillary_product(self) -> AliasedString:
+        return make_aliased_string(
+            self.ancillary_product,
+            "aliases.ancillary_product",
+        )
+
+    @property
+    def remote_path(self) -> str:
+        """Path to the remote store."""
+        path = [
+            self._probe.true_value,
+            self._instrument.true_value,
+            self._data_rate.true_value,
+            self._data_level.true_value,
+        ]
+        additional = (
+            [] if not bool(self._data_type) else [self._data_type.true_value]
+        )
+        return "/".join(path + additional)
+
+    @property
+    def local_path(self) -> str:
+        """Path to the local store."""
+        alias = (
+            "alias"
+            if config.get("query/use_alias", default=False)
+            else "true_value"
+        )
+        probe = getattr(self._probe, alias)
+        instrument = getattr(self._instrument, alias)
+        data_rate = getattr(self._data_rate, alias)
+        data_type = getattr(self._data_type, alias)
+        data_level = getattr(self._data_level, alias)
+
+        # This will only apply for FGM
+        if config.get(
+            f"{self._instrument.true_value}/alias_local_data_type",
+            default=False,
+        ) and not bool(self._data_type):
+            data_type = config.get(
+                f"{self._instrument.true_value}/aliases/data_type/None",
+                default=self.data_type,
+            )
+
+        return "/".join([probe, instrument, data_type, data_rate, data_level])
 
     @property
     def metadata(self) -> dict[str, str]:
-        r"""Metadata from query parameters."""
+        """Return the query's metadata."""
+        probe = self._probe.true_value
+        instrument = self._instrument.true_value
+        data_rate = self._data_rate.true_value
+        data_type = self._data_type.true_value
+        data_level = self._data_level.true_value
+
+        extras: dict[str, str] = {}
+        if instrument in ["feeps", "fpi"]:
+            extras["species"] = parse_species(instrument, data_type)
+
         return {
-            "probe": self.probe,
-            "instrument": self.instrument,
-            "data_rate": self.data_rate,
-            "_data_rate": self._data_rate,
-            "data_type": self.data_type,
-            "_data_type": str(self._data_type),
-            "data_level": self.data_level,
-            "product": self.product,
+            "probe": probe,
+            "instrument": instrument,
+            "data_rate": data_rate,
+            "data_type": data_type,
+            "data_level": data_level,
+            "local_path": self.local_path,
+            **extras,
+        }
+
+    def get_url(self, command: str, data: str = "science") -> str:
+        """Get the url for a HTTP request.
+
+        Parameters
+        ----------
+        command : str
+            {'file_names', 'file_info', 'version_info', 'download'}
+        data : str
+            {'science', 'ancillary', 'hk'}
+
+        Returns
+        -------
+        url : str
+            Base url to provide for an HTTP request.
+
+        """
+        base_api_url = config.get("query/base_api_url", "raise")
+        return f"{base_api_url}/{command}/{data}"
+
+    def get_payload(
+        self,
+        cdf_file_name: str | None = None,
+    ) -> dict[str, str | None]:
+        """Get the HTTP payload constructed from query parameters.
+
+        Parameters
+        ----------
+        cdf_file_name : str, optional
+            Query parameters will be ignored if a specific
+            ``cdf_file_name`` is provided.
+
+        Returns
+        -------
+        payload : dict
+            Payload to provide for an HTTP request.
+
+        """
+
+        def wrap_none(value: str) -> str | None:
+            return None if value == "None" else value
+
+        if cdf_file_name is not None:
+            return {"file": cdf_file_name}
+
+        if pd.isnull(self._start_time) and pd.isnull(self._stop_time):
+            msg = (
+                "Both 'start_time' and 'stop_time' are not set! "
+                "This is unsafe because it will query a lot of CDF files. "
+                "Please set a time range."
+            )
+            raise ValueError(msg)
+
+        return {
+            "start_date": self._start_time.strftime("%Y-%m-%d-%H-%M-%S"),
+            "end_date": self._stop_time.strftime("%Y-%m-%d-%H-%M-%S"),
+            "sc_id": wrap_none(self._probe.true_value),
+            "instrument_id": wrap_none(self._instrument.true_value),
+            "data_rate_mode": wrap_none(self._data_rate.true_value),
+            "descriptor": wrap_none(self._data_type.true_value),
+            "data_level": wrap_none(self._data_level.true_value),
+            "product": wrap_none(self._ancillary_product.true_value),
         }
 
     def __repr__(self) -> str:
-        r"""Repr for query class."""
-
-        def _or_na(arg):  # noqa: ANN001,ANN202
-            if arg is None:
-                return "N/A"
-
-            return arg
-
         return (
             "Query parameters:\n"
-            f"  * start_date  : {_or_na(self.start_date)}\n"
-            f"  * end_date    : {_or_na(self.end_date)}\n"
-            f"  * probe       : {_or_na(self.probe)}\n"
-            f"  * instrument  : {_or_na(self.instrument)}\n"
-            f"  * data_rate   : {_or_na(self.data_rate)}\n"
-            f"  * data_type   : {_or_na(self.data_type)}\n"
-            f"  * data_level  : {_or_na(self.data_level)}\n"
-            f"  * product     : {_or_na(self.product)}"
+            f"  * start_time        : {self.start_time}\n"
+            f"  * stop_time         : {self.stop_time}\n"
+            f"  * probe             : {self._probe}\n"
+            f"  * instrument        : {self._instrument}\n"
+            f"  * data_rate         : {self._data_rate}\n"
+            f"  * data_type         : {self._data_type}\n"
+            f"  * data_level        : {self._data_level}\n"
+            f"  * ancillary_product : {self._ancillary_product}"
         )
+
+    def update(self, **kwargs) -> None:
+        """Update the query with init parameters."""
+        for variable, value in kwargs.items():
+            if value is not None:
+                setattr(self, variable, value)
+
+    def reset(self) -> None:
+        """Reset the query."""
+        for variable in [
+            "start_time",
+            "stop_time",
+            "probe",
+            "instrument",
+            "data_rate",
+            "data_type",
+            "data_level",
+            "ancillary_product",
+        ]:
+            setattr(self, variable, None)
+
+    def save_state(self) -> None:
+        """Save the current query."""
+        self._state = asdict(self)
+
+    def restore_state(self) -> None:
+        self.update(**self._state)
+
+
+query = Query()

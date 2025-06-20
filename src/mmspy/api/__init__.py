@@ -1,13 +1,7 @@
-r"""Provide interfaces for LASP SDC API."""
+"""Provide API for the LASP MMS SDC."""
 
-__all__ = [
-    "MMS",
-    "Query",
-    "Request",
-    "Synchronizer",
-]
+__all__ = ["Query", "query", "Store", "store", "load"]
 
-from .mms import MMS
-from .query import Query
-from .request import Request
-from .sync import Synchronizer
+from mmspy.api.load import load
+from mmspy.api.query import Query, query
+from mmspy.api.store import Store, store
