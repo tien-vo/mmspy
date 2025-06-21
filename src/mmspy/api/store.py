@@ -29,23 +29,22 @@ from mmspy.api.utils.progress_bar import bar_config
 from mmspy.api.utils.remote import download_cdf_file, get_remote_files
 from mmspy.api.utils.render_tree import render_tree
 from mmspy.api.utils.request import setup_request_session
-from mmspy.api.utils.store import setup_zarr_store
+from mmspy.api.utils.store import convert_path, setup_zarr_store
 from mmspy.compute.utils import ensure_quantifiable, force_monotonic
-from mmspy.config import config
-from mmspy.config.paths import DATA_DIR
-from mmspy.config.units import units as u
+from mmspy.configure.config import config
+from mmspy.configure.units import units as u
 
 log = logging.getLogger(__name__)
 
 
 @define
 class Store:
-    """Data storage.
+    """Manager for all data storages based on `~mmspy.query` parameters.
 
     .. todo:: Add examples.
 
-    Attributes
-    ----------
+    Parameter
+    ---------
     path : path-like, optional
         Path to local storage. Default to system data directory.
 
@@ -59,8 +58,8 @@ class Store:
     )
 
     path: str | PathLike = field(
-        default=DATA_DIR,
-        converter=Path,
+        default=None,
+        converter=convert_path,
         validator=setup_zarr_store,
     )
 
@@ -335,16 +334,11 @@ class Store:
 
     def show(self, pattern: str = "") -> None:
         """Show the data store tree."""
-        string = render_tree(self, pattern)
-        print(string)
+        render_tree(self, pattern)
 
     def __del__(self) -> None:
         """Close request session."""
         self.request.close()
-
-    def __repr__(self) -> str:
-        """Repr for data store."""
-        return render_tree(self)
 
 
 store = Store()

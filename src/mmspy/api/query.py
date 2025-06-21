@@ -9,82 +9,94 @@ from attrs import asdict, define, field
 
 from mmspy.api.utils.alias import AliasedString, make_aliased_string
 from mmspy.api.utils.file import parse_species
-from mmspy.config.config import config
+from mmspy.configure.config import config
 from mmspy.types import Date
 
 log = logging.getLogger(__name__)
 
 
+#  """
+#  Examples: `'2015-10-16'`, `'2015-10-16T08:00:00'`
+#  Examples: `'2015-10-17'`, `'2015-10-16T14:00:00'`
+#  Examples: `'mms1'`, `'mms2'`, `'mms3'`, `'mms4'`
+#  Examples: `'aspoc'`, `'dsp'`, `'edi'`, `'edp'`, `'epd'`,
+#      `'epd-eis'`, `'feeps'`, `'fgm'`, `'fpi'`, `'fsm'`, `'hpca'`,
+#      `'mec'`, `'scm'`
+#  Examples: `'srvy'`, `'brst'`, `'slow'`, `'fast'`
+#  Examples: `'epht89d'`, `'epht89q'`, `'ephts04d'` (for MEC),
+#      `'dce'`, `'scpot'` (for EDP), `'scsrvy'`, `'scb'`, `'schb'` (for SCM),
+#      `'dis-dist'`, `'dis-moms'`, `'dis-partmoms'`, `'des-dist'`,
+#      `'des-moms'`, `'des-partmoms'` (for FPI),
+#      `'ion'`, `'electron'` (for FEEPS)
+#  Examples: `'l2'`, `'l3'`
+#  Examples: `'defeph'`, `'defatt'`, `'predatt'`, `'predeph'`,
+#      `'radpred'`, `'manplan'`, `'timeline'`
+#  """
+
+
 @define
 class Query:
-    """API parameters for querying the MMS SDC.
+    """Query parameters for the MMS SDC.
 
     .. todo:: Add examples.
 
-    For details on the web services and the API query parameters, see the
-    `SDC website`_. For usage examples, see the ``Attributes`` and
+    This class is not supposed to be initialized directly. Rather, it
+    should be used through the package-level `mmspy.query` instance.
+
+    For detailed descriptions of the web services and the query parameters,
+    see the `SDC website`_. For usage examples, see the ``Attributes`` and
     ``Examples`` sections below.
 
     .. _`SDC website`: https://lasp.colorado.edu/mms/sdc/public/about/how-to/
 
-    Attributes
+    Parameters
     ----------
-    start_time : date_like, optional
-        Query start time in acceptable format for `~pandas.Timestamp`, e.g.,
-        YYYY-MM-DD, YYYY-MM-DD/hh:mm:ss, or YYYY-MM-DDThh:mm:ss.ssssss
-        (API equivalence: ``start_date``).
-    stop_time : date_like, optional
-        Query stop time in acceptable format for `~pandas.Timestamp`, e.g.,
-        YYYY-MM-DD, YYYY-MM-DD/hh:mm:ss, or YYYY-MM-DDThh:mm:ss.ssssss
-        (API equivalence: ``end_date``).
+    start_time : date-like, optional
+        API equivalence: ``start_date``.
+    stop_time : date-like, optional
+        API equivalence: ``stop_date``.
     probe : str, optional
-        Probe name (API equivalence: ``sc_id``).
+        API equivalence: ``sc_id``.
     instrument : str, optional
-        Instrument name (API equivalence: ``instrument_id``).
+        API equivalence: ``instrument_id``.
     data_rate : str, optional
-        Data rate mode (API equivalence: ``data_rate_mode``).
+        API equivalence: ``data_rate_mode``.
     data_type : str, optional
-        Data descriptor (API equivalence: ``descriptor``).
+        API equivalence: ``descriptor``.
     data_level : str, optional
-        Data level (API equivalence: ``data_level``).
+        API equivalence: ``data_level``.
     ancillary_product : str, optional
-        Ancillary product (API equivalence: ``product``). Note: This is for
-        ancillary data queries only, i.e., ``.get_url(data='ancillary')``.
+        API equivalence: ``product``.
 
     """
 
     start_time: Date = field(default=None, converter=pd.Timestamp)
-    """: Examples: `'2015-10-16'`, `'2015-10-16T08:00:00'`"""
+    """: Query start time in acceptable format for `~pandas.Timestamp`,
+    e.g., YYYY-MM-DD, YYYY-MM-DD/hh:mm:ss, or YYYY-MM-DDThh:mm:ss.ssssss.
+    """
 
     stop_time: Date = field(default=None, converter=pd.Timestamp)
-    """: Examples: `'2015-10-17'`, `'2015-10-16T14:00:00'`"""
+    """: Query stop time in acceptable format for `~pandas.Timestamp`,
+    e.g., YYYY-MM-DD, YYYY-MM-DD/hh:mm:ss, or YYYY-MM-DDThh:mm:ss.ssssss.
+    """
 
     probe: str = field(default=None, converter=str)
-    """: Examples: `'mms1'`, `'mms2'`, `'mms3'`, `'mms4'`"""
+    """: Probe name."""
 
     instrument: str = field(default=None, converter=str)
-    """: Examples: `'aspoc'`, `'dsp'`, `'edi'`, `'edp'`, `'epd'`,
-    `'epd-eis'`, `'feeps'`, `'fgm'`, `'fpi'`, `'fsm'`, `'hpca'`,
-    `'mec'`, `'scm'`
-    """
+    """: Instrument name."""
 
     data_rate: str = field(default=None, converter=str)
-    """: Examples: `'srvy'`, `'brst'`, `'slow'`, `'fast'`"""
+    """: Data rate mode."""
 
     data_type: str = field(default=None, converter=str)
-    """: Examples: `'epht89d'`, `'epht89q'`, `'ephts04d'` (for MEC),
-    `'dce'`, `'scpot'` (for EDP), `'scsrvy'`, `'scb'`, `'schb'` (for SCM),
-    `'dis-dist'`, `'dis-moms'`, `'dis-partmoms'`, `'des-dist'`,
-    `'des-moms'`, `'des-partmoms'` (for FPI),
-    `'ion'`, `'electron'` (for FEEPS)
-    """
+    """: Data descriptor."""
 
     data_level: str = field(default=None, converter=str)
-    """: Examples: `'l2'`, `'l3'`"""
+    """: Data level."""
 
     ancillary_product: str = field(default=None, converter=str)
-    """: Examples: `'defeph'`, `'defatt'`, `'predatt'`, `'predeph'`,
-    `'radpred'`, `'manplan'`, `'timeline'`"""
+    """: Ancillary product (unsupported)."""
 
     _state: dict = field(default={}, init=False, repr=False)
 
@@ -253,9 +265,8 @@ class Query:
             "product": wrap_none(self._ancillary_product.true_value),
         }
 
-    def __repr__(self) -> str:
+    def summary(self) -> str:
         return (
-            "Query parameters:\n"
             f"  * start_time        : {self.start_time}\n"
             f"  * stop_time         : {self.stop_time}\n"
             f"  * probe             : {self._probe}\n"

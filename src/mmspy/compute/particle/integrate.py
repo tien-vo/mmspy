@@ -3,7 +3,7 @@ import pandas as pd
 import xarray as xr
 
 from mmspy.compute.utils import match_time_resolution
-from mmspy.config.units import units as u
+from mmspy.configure.units import units as u
 
 
 def precondition_dataset(

@@ -9,7 +9,7 @@ import xarray as xr
 from mmspy.api.query import query
 from mmspy.api.store import store as store_
 from mmspy.api.utils.file import truncate_file_list_using_metadata
-from mmspy.config.config import config
+from mmspy.configure.config import config
 
 log = logging.getLogger(__name__)
 default_load_kwargs = {"combine": "nested", "parallel": True}
@@ -30,7 +30,7 @@ def load(
     load_kwargs: dict = default_load_kwargs,
     **kwargs,
 ) -> xr.Dataset:
-    """Load an MMS dataset from any `store`.
+    """Load an MMS dataset with the data `~mmspy.store` manager.
 
     Parameters
     ----------

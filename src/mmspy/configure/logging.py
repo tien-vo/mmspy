@@ -11,9 +11,9 @@ import sys
 
 import pandas as pd
 
-from mmspy.config.config import DEFAULT_CONFIG_FILE, config
-from mmspy.config.paths import CACHE_DIR, DATA_DIR, STATE_DIR
-from mmspy.config.units import UNIT_DEFINITIONS
+from mmspy.configure.config import DEFAULT_CONFIG_FILE, config
+from mmspy.configure.paths import CACHE_DIR, DATA_DIR, STATE_DIR
+from mmspy.configure.units import UNIT_DEFINITIONS
 
 
 class IgnoreItspDimensionWarningsFilter(logging.Filter):

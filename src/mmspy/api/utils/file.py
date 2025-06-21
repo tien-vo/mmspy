@@ -11,17 +11,17 @@ from bisect import bisect_left, bisect_right
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import xarray as xr
 import numpy as np
 import pandas as pd
+import xarray as xr
 import zarr
 from attrs import Attribute, asdict, define, field
 
-from mmspy.config.units import units as u
+from mmspy.configure.units import units as u
 from mmspy.types import Date, Quantity, T_File
 
 if TYPE_CHECKING:
-    from mmspy.api import Query
+    from mmspy.api.query import Query
 
 
 def generate_file_name(time: Date) -> str:
@@ -151,6 +151,7 @@ class CdfFile:
     .. todo:: Update docstring
 
     """
+
     cdf_file_name: str = field(validator=parse_file_name)
     modified_date: str = ""
     size: str = ""
@@ -274,6 +275,7 @@ def truncate_file_list_using_metadata(
                     local_start_time = str(dataset.time[0].values)
                     local_stop_time = str(dataset.time[-1].values)
             if not (bool(local_start_time) and bool(local_stop_time)):
+                filtered_list.append(file)
                 continue
             if (
                 time_in_range(
@@ -299,7 +301,7 @@ def truncate_file_list_using_metadata(
             ):
                 filtered_list.append(file)
         except (FileNotFoundError, zarr.errors.PathNotFoundError):
-            pass
+            continue
 
     return filtered_list
 

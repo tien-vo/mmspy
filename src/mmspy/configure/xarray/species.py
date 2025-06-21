@@ -6,8 +6,8 @@ from typing import Generic
 
 import xarray as xr
 
-from mmspy.config.config import config
-from mmspy.config.units import units as u
+from mmspy.configure.config import config
+from mmspy.configure.units import units as u
 from mmspy.types import Quantity, T_Xarray
 
 

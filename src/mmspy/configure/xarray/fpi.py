@@ -7,8 +7,8 @@ import xarray as xr
 
 from mmspy.compute.utils import match_time_resolution
 from mmspy.compute.vector import cross
-from mmspy.config.xarray.utils import validate_dataset
-from mmspy.config.units import units as u
+from mmspy.configure.units import units as u
+from mmspy.configure.xarray.utils import validate_dataset
 
 
 def spherical_dot(

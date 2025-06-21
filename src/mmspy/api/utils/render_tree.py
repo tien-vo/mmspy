@@ -54,20 +54,15 @@ def find_literal_pattern(
     return paths
 
 
-def render_tree(store: "Store", pattern: str = "") -> str:
+def render_tree(store: "Store", pattern: str = "") -> None:
     if bool(pattern) and pattern[0] == "/":
         pattern = pattern[1:]
 
     find = find_glob_pattern if is_glob(pattern) else find_literal_pattern
     paths = find(pattern, store.zarr, store_prefix="/store")
     tree: Node = list_to_tree(paths)
-    return "\n".join(
-        [
-            (
-                f"{branch}{stem}{node.node_name}"
-                if node.node_name != "store"
-                else f"/ (system path: {store.path})"
-            )
-            for branch, stem, node in yield_tree(tree)
-        ]
-    )
+    for branch, stem, node in yield_tree(tree):
+        if node.node_name != "store":
+            print(f"{branch}{stem}{node.node_name}")
+        else:
+            print(f"/ (system path: {store.path})")

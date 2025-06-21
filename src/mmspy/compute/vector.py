@@ -12,7 +12,7 @@ import numpy as np
 import xarray as xr
 
 from mmspy.compute.utils import is_quantified
-from mmspy.config.units import units as u
+from mmspy.configure.units import units as u
 from mmspy.types import Dims, Sequence
 
 

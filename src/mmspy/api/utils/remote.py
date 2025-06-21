@@ -15,11 +15,12 @@ from mmspy.api.utils.file import (
     truncate_file_list_using_name,
 )
 from mmspy.api.utils.progress_bar import bar_config
-from mmspy.config.config import config
-from mmspy.config.units import units as u
+from mmspy.configure.config import config
+from mmspy.configure.units import units as u
 
 if TYPE_CHECKING:
-    from mmspy.api import Query, Store
+    from mmspy.api.query import Query
+    from mmspy.api.store import Store
 
 log = logging.getLogger(__name__)
 

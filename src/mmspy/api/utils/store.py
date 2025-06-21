@@ -6,10 +6,18 @@ from typing import TYPE_CHECKING
 import zarr
 from attrs import Attribute
 
-from mmspy.config.config import config
+from mmspy.configure.config import config
+from mmspy.configure.paths import DATA_DIR
 
 if TYPE_CHECKING:
     from mmspy.api.store import Store
+
+
+def convert_path(path) -> Path:
+    if path is None:
+        return DATA_DIR
+
+    return Path(path)
 
 
 def setup_zarr_store(store: "Store", attribute: Attribute, path: Path) -> None:
@@ -18,6 +26,9 @@ def setup_zarr_store(store: "Store", attribute: Attribute, path: Path) -> None:
     .. todo:: Add remote capability.
 
     """
+    if path is None:
+        path = DATA_DIR
+
     # Create root node
     root = zarr.open(zarr.DirectoryStore(path), mode="a")
     setattr(store, "zarr", root)

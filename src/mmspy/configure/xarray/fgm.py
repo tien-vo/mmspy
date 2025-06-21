@@ -7,7 +7,7 @@ import logging
 import numpy as np
 import xarray as xr
 
-from mmspy.config.xarray.utils import validate_dataset
+from mmspy.configure.xarray.utils import validate_dataset
 
 log = logging.getLogger(__name__)
 

@@ -11,7 +11,7 @@ from mmspy.api.processors.utils import (
     filter_variables,
     shorten_variable_names,
 )
-from mmspy.config.config import config
+from mmspy.configure.config import config
 
 # These labels are not needed
 drop_labels = ["label_r_gse", "b_gse_labls", "represent_vec_tot"]

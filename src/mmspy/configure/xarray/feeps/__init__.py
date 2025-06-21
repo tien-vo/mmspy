@@ -2,4 +2,4 @@
 
 __all__ = ["FeepsAccessor"]
 
-from mmspy.config.xarray.feeps.accessor import FeepsAccessor
+from mmspy.configure.xarray.feeps.accessor import FeepsAccessor

@@ -7,7 +7,7 @@ from typing import Callable
 
 import pint
 
-from mmspy.config.units.plasma_parameters import (
+from mmspy.configure.units.plasma_parameters import (
     cyclotron_frequency_to_magnetic_field,
     density_to_plasma_frequency,
     kinetic_energy_to_lorentz_factor,

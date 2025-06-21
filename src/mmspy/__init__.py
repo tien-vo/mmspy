@@ -7,8 +7,7 @@ from the NASA Magnetospheric Multiscale (MMS) mission.
 from importlib.metadata import version as _version
 from typing import TYPE_CHECKING
 
-from mmspy.config import (
-    Config,
+from mmspy.configure import (
     config,
     configure_matplotlib,
     enable_diagnostics,
@@ -19,10 +18,15 @@ from mmspy.config import (
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from mmspy.api import Query, Store
+    from mmspy.api.query import Query
+    from mmspy.api.store import Store
 
     query: Query
+    """Package-level instance of `~mmspy.api.query.Query`."""
+
     store: Store
+    """Package-level instance of `~mmspy.api.store.Store`."""
+
     load: Callable
 
 from mmspy.api import load, query, store

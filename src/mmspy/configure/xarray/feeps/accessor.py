@@ -7,15 +7,15 @@ __all__ = [
 import numpy as np
 import xarray as xr
 
-from mmspy.config.units import units as u
-from mmspy.config.xarray.feeps.tables import (
+from mmspy.configure.units import units as u
+from mmspy.configure.xarray.feeps.tables import (
     get_energy_table,
     get_flat_field_table,
     get_sun_contamination_table,
     get_time_dependent_bad_eye_table,
     get_time_independent_bad_eye_table,
 )
-from mmspy.config.xarray.utils import validate_dataset
+from mmspy.configure.xarray.utils import validate_dataset
 from mmspy.types import Iterable, Quantity
 
 
@@ -324,9 +324,13 @@ class FeepsAccessor:
             left_mask = (left & (this_bad == 1)).sel(**kw)
             right_mask = (right & (next_bad == 1)).sel(**kw)
 
-            not_time_dimensions = [dim for dim in dataset.dims if dim != "time"]
+            not_time_dimensions = [
+                dim for dim in dataset.dims if dim != "time"
+            ]
             for variable in dataset:
-                if not _is_distribution(dataset[variable], not_time_dimensions):
+                if not _is_distribution(
+                    dataset[variable], not_time_dimensions
+                ):
                     continue
 
                 dataset[variable] = xr.where(

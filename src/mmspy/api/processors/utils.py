@@ -10,8 +10,8 @@ import logging
 import pandas as pd
 import xarray as xr
 
-from mmspy.config.config import config
-from mmspy.config.units import units as u
+from mmspy.configure.config import config
+from mmspy.configure.units import units as u
 
 log = logging.getLogger(__name__)
 

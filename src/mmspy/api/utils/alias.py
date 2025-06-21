@@ -3,7 +3,7 @@ __all__ = ["AliasedString"]
 
 from attrs import define, field
 
-from mmspy.config.config import config
+from mmspy.configure.config import config
 
 
 @define
@@ -13,6 +13,7 @@ class AliasedString:
     .. todo:: Add docstring
 
     """
+
     true_value: str = field(default=None, converter=str)
     alias: str = field(default=None, converter=str)
 

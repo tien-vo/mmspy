@@ -14,7 +14,9 @@ from typing import IO, Any, Union
 
 from benedict import benedict
 
-from mmspy.config.paths import STATE_DIR
+from mmspy.configure.paths import STATE_DIR
+
+DEFAULT_CONFIG_FILE = str(files("mmspy.data") / "default-config.toml")
 
 
 class Config(benedict):
@@ -88,5 +90,4 @@ class Config(benedict):
         return json.dumps(self, sort_keys=True, indent=2, default=str)
 
 
-DEFAULT_CONFIG_FILE = str(files("mmspy.data") / "default-config.toml")
 config = Config(load_default=True)

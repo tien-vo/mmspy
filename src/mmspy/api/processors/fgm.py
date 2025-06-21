@@ -12,7 +12,7 @@ from mmspy.api.processors.utils import (
     shorten_variable_names,
 )
 from mmspy.compute.utils import force_monotonic, match_time_resolution
-from mmspy.config.config import config
+from mmspy.configure.config import config
 
 # These labels are not needed
 drop_labels = [

@@ -4,7 +4,7 @@ from astropy.convolution import Gaussian2DKernel, convolve
 from scipy.ndimage import median_filter
 
 from mmspy.compute.utils import is_quantified
-from mmspy.config.units import units as u
+from mmspy.configure.units import units as u
 from mmspy.types import Callable, Dims, NDArray
 
 

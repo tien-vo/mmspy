@@ -10,10 +10,10 @@ from importlib.resources import files
 import pint
 import pint_xarray
 
-import mmspy.config.units.formatters
-from mmspy.config.paths import CACHE_DIR
-from mmspy.config.units.contexts import elc_context, ion_context
-from mmspy.config.units.preprocessors import _get_fits_units_processor
+import mmspy.configure.units.formatters
+from mmspy.configure.paths import CACHE_DIR
+from mmspy.configure.units.contexts import elc_context, ion_context
+from mmspy.configure.units.preprocessors import _get_fits_units_processor
 from mmspy.types import Registry
 
 

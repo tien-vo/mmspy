@@ -1,14 +1,12 @@
 """Provide dataclass for particle grid."""
 
-__all__ = [
-    "ParticleGrid",
-]
+__all__ = ["ParticleGrid"]
 
 import numpy as np
 from attrs import define
 
+from mmspy.configure.units import units as u
 from mmspy.types import NDArray, Quantity, Unit
-from mmspy.config.units import units as u
 
 
 @define
