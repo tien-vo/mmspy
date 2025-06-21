@@ -39,6 +39,11 @@ def get_remote_files(
         log.warning(e)
         return []
 
+    if not response.ok:
+        msg = f"Bad query with HTTP code {response.status_code}."
+        log.warning(msg)
+        return []
+
     # Sort the files
     files = sorted(
         response.json()["files"],
