@@ -1,6 +1,10 @@
 """Format `Axes`."""
 
-__all__ = ["format_datetime_labels"]
+__all__ = [
+    "format_datetime_labels",
+    "format_ybins",
+    "autoformat",
+]
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -25,3 +29,18 @@ def format_datetime_labels(ax: Any) -> None:
     else:
         for index in np.ndindex(ax.shape):
             ax[index].xaxis.set_major_formatter(formatter)
+
+
+def format_ybins(ax: Any) -> None:
+    if isinstance(ax, plt.Axes):
+        if ax.get_yscale() != "log":
+            ax.locator_params(axis="y", nbins=5)
+    else:
+        for index in np.ndindex(ax.shape):
+            if ax[index].get_yscale() != "log":
+                ax[index].locator_params(axis="y", nbins=5)
+
+
+def autoformat(ax: Any) -> None:
+    format_datetime_labels(ax)
+    format_ybins(ax)
