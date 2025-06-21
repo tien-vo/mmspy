@@ -88,6 +88,7 @@ class FeepsAccessor:
 
     energy_variable: str
     error_variable: str
+    sector_variable: str
 
     def __init__(self, dataset: xr.Dataset) -> None:
         """Validate and initialize accessor for a dataset.
@@ -111,6 +112,11 @@ class FeepsAccessor:
                 self.energy_variable = variable
             if array.pint.units.is_compatible_with("%"):
                 self.error_variable = variable
+            if array.attrs.get("CATDESC", "") == (
+                "Spin sector in which the spacecraft "
+                "was oriented during data acquisition"
+            ):
+                self.sector_variable = variable
 
     @property
     def eyes(self) -> list[int]:
@@ -306,12 +312,12 @@ class FeepsAccessor:
             )
 
             this_bad = xr.where(
-                dataset.spin_sector_number == this_bad_sector,
+                dataset[self.sector_variable] == this_bad_sector,
                 1,
                 0,
             ).sum(dim="spin_sector")
             next_bad = xr.where(
-                dataset.spin_sector_number == next_bad_sector,
+                dataset[self.sector_variable] == next_bad_sector,
                 1,
                 0,
             ).sum(dim="spin_sector")
