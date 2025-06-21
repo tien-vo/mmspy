@@ -44,6 +44,8 @@ def process_fgm(
 
     # Rename rank-1 spatial dimension and drop magnitude
     dataset = dataset.rename_dims(dim0="rank_1")
+    if "record0" in dataset.dims:
+        dataset = dataset.rename(record0="time")
     dataset = dataset.assign_coords(rank_1=["x", "y", "z", "mag"])
     dataset = dataset.drop_sel(rank_1="mag")
 
