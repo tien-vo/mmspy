@@ -12,7 +12,11 @@ import pint_xarray
 
 import mmspy.configure.units.formatters
 from mmspy.configure.paths import CACHE_DIR
-from mmspy.configure.units.contexts import elc_context, ion_context
+from mmspy.configure.units.contexts import (
+    elc_context,
+    electron_context,
+    ion_context,
+)
 from mmspy.configure.units.preprocessors import _get_fits_units_processor
 from mmspy.types import Registry
 
@@ -31,6 +35,7 @@ def _configure_units() -> Registry:
     registry.load_definitions(UNIT_DEFINITIONS)
     registry.add_context(ion_context)
     registry.add_context(elc_context)
+    registry.add_context(electron_context)
     pint.set_application_registry(registry)
 
     return pint.get_application_registry()
