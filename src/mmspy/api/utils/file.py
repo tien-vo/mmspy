@@ -64,9 +64,9 @@ def parse_species(instrument: str, data_type: str) -> str:
         case "feeps":
             return data_type
         case "fpi":
-            if "dis" in data_type:
+            if data_type.split("-")[0] == "dis":
                 return "ion"
-            if "des" in data_type:
+            if data_type.split("-")[0] == "des":
                 return "electron"
         case "hpca":
             return "ion"
