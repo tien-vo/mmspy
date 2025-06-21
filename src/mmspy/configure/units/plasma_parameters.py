@@ -16,6 +16,8 @@ __all__ = [
     "cyclotron_frequency_to_magnetic_field",
     "density_to_plasma_frequency",
     "plasma_frequency_to_density",
+    "phase_space_density_to_number_flux",
+    "number_flux_to_phase_space_density",
 ]
 
 import numpy as np
@@ -146,3 +148,25 @@ def plasma_frequency_to_density(
     charge, mass = parse_species(species, registry)
     eps0 = registry.eps_0
     return (eps0 * mass / charge**2) * (2 * np.pi * frequency) ** 2
+
+
+def phase_space_density_to_number_flux(
+    registry: Registry,
+    phase_space_density: Quantity,
+    energy: Quantity,
+    species: str,
+) -> Quantity:
+    _, mass = parse_species(species, registry)
+    momentum = kinetic_energy_to_momentum(registry, energy, species)
+    return momentum**2 / mass**3 * phase_space_density * energy
+
+
+def number_flux_to_phase_space_density(
+    registry: Registry,
+    number_flux: Quantity,
+    energy: Quantity,
+    species: str,
+) -> Quantity:
+    _, mass = parse_species(species, registry)
+    momentum = kinetic_energy_to_momentum(registry, energy, species)
+    return mass**3 / momentum**2 * number_flux / energy
