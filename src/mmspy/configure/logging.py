@@ -19,7 +19,7 @@ from mmspy.configure.units import UNIT_DEFINITIONS
 class IgnoreItspDimensionWarningsFilter(logging.Filter):
     """Filter ITSP warnings for dimension issues with L2 CDF files.
 
-    The metadata in FSM and FEEPS raw CDF files have non-matching
+    The metadata in FGM, FSM and FEEPS raw CDF files have non-matching
     dimensions. There is nothing we can do except for opening a PR
     for `cdflib` or asking the instrument teams to regenerate files
     with corrected metadata. So for now, this filter is to ignore the
@@ -35,7 +35,9 @@ class IgnoreItspDimensionWarningsFilter(logging.Filter):
 
         def _in_msg(pattern: str) -> bool:
             return (
-                _is(record.msg, "fsm") or _is(record.msg, "feeps")
+                _is(record.msg, "fgm")
+                or _is(record.msg, "fsm")
+                or _is(record.msg, "feeps")
             ) and pattern in record.msg
 
         different_dimension = _in_msg("but they have different dimension")
@@ -86,7 +88,7 @@ def enable_log(file_name: str | None = None) -> None:
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(file_formatter)
 
-    logger = logging.getLogger("mmspy")
+    logger = logging.getLogger("")
     logger.addHandler(file_handler)
     logger.info(f"Log path: {file_name}")
     logger.debug(f"Config path: {config._file_name}")
