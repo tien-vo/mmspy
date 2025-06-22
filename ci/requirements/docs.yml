@@ -3,30 +3,34 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - numpy
-  - scipy
-  - cdflib
-  - xarray
-  - dask
-  - zarr
-  - attrs
-  - pint-xarray
-  - tqdm
-  - matplotlib
-  - requests
-  - pathos
-  - bigtree
-  - bs4
-  - sphinx
-  - sphinx-autobuild
-  - pydata-sphinx-theme
-  - sphinx-automodapi
-  - nbsphinx
-  - sphinx-copybutton
-  - sphinx-design
-  - sphinxcontrib-bibtex
-  - jupyter-sphinx
-  - pandoc
+  - "python>=3.11"
   - pip:
-      - benedict
-      - -e ../..
+    - "numpy>=2.2.6"
+    - "scipy>=1.15.3"
+    - "cdflib (>=1.3.4,<2.0.0)"
+    - "xarray (>=2025.4.0,<2026.0.0)"
+    - "dask[distributed]>=2025.5.1,<2026.0.0"
+    - "zarr==2.18.5"
+    - "attrs (>=25.3.0,<26.0.0)"
+    - "pint-xarray (>=0.4,<0.5)"
+    - "tqdm (>=4.67.1,<5.0.0)"
+    - "matplotlib>=3.10.3"
+    - "requests>=2.32.3"
+    - "pathos>=0.3.4"
+    - "bigtree>=0.29.2"
+    - "bs4>=0.0.2"
+    - "astropy>=7.1.0"
+    - "python-benedict[toml]>=0.34.1"
+    - "numcodecs==0.15.1"
+    - "python-benedict[toml]>=0.34.1"
+    - "sphinx>=8.0.2,<9"
+    - "sphinx-autobuild>=2024.10.3,<2025"
+    - "pydata-sphinx-theme>=0.16.0,<0.17"
+    - "sphinx-automodapi>=0.18.0,<0.19"
+    - "nbsphinx>=0.9.5,<0.10"
+    - "sphinx-copybutton>=0.5.2,<0.6"
+    - "sphinx-design>=0.6.1,<0.7"
+    - "sphinxcontrib-bibtex>=2.6.3,<3"
+    - "jupyter-sphinx>=0.5.3"
+    - "pandoc>=2.4"
+    - -e ../..
