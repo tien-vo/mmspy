@@ -100,6 +100,7 @@ def reduce_distribution(
 
 def integrate_distribution(
     f,
+    energy="W",
     zenith="theta",
     azimuth="phi",
     flip_direction=True,
@@ -113,7 +114,9 @@ def integrate_distribution(
     # PSD
     f = f.pint.quantify().pint.to("phase_space_density_unit").fillna(0.0)
     # Particle support
-    f = f.assign_coords(u=(f.W / (f.W + W0)).pint.to("dimensionless"))
+    f = f.assign_coords(
+        u=(f[energy] / (f[energy] + W0)).pint.to("dimensionless")
+    )
     f[zenith] = f[zenith].pint.to("rad")
     f[azimuth] = f[azimuth].pint.to("rad")
 
