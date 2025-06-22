@@ -35,10 +35,10 @@ def format_ybins(ax: Any) -> None:
     if isinstance(ax, plt.Axes):
         if ax.get_yscale() != "log":
             ax.locator_params(axis="y", nbins=5)
-    else:
-        for index in np.ndindex(ax.shape):
-            if ax[index].get_yscale() != "log":
-                ax[index].locator_params(axis="y", nbins=5)
+            return
+    for index in np.ndindex(ax.shape):
+        if ax[index].get_yscale() != "log":
+            ax[index].locator_params(axis="y", nbins=5)
 
 
 def autoformat(ax: Any) -> None:
