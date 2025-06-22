@@ -23,7 +23,6 @@ dependencies = [
     "zarr==2.18.5",
     "attrs (>=25.3.0,<26.0.0)",
     "pint-xarray (>=0.4,<0.5)",
-    "anytree (>=2.13.0,<3.0.0)",
     "tqdm (>=4.67.1,<5.0.0)",
     "matplotlib>=3.10.3",
     "requests>=2.32.3",
