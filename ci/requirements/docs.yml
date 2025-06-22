@@ -1,0 +1,31 @@
+name: mmspy-docs
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - numpy
+  - scipy
+  - cdflib
+  - xarray
+  - dask
+  - zarr
+  - attrs
+  - pint-xarray
+  - tqdm
+  - matplotlib
+  - requests
+  - pathos
+  - bigtree
+  - bs4
+  - sphinx
+  - sphinx-autobuild
+  - pydata-sphinx-theme
+  - sphinx-automodapi
+  - nbsphinx
+  - sphinx-copybutton
+  - sphinx-design
+  - sphinxcontrib-bibtex
+  - jupyter-sphinx
+  - pandoc
+  - pip:
+      - -e ../..
