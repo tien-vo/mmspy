@@ -1,4 +1,0 @@
-Installing mmspy
-================
-
-Installation instructions.
