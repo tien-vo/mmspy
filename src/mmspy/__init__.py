@@ -29,6 +29,7 @@ if TYPE_CHECKING:
 
     load: Callable
 
+import mmspy.plot
 from mmspy.api import load, query, store
 from mmspy.compute import (
     ParticleGrid,
