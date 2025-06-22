@@ -71,6 +71,8 @@ docs = [
     "sphinx-copybutton>=0.5.2,<0.6",
     "sphinx-design>=0.6.1,<0.7",
     "sphinxcontrib-bibtex>=2.6.3,<3",
+    "jupyter-sphinx>=0.5.3",
+    "pandoc>=2.4",
 ]
 tests = [
     "pytest>=8.3.3,<9",
