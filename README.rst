@@ -41,7 +41,7 @@ and make analysis of MMS data more intuitive, efficient, and scalable.
 
 Documentation
 -------------
-Learn more about `mmspy` at `https://mmspy.readthedocs.io/ <https://mmspy.readthedocs.io/>`.
+Learn more about `mmspy` at `https://mmspy.readthedocs.io`.
 
 .. _pyspedas: https://pyspedas.readthedocs.io/en/latest/
 .. _dask: https://docs.dask.org/en/stable/
