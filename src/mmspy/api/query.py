@@ -240,8 +240,15 @@ class Query:
 
         """
 
-        def wrap_none(value: str) -> str | None:
+        def wrap_none_string(value: str) -> str | None:
             return None if value == "None" else value
+
+        def wrap_none_time(value: pd.Timestamp) -> str | None:
+            return (
+                value.strftime("%Y-%m-%d-%H-%M-%S")
+                if not pd.isnull(value)
+                else None
+            )
 
         if cdf_file_name is not None:
             return {"file": cdf_file_name}
@@ -252,17 +259,17 @@ class Query:
                 "This is unsafe because it will query a lot of CDF files. "
                 "Please set a time range."
             )
-            raise ValueError(msg)
+            log.warning(msg)
 
         return {
-            "start_date": self._start_time.strftime("%Y-%m-%d-%H-%M-%S"),
-            "end_date": self._stop_time.strftime("%Y-%m-%d-%H-%M-%S"),
-            "sc_id": wrap_none(self._probe.true_value),
-            "instrument_id": wrap_none(self._instrument.true_value),
-            "data_rate_mode": wrap_none(self._data_rate.true_value),
-            "descriptor": wrap_none(self._data_type.true_value),
-            "data_level": wrap_none(self._data_level.true_value),
-            "product": wrap_none(self._ancillary_product.true_value),
+            "start_date": wrap_none_time(self._start_time),
+            "end_date": wrap_none_time(self._stop_time),
+            "sc_id": wrap_none_string(self._probe.true_value),
+            "instrument_id": wrap_none_string(self._instrument.true_value),
+            "data_rate_mode": wrap_none_string(self._data_rate.true_value),
+            "descriptor": wrap_none_string(self._data_type.true_value),
+            "data_level": wrap_none_string(self._data_level.true_value),
+            "product": wrap_none_string(self._ancillary_product.true_value),
         }
 
     def summary(self) -> str:
@@ -276,6 +283,9 @@ class Query:
             f"  * data_level        : {self._data_level}\n"
             f"  * ancillary_product : {self._ancillary_product}"
         )
+
+    def show(self) -> None:
+        print(self.summary())
 
     def update(self, **kwargs) -> None:
         """Update the query with init parameters."""
