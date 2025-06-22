@@ -1,7 +1,9 @@
+=======
 Gallery
 =======
 
-This page contains a few specific use cases of `mmspy`.
+This page contains a few specific and advanced use cases of `mmspy`. It is
+still under construction. More examples to come!
 
 .. include:: notebooks-examples-gallery.txt
 
@@ -9,4 +11,4 @@ This page contains a few specific use cases of `mmspy`.
     :maxdepth: 1
     :hidden:
 
-    Time-frequency analysis of magnetic turbulence <examples/time-frequency-analysis>
+    examples/particle

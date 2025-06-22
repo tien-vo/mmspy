@@ -1,13 +1,19 @@
-mmspy documentation
-===================
+.. title:: mmspy documentation
+
+.. module:: mmspy
+
+#############################
+mmspy |version| documentation
+#############################
+
+mmspy is a Python package for querying and analyzing data from the
+NASA Magnetospheric Multiscale (MMS) mission, powered by
+`Xarray <https://xarray.dev/>`_.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :hidden:
 
-   User Guide <user-guide/index>
-   Examples <gallery>
-
-**Version**: |version|
-
-Introduction text for the package.
+   Getting Started <getting-started/index>
+   Gallery <gallery>
+   API Reference <api>

@@ -1,4 +1,4 @@
 notebooks-examples:
-  - title: Time-frequency analysis
-    path: examples/time-frequency-analysis.html
-    thumbnail: _static/examples/time-frequency-analysis/ergun+20_overview.png
+  - title: Particle distribution
+    path: examples/particle.html
+    thumbnail: _static/examples/particle/burch+16_overview.png
