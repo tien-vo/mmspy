@@ -32,7 +32,8 @@ def find_glob_pattern(
     def findall(path):
         path = Path(path)
         if regex.search(str(path)) or regex.search(str(path.parent)):
-            paths.append(str(store_prefix / path))
+            if path.parent.name[:4] != "zarr":
+                paths.append(str(store_prefix / path))
 
     store.visit(findall)
     return paths
