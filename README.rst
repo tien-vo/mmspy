@@ -43,8 +43,13 @@ Documentation
 -------------
 Learn more about `mmspy` at `https://mmspy.readthedocs.io`.
 
+License
+-------
+This project is licensed under the terms of the GNU General Public License v3.0.
+
 .. _pyspedas: https://pyspedas.readthedocs.io/en/latest/
 .. _dask: https://docs.dask.org/en/stable/
 .. _zarr: https://zarr.readthedocs.io/en/stable/
 .. _pint: https://pint.readthedocs.io/en/stable/
 .. _cdasws: https://cdaweb.gsfc.nasa.gov/WebServices/REST/
+
