@@ -29,6 +29,7 @@ dependencies = [
     "pathos>=0.3.4",
     "bigtree>=0.29.2",
     "bs4>=0.0.2",
+    "benedict>=0.3.2",
 ]
 classifiers = [
     "Development Status :: 1 - Planning",

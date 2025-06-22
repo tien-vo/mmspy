@@ -152,6 +152,18 @@ wheels = [
 ]
 
 [[package]]
+name = "benedict"
+version = "0.3.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/97/8f/3221feb57d3c9897a171099b405700d8d3a724e42e0271f502d76217fb59/BeneDict-0.3.2.tar.gz", hash = "sha256:e6f66b544393fd628110e79af8854b88aa825606247e28c28decdf010c9d5df3", size = 9860, upload-time = "2019-03-27T05:29:39.444Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c2/85/a7a3c5dd7bd6d0a1f335e13938c82a91546af2facdf96d66a097b15e4d7e/BeneDict-0.3.2-py3-none-any.whl", hash = "sha256:3bff72dc6d30d02fe51f613694c7efa2b21cde4aacc73613726ba3610f900c73", size = 9642, upload-time = "2019-03-27T05:29:38.136Z" },
+]
+
+[[package]]
 name = "bigtree"
 version = "0.29.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1296,6 +1308,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "attrs" },
+    { name = "benedict" },
     { name = "bigtree" },
     { name = "bs4" },
     { name = "cdflib" },
@@ -1343,6 +1356,7 @@ tests = [
 [package.metadata]
 requires-dist = [
     { name = "attrs", specifier = ">=25.3.0,<26.0.0" },
+    { name = "benedict", specifier = ">=0.3.2" },
     { name = "bigtree", specifier = ">=0.29.2" },
     { name = "bs4", specifier = ">=0.0.2" },
     { name = "cdflib", specifier = ">=1.3.4,<2.0.0" },

@@ -17,6 +17,7 @@ dependencies:
   - pathos
   - bigtree
   - bs4
+  - benedict
   - sphinx
   - sphinx-autobuild
   - pydata-sphinx-theme
