@@ -71,17 +71,41 @@ def spherical_angle(vector: xr.DataArray) -> tuple[xr.DataArray, xr.DataArray]:
 class FpiAccessor:
     """Xarray accessor for FPI datasets."""
 
-    def __init__(self, ds: xr.Dataset) -> None:
+    psd_variable: str
+    energy_variable: str
+    zenith_variable: str
+    azimuth_variable: str
+
+    def __init__(self, dataset: xr.Dataset) -> None:
         """Validate and initialize accessor for a dataset.
 
         Parameters
         ----------
-        ds : Dataset
+        dataset : Dataset
             Xarray dataset
 
         """
-        validate_dataset(ds, "FPI", ["DIS", "DES"])
-        self._ds = ds.pint.quantify()
+        validate_dataset(dataset, "FPI", ["DIS", "DES"])
+        self._dataset = dataset.pint.quantify()
+        variables = list(self._dataset.data_vars)
+        coords = list(self._dataset.coords)
+        for variable in variables + coords:
+            array = self._dataset[variable]
+            if not bool(array.pint.units):
+                continue
+
+            DESC = array.attrs.get("CATDESC", "")
+            if (
+                "sky-map instrument distribution" in DESC
+                and "error" not in DESC
+            ):
+                self.psd_variable = variable
+            if "energies" in DESC and "delta" not in DESC:
+                self.energy_variable = variable
+            if "zenith angles" in DESC and "bin delta" not in DESC:
+                self.zenith_variable = variable
+            if "azimuth angles" in DESC and "bin delta" not in DESC:
+                self.azimuth_variable = variable
 
     def correct_for_spacecraft_potential(
         self,
@@ -99,32 +123,44 @@ class FpiAccessor:
 
         Returns
         -------
-        ds : Dataset
+        dataset : Dataset
             FPI dataset with corrected energies
 
         """
-        ds = self._ds.copy()
+        dataset = self._dataset.copy()
 
         V_sc = match_time_resolution(
             spacecraft_potential,
-            ds.time,
+            dataset.time,
             average=average,
         )
         V_sc = xr.DataArray(
             name=V_sc.name,
-            data=V_sc.data.to("energy_unit", species := ds.species.name),
+            data=V_sc.data.to("energy_unit", species := dataset.species.name),
             dims=V_sc.dims,
             coords=V_sc.coords,
             attrs=V_sc.attrs,
         )
 
         if species == "elc":
-            ds = ds.assign(f=xr.where(np.abs(V_sc) < ds.W, ds.f, 0.0))
+            dataset = dataset.assign(
+                {
+                    self.psd_variable: xr.where(
+                        np.abs(V_sc) < dataset[self.energy_variable],
+                        dataset[self.psd_variable],
+                        0.0,
+                    )
+                }
+            )
 
-        ds = ds.assign(W=ds.W + V_sc)
-        ds.W.attrs["VAR_NOTES"] += "; Adjusted for spacecraft potential"
+        dataset = dataset.assign(
+            {self.energy_variable: dataset[self.energy_variable] + V_sc}
+        )
+        dataset[self.energy_variable].attrs[
+            "VAR_NOTES"
+        ] += "; Adjusted for spacecraft potential"
 
-        return ds
+        return dataset
 
     def add_field_aligned_coordinates(
         self,
@@ -153,14 +189,14 @@ class FpiAccessor:
 
         Returns
         -------
-        ds : Dataset
+        dataset : Dataset
             FPI dataset with corrected energies
 
         """
-        ds = self._ds.copy()
+        dataset = self._dataset.copy()
 
         # Interpolate inputs onto ds time resolution
-        kw = {"target": ds.time, "average": average}
+        kw = {"target": dataset.time, "average": average}
         B = match_time_resolution(magnetic_field, **kw)
         if "time" in reference_vector.dims:
             reference_vector = match_time_resolution(reference_vector, **kw)
@@ -172,7 +208,10 @@ class FpiAccessor:
         e2 = cross(e3, e1, dim="rank_1")
 
         # Calculate decomposition
-        V_angle = (ds.theta_dbcs, ds.phi_dbcs)
+        V_angle = (
+            dataset[self.zenith_variable],
+            dataset[self.azimuth_variable],
+        )
         V_perp_1 = spherical_dot(V_angle, spherical_angle(e1))
         V_perp_2 = spherical_dot(V_angle, spherical_angle(e2))
         V_para = spherical_dot(V_angle, spherical_angle(e3))
@@ -180,9 +219,9 @@ class FpiAccessor:
         theta = np.degrees(np.arccos(V_para))
         phi = np.degrees(np.arctan2(V_perp_2, V_perp_1)) % u("360 deg")
 
-        ds = ds.assign(B_avg=B, theta_fac=theta, phi_fac=phi)
-        ds = ds.set_coords(["theta_fac", "phi_fac"])
-        ds = ds.transpose(
+        dataset = dataset.assign(B_avg=B, theta_fac=theta, phi_fac=phi)
+        dataset = dataset.set_coords(["theta_fac", "phi_fac"])
+        dataset = dataset.transpose(
             "time",
             "energy_channel",
             "azimuthal_sector",
@@ -190,4 +229,4 @@ class FpiAccessor:
             ...,
         )
 
-        return ds
+        return dataset
