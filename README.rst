@@ -3,14 +3,11 @@
    
 |Doi|_
 
-mmspy
-=====
-
 `mmspy` is a package for querying and analysing data from the NASA
 Magnetospheric Multiscale (MMS) mission.
 
 Features
---------
+========
 
 - Interface for LASP MMS Science Data Center (SDC) web services.
 - Advanced integrator and interpolator for extended 3D particle distribution
@@ -18,7 +15,7 @@ Features
 - Implementation of multi-spacecraft data analysis methods in `xarray`.
 
 Why another space physics software?
------------------------------------
+===================================
 
 At the moment, there are already a couple of well-developed Python
 libraries for loading space physics data, such as
@@ -45,11 +42,11 @@ features aim to make the most out of metadata provided in CDF files
 and make analysis of MMS data more intuitive, efficient, and scalable.
 
 Documentation
--------------
+=============
 Learn more about `mmspy` at `https://mmspy.readthedocs.io`.
 
 License
--------
+=======
 This project is licensed under the terms of the GNU General Public License v3.0.
 
 .. _pyspedas: https://pyspedas.readthedocs.io/en/latest/
@@ -57,4 +54,3 @@ This project is licensed under the terms of the GNU General Public License v3.0.
 .. _zarr: https://zarr.readthedocs.io/en/stable/
 .. _pint: https://pint.readthedocs.io/en/stable/
 .. _cdasws: https://cdaweb.gsfc.nasa.gov/WebServices/REST/
-
