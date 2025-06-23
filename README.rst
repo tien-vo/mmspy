@@ -1,7 +1,4 @@
-.. |Doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.15717493.svg
-.. _Doi: https://doi.org/10.5281/zenodo.15717492
-   
-|Doi|_
+|made-with-python| |PyPI version| |PyPI license| |Documentation| |Zenodo|
 
 `mmspy` is a package for querying and analysing data from the NASA
 Magnetospheric Multiscale (MMS) mission.
@@ -54,3 +51,21 @@ This project is licensed under the terms of the GNU General Public License v3.0.
 .. _zarr: https://zarr.readthedocs.io/en/stable/
 .. _pint: https://pint.readthedocs.io/en/stable/
 .. _cdasws: https://cdaweb.gsfc.nasa.gov/WebServices/REST/
+
+.. |made-with-python| image:: https://img.shields.io/badge/Made%20with-Python-1f425f.svg
+   :target: https://www.python.org/
+
+.. |PyPI version| image:: https://img.shields.io/pypi/v/mmspy.svg?logo=pypi
+   :target: https://pypi.python.org/pypi/mmspy/
+
+.. |PyPI license| image:: https://img.shields.io/pypi/l/mmspy
+   :target: https://pypi.python.org/pypi/mmspy/
+
+.. |PyPI status| image:: https://img.shields.io/pypi/status/mmspy.svg
+   :target: https://pypi.python.org/pypi/mmspy/
+
+.. |Documentation| image:: https://readthedocs.org/projects/mmspy/badge/?version=latest
+   :target: https://mmspy.readthedocs.io/en/latest/
+
+.. |Zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.15717493.svg
+   :target: https://doi.org/10.5281/zenodo.15717492

@@ -5,7 +5,7 @@ description = "A Python package for querying and analysing data from the NASA Ma
 authors = [{ name = "tien-vo", email = "tvo.work@proton.me" }]
 requires-python = ">=3.11"
 readme = "README.rst"
-license = { text = "GPL-3.0-only" }
+license = { text = "GPL-3.0" }
 keywords = [
     "space plasma",
     "heliophysics",
@@ -34,7 +34,7 @@ dependencies = [
     "astropy>=7.1.0",
 ]
 classifiers = [
-    "Development Status :: 1 - Planning",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Natural Language :: English",
