@@ -37,8 +37,8 @@ and make analysis of MMS data more intuitive, efficient, and scalable.
 Installation
 ------------
 
-``mmspy`` is distributed on the `Python package Index <https://pypi.org/>`_.
-To install, run
+`mmspy` is distributed on the `Python package Index (PyPI)
+<https://pypi.org/>`_. To install, run:
 
 .. code-block:: console
 
