@@ -3,7 +3,7 @@
 .. module:: mmspy
 
 #############################
-mmspy |version| documentation
+mmspy |release| documentation
 #############################
 
 mmspy is a Python package for querying and analyzing data from the
