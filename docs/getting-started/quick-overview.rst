@@ -10,7 +10,7 @@ dimensions and coordinates labeling, with all metadata preserved
 from CDF files.
 
 In the following, we show how MMS datasets are loaded with `mmspy` and
-the basics of each of the feature. Users are encouraged to familiarize
+the basics of each of the above features. Users are encouraged to familiarize
 at least with `xarray`'s basic `data structures <xarray_structures_>`_.
 While knowledge of `pint`_ and `dask`_ internals are good to know,
 there is generally no need to dig too deep into it, since all the
@@ -36,12 +36,20 @@ The path can be changed, for example, by setting:
 
 .. jupyter-execute::
 
-    mms.store.path = "./data.zarr"
+    mms.store.path = "./data.zarr/quick-overview"
     mms.store.show()
+
+.. tip::
+    Provide a path, e.g., "local/mms1/fgm" to :py:meth:`mmspy.store.show` to
+    list a store's content.
 
 .. note::
     By default, a ``'local'`` store is always initialized under the
     root directory.
+
+.. note::
+    Interactive ``'remote'`` store exploration is a planned feature. We
+    are deciding how best to do this web-scraping on the SDC.
 
 `mmspy.store` handles the synchronization from the `remote store
 <remote_>`_ to the ``'local'`` store, wherein CDF files from the
@@ -110,10 +118,11 @@ we see that it is described by ``Dimensions``, ``Coordinates``,
 the shape (degrees of freedom) of arrays.
 `Coordinates <coordinate_>`_ label the `dimensions <dimension_>`_, and
 there can be many `coordinates <coordinate_>`_ along each
-`dimension <dimension_>`_. `Data variables <variable_>`_ are described
-by both `dimensions <dimension_>`_ and `coordinates <coordinate_>`_, as
-well as their :py:attr:`~xarray.DataArray.data`. Attributes contain the
-metadata describing a `~xarray.Dataset` or `~xarray.DataArray`.
+`dimension <dimension_>`_. `Data variables <variable_>`_ contain data
+through the :py:attr:`~xarray.DataArray.data` property, described
+by both `dimensions <dimension_>`_ and `coordinates <coordinate_>`_.
+Attributes :py:attr:`~xarray.DataArray.attrs` are dictionaries containing
+the metadata describing a `~xarray.Dataset` or `~xarray.DataArray`.
 
 Let us print a variable from the ``fgm`` dataset, say the GSE magnetic
 field:
@@ -161,7 +170,7 @@ Instead of evaluating operations for numerical results, `dask`_ calculates
 that plan out the calculations for each data chunk (and how to merge them).
 Task graphs are automatically optimized and are evaluated when
 :py:func:`~dask.compute()` is called. In the
-`dask integration <dask_integration_>`_ section below, we provide
+`dask section <dask_integration_>`_ below, we provide
 an example of calculating a complicated graph.
 
 Note that in regular usage, a user does not need to perform the
@@ -261,6 +270,13 @@ Similarly, ion moments from the Fast Plasma Investigation (FPI):
     ion_fpi = mms.load(instrument="fpi", data_type="dis-moms")
     ion_fpi
 
+and heavy-ion moments from the Hot Plasma Composition Analyzer (HPCA):
+
+.. jupyter-execute::
+
+    hpca = mms.load(instrument="hpca", data_rate="srvy", data_type="moments")
+    hpca
+
 FEEPS dataset
 ~~~~~~~~~~~~~
 
@@ -281,10 +297,10 @@ Masking flagged data
 
 Data from the level-2 CDF files are not fault-free, and many 
 instruments have caveats that one should read about in the `product
-guides <product_guide_>`_ before using the data. `mmspy` provides
-instrument-specific `xarray accessors <accessors_>`_ (`fgm`, `edp`, `fpi`,
-`feeps`) that allows for automatic data masking in accordance with the
-`Calibration and Measurement Algorithms document (CMAD)
+guides <product_guide_>`_ before using the data. For convenience, `mmspy`
+provides instrument-specific `xarray accessors <accessors_>`_
+(`fgm`, `edp`, `fpi`, `feeps`) that allows for automatic data masking in
+accordance with the `Calibration and Measurement Algorithms document (CMAD)
 <https://hpde.io/NASA/Document/MMS/CMAD.html>`_ and in consistency with
 `PySPEDAS <pyspedas_>`_. The FEEPS masking is the most complicated,
 which uses multiple time-dependent and time-independent energy tables.
@@ -305,12 +321,12 @@ handling. However, `xarray` currently cannot wrap astropy quantities
 until `Quantity 2.0 <quantity_2_>`_ is implemented. Thus, `mmspy`
 resorts to utilizing `pint`_ and `pint-xarray <pint_xarray_>`_ for units
 handling and conversions. One setback is that `pint`_ does not accept
-`FITS-compliant <fits_>`_ strings. Thus, users familiar with
-`astropy.units <astropy_units_>`_ may find it difficult to migrate to
-`pint`_. As a resolution, `mmspy` implements a custom `pint`_ formatter
-that makes the `pint`_ experience as close to that of
-`astropy.units <astropy_units_>`_ as much as possible. This formatter is
-initialized when `mmspy` is imported.
+`FITS-compliant <fits_>`_ strings (e.g., `'cm-2 s-1 sr-1'`). Thus, users
+familiar with `astropy.units <astropy_units_>`_ may find it difficult to
+migrate to `pint`_. As a resolution, `mmspy` implements a custom
+`pint`_ formatter for FITS unit strings that makes the `pint`_ experience
+as close to that of `astropy.units <astropy_units_>`_ as much as possible.
+This formatter is initialized when `mmspy` is imported.
 
 Below is an example of using the custom `mmspy.units` registry
 for calculating the ion cyclotron frequency:
@@ -318,39 +334,39 @@ for calculating the ion cyclotron frequency:
 .. jupyter-execute::
 
     from mmspy import units as u
+    import numpy as np
 
     background_field = u.Quantity(50.0, "nT")
-    proton_gyrofrequency = (u.e * background_field / u.m_p).to("Hz")
+    proton_gyrofrequency = (u.e * background_field / u.m_p / 2 / np.pi).to("Hz")
     proton_gyrofrequency
 
 .. tip::
-    The pint unit registry can also be imported
-    with `from pint import application_registry as u`, which is the
-    same registry as `mmspy.units`.
+    `mmspy.units` is an application-level registry. Thus, it can also be
+    imported with `from pint import application_registry as u`.
 
 
-`pint-xarray <pint_xarray_>`_ also provides an `accessor <accessors_>`_
-called `pint` that allows similar unit conversions with
-`quantified <xarray_pint_blog>`_ `xarray`. `xarray.Dataset` loaded with
-`mmspy.load()` are quantified by default. For example, to convert magnetic
-field amplitude to gyrofrequency, similar to above calculations:
+`xarray.Dataset` loaded with `mmspy.load()` are `quantified
+<xarray_pint_blog>`_ with `pint`_ by default. To do the same conversion
+above with a magnetic field data array, use the `pint`
+`accessor <accessors_>`_:
 
 .. jupyter-execute::
 
     background_field = fgm.b_gse.tensor.magnitude
-    fci = (u.e * background_field / u.m_p).pint.to("Hz")
+    fci = (u.e * background_field / u.m_p / 2 / np.pi).pint.to("Hz")
     fci.data.compute()
 
-.. tip::
-    Dequantify an `~xarray.Dataset` or `~xarray.DataArray` with
-    :py:meth:`pint.dequantify`. For example, `fgm.b_gse.pint.dequantify()`
-    will return a `~xarray.DataArray` with the `pint` wrapping layer removed,
-    where the units will be saved in its ``attrs``. In opposite,
-    `fgm.b_gse.pint.quantify()` will rewrap the array with `pint.Quantity`.
-
-Above, :py:attr:`tensor` is an `accessor <accessors_>`_
+Above, :py:attr:`~xarray.DataArray.tensor` is an `accessor <accessors_>`_
 provided by `mmspy` to conveniently calculate the magnitude of
 ``rank_1`` and ``rank_2`` tensors.
+
+.. tip::
+    Dequantify a `~xarray.Dataset` or `~xarray.DataArray` with
+    :py:meth:`~xarray.DataArray.pint.dequantify`. For example,
+    `fgm.b_gse.pint.dequantify()` returns a `~xarray.DataArray` with the
+    `pint` wrapping layer removed, where the units will be saved in its
+    :py:attr:`~xarray.DataArray.attrs`. In opposite,
+    `fgm.b_gse.pint.quantify()` will rewrap the array with `pint.Quantity`.
 
 Furthermore, `mmspy` provides convienient conversion species-dependent
 parameters, so that one can directly convert by specifying what species
@@ -360,6 +376,10 @@ the conversion involves:
 
     fce = background_field.data.to("Hz", "electron")
     fce.compute()
+
+.. note::
+    Conversion to frequency by `mmspy` is always to ordinary frequency
+    (unit `'Hz'`).
 
 Unfortunately, this conversion is not implemented within the pint
 accessor. So one would have to detach the data from the `xarray` manually
@@ -418,6 +438,17 @@ density (a bit more involved, since the conversion involves energy) as follows:
     )
     ion_fpi
 
+Below is a full list of supported conversions:
+
+    - Voltage <-> Potential energy
+    - Kinetic energy -> Lorentz factor
+    - Momentum -> Lorentz factor
+    - Kinetic energy <-> Momentum
+    - Kinetic energy <-> Speed
+    - Magnetic field <-> Cyclotron frequency
+    - Density <-> Plasma frequency
+    - Phase space density <-> Energy flux
+
 .. _dask_integration:
 
 Dask in action
@@ -434,7 +465,7 @@ one of the variables from the previous section:
 
 These layers show all of the necessary steps to get from data on-disk
 to the final computational results in-memory, which is the ion speed
-quantified in ``'km/s'``. The benefit of using `dask` adds up quickly for
+quantified in ``'km/s'``. The benefit of using `dask`_ adds up quickly for
 more complicated operations, which could easily result in a graph of
 hundreds of layers.
 
@@ -443,7 +474,7 @@ to integrate for the number density using the omni-directional phase
 space density ``ion_fpi.f_omni``. Usually, there are important
 preprocessing steps to obtain the correct plasma moments. But let us
 ignore them for now. Perform a regrid in the ion speed
-(see more detail in the Gallery):
+(see more detailed examples in the :ref:`gallery`):
 
 .. jupyter-execute::
 
@@ -517,7 +548,7 @@ previous section with the L2 density using `matplotlib`:
 
 Not too bad! There are some expected discrepancy, mainly due to the usage
 of a linear grid. A more detailed example on how to use functions in the
-`mmspy.compute.particle` module is given in the Gallery.
+:py:mod:`mmspy.compute.particle` module is given in the :ref:`gallery`.
 
 Alias query parameters and variables
 ------------------------------------
