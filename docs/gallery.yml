@@ -1,4 +1,4 @@
 notebooks-examples:
-  - title: Particle distribution
-    path: examples/particle.html
-    thumbnail: _static/examples/particle/burch+16_overview.png
+  - title: FPI particle distribution
+    path: examples/fpi-distribution.html
+    thumbnail: _static/examples/fpi-distribution/burch+16_overview.png

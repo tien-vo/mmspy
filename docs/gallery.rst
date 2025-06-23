@@ -1,3 +1,5 @@
+.. _gallery:
+
 =======
 Gallery
 =======
@@ -11,4 +13,4 @@ still under construction. More examples to come!
     :maxdepth: 1
     :hidden:
 
-    examples/particle
+    examples/fpi-distribution

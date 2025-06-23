@@ -38,6 +38,9 @@ def process_edp_dce(
     # Rename epoch
     dataset = dataset.rename({f"{prefix}_epoch_{suffix}": "time"})
 
+    # Squeeze dataset to remove dim2 if it exists
+    dataset = dataset.squeeze()
+
     # Rename rank-1 spatial dimension
     dataset = dataset.rename_dims(dim0="rank_1")
     dataset = dataset.assign_coords(rank_1=["x", "y", "z"])
