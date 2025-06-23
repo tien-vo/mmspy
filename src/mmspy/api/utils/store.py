@@ -37,6 +37,7 @@ def setup_zarr_store(store: "Store", attribute: Attribute, path: Path) -> None:
     root.require_group(config.get("store/sync_store", "raise"))
 
     #  # Make remote store
+    root.require_group("remote")
     #  remote_store = zarr.TempStore(dir=path)
     #  temporary_path = Path(remote_store.path)
     #  new_path = temporary_path.parent / "remote"
