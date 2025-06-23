@@ -5,11 +5,11 @@
     
     .. grid-item-card::
         :text-align: center
-        :link: examples/particle.html
+        :link: examples/fpi-distribution.html
 
-        .. image:: _static/examples/particle/burch+16_overview.png
-            :alt: Particle distribution
+        .. image:: _static/examples/fpi-distribution/burch+16_overview.png
+            :alt: FPI particle distribution
         +++
-        Particle distribution
+        FPI particle distribution
 
         

@@ -6,13 +6,15 @@ Interpolating and integrating FPI distribution functions
 distribution function may be interpolated onto an N-dimensional regular
 grid (in linear or logarithmic spacing) and integrated for plasma moments.
 We do this specifically for the electron diffusion region reported in
-`Burch et al (2016), Science <burch16_>`_.
+`Burch et al (2016) <burch16_>`_.
 
-First import the package and pre-configure the query:
+First import and pre-configure the package:
 
 .. jupyter-execute::
     
     import mmspy as mms
+
+    mms.store.path = "./data.zarr/examples/fpi-distribution"
 
     mms.query.start_time = "2015-10-16T13:06:55"
     mms.query.stop_time = "2015-10-16T13:07:05"
@@ -107,8 +109,10 @@ and plot:
     fig.align_ylabels(axes)
     plt.show()
 
-Process FPI distributions
--------------------------
+The EDR is indicated by the vertical dashed line.
+
+Processing FPI distributions
+----------------------------
 
 Load the spacecraft potential, ion, and electron distribution functions:
 
@@ -124,7 +128,7 @@ Preprocessing
 A common preprocessing step suggested for FPI distributions 
 `(CMAD) <https://hpde.io/NASA/Document/MMS/CMAD.html>`_
 is to subtract the spacecraft potential. This can be done quickly via
-the `fpi` `accessor <accessors_>`_:
+the `fpi` `accessor <accessor_>`_:
 
 .. jupyter-execute::
 
@@ -138,10 +142,10 @@ the `fpi` `accessor <accessors_>`_:
     function to perform a rolling average on the scale of `V_sc`'s resolution.
 
 By default, the units of phase space density in the CDF files are
-``'s3 cm-6'``, which can be as low as ``1e-25-1e-30``. Arithmetic operations
+``'s3 cm-6'``, which can be as low as ``1e-25-1e-30``. Calculations
 at these values are not recommended. Thus, it is in general good to
 convert the distribution functions to some other units that are far from
-machine precision, or to normalize the distributions with their minimum
+machine error, or to normalize the distributions with their minimum
 values before interpolation. Here, we do the former (also converting
 the data type to double precision in the process):
 
@@ -183,7 +187,7 @@ To define a new grid of a given coordinate:
     The ``grid`` above is 3-dimensional. If you only wish to regrid
     along one specific coordinate, say ``'energy'``, remove the other
     keys. This allows the routine to perform interpolation in arbitrary
-    dimensions.
+    dimensions. An example of 1-d regrid is given in :ref:`dask_integration`.
 
 The (unaliased) energy coordinate in L2 distribution functions have
 two dimensions, ``time`` and ``energy_channel``:
@@ -309,7 +313,7 @@ Velocity
     labels = ["$V_{ix}$", "$V_{iy}$", "$V_{iz}$", "$V_{ex}$", "$V_{ey}$", "$V_{ez}$"]
     axes[0].legend(frameon=False, loc="upper right")
     for i, ax in enumerate(axes):
-        mms.plot.add_panel_label(axes[i], x=0.02, y=0.93, text=labels[i], va="top")
+        mms.plot.add_panel_label(axes[i], x=0.01, y=0.91, text=labels[i], va="top")
 
     mms.plot.autoformat(axes)
     plt.show()
@@ -340,7 +344,7 @@ For ions:
     labels = ["$P_{xx}$", "$P_{yy}$", "$P_{zz}$", "$P_{xy}$", "$P_{xz}$", "$P_{yz}$"]
     axes[0].legend(frameon=False, loc="upper right")
     for i, ax in enumerate(axes):
-        mms.plot.add_panel_label(axes[i], x=0.02, y=0.93, text=labels[i], va="top")
+        mms.plot.add_panel_label(axes[i], x=0.01, y=0.91, text=labels[i], va="top")
 
     mms.plot.autoformat(axes)
     plt.show()
@@ -368,10 +372,15 @@ For electrons:
     labels = ["$P_{xx}$", "$P_{yy}$", "$P_{zz}$", "$P_{xy}$", "$P_{xz}$", "$P_{yz}$"]
     axes[0].legend(frameon=False, loc="upper right")
     for i, ax in enumerate(axes):
-        mms.plot.add_panel_label(axes[i], x=0.02, y=0.93, text=labels[i], va="top")
+        mms.plot.add_panel_label(axes[i], x=0.01, y=0.91, text=labels[i], va="top")
 
     mms.plot.autoformat(axes)
     plt.show()
+
+.. note::
+    The electron moments have better agreement here. That means the defined
+    ``grid`` fits the electron distribution. One needs to play around more
+    with the ion ``grid``.
 
 .. _burch16: 10.1126/science.aaf2939
 .. _accessor: https://docs.xarray.dev/en/stable/internals/extending-xarray.html

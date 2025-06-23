@@ -65,6 +65,9 @@ def process_fpi_dist(
     # Shorten variable names
     dataset = shorten_variable_names(dataset, prefix=prefix, suffix=suffix)
 
+    # Set coordinates
+    dataset = dataset.set_coords(["energy", "phi", "theta"])
+
     # Drop unnecessary labels
     dataset = dataset.drop_vars(drop_labels)
 
