@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+title: mmspy
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Tien
+    family-names: Vo
+    email: tvo.work@proton.me
+    affiliation: Laboratory for Atmospheric and Space Physics
+    orcid: 'https://orcid.org/0000-0002-8335-1441'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.15717492
+    description: Zenodo
+repository-code: 'https://github.com/tien-vo/mmspy'
+url: 'https://mmspy.readthedocs.io'
+abstract: >-
+  mmspy is a Python package for querying and analyzing data
+  from the NASA Magnetospheric Multiscale (MMS) mission,
+  powered by Xarray.
+keywords:
+  - physics
+  - magnetosphere
+  - magnetospheric-multiscale
+  - mms
+  - space-physics
+  - heliophysics
+  - data-analysis
+  - science
+license: GPL-3.0

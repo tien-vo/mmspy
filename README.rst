@@ -1,3 +1,8 @@
+.. |Doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.15717493.svg
+.. _Doi: https://doi.org/10.5281/zenodo.15717492
+   
+|Doi|_
+
 mmspy
 =====
 
