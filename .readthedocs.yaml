@@ -3,7 +3,7 @@ version: 2
 build:
   os: ubuntu-lts-latest
   tools:
-    python: mambaforge-latest
+    python: mambaforge-3.11
   jobs:
     pre_install:
       - git update-index --assume-unchanged docs/conf.py ci/requirements/docs.yml
