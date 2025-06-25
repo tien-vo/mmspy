@@ -37,6 +37,33 @@ and make analysis of MMS data more intuitive, efficient, and scalable.
 Installation
 ------------
 
+Required dependencies
+~~~~~~~~~~~~~~~~~~~~~
+
+- `python <https://www.python.org/>`__ (>=3.11)
+- `numpy <https://www.numpy.org/>`__ (>=2.2.6)
+- `scipy <https://scipython.com/>`__ (>=1.15.3)
+- `xarray <https://xarray.dev/>`__ (>=2025.4.0,<2026.0.0)
+- `dask[distributed] <https://www.dask.org/>`__ (>=2025.5.1,<2026.0.0)
+- `zarr <https://zarr.readthedocs.io/en/stable/>`__ (2.18.5)
+- `cdflib <https://cdflib.readthedocs.io/en/latest/>`__ (>=1.3.4,<2.0.0))
+- `attrs <https://www.attrs.org/en/stable/>`__ (>=25.3.0,<26.0.0)
+- `pint-xarray <https://pint-xarray.readthedocs.io/en/stable/>`__ (>=0.4,<0.5)
+- `tqdm <https://tqdm.github.io/>`__ (>=4.67.1,<5.0.0)
+- `matplotlib <https://matplotlib.org/>`__ (>=3.10.3)
+- `requests <https://requests.readthedocs.io/en/latest/>`__ (>=2.32.3)
+- `pathos <https://pathos.readthedocs.io/en/latest/pathos.html>`__ (>=0.3.4)
+- `bigtree <https://bigtree.readthedocs.io/stable/>`__ (>=0.29.2)
+- `bs4 <https://www.crummy.com/software/BeautifulSoup/>`__ (>=0.0.2)
+- `python-benedict[toml] <https://github.com/fabiocaccamo/python-benedict>`__ (>=0.34.1)
+- `numcodecs <https://github.com/zarr-developers/numcodecs>`__ (0.15.1)
+- `rocket-fft <https://github.com/styfenschaer/rocket-fft>`__ (>=0.2.5)
+- `astropy <https://www.astropy.org/>`__ (>=7.1.0)
+
+
+Instructions
+~~~~~~~~~~~~
+
 `mmspy` is distributed on the `Python package Index (PyPI)
 <https://pypi.org/>`_. To install, run:
 

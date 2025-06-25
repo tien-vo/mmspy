@@ -7,4 +7,4 @@ from mmspy.plot.draw import (
     draw_earth,
     draw_multicolored_line,
 )
-from mmspy.plot.format import autoformat, format_datetime_labels, format_ybins
+from mmspy.plot.format import autoformat, format_datetime_labels, format_ticks

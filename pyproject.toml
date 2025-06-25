@@ -1,6 +1,6 @@
 [project]
 name = "mmspy"
-version = "0.2.3"
+version = "0.2.4"
 description = "A Python package for querying and analysing data from the NASA Magnetospheric Multiscale (MMS) mission."
 authors = [{ name = "tien-vo", email = "tvo.work@proton.me" }]
 requires-python = ">=3.11"
@@ -32,6 +32,7 @@ dependencies = [
     "python-benedict[toml]>=0.34.1",
     "numcodecs==0.15.1",
     "astropy>=7.1.0",
+    "rocket-fft>=0.2.5",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
