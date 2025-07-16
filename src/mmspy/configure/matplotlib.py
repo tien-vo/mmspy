@@ -40,6 +40,8 @@ def configure_matplotlib(
         Recommended for multiprocessing.
 
     """
+    import colorcet
+
     plt.rc("text", usetex=use_tex and latex_binary is not None)
 
     if use_stylesheet:
