@@ -7,6 +7,7 @@ __all__ = [
     "generate_file_name",
 ]
 
+import logging
 from bisect import bisect_left, bisect_right
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -19,6 +20,8 @@ from attrs import Attribute, asdict, define, field
 
 from mmspy.configure.units import units as u
 from mmspy.types import Date, Quantity, T_File
+
+log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from mmspy.api.query import Query
@@ -75,7 +78,8 @@ def parse_species(instrument: str, data_type: str) -> str:
         f"Cannot parse species information from {instrument!r} "
         f"and {data_type!r}"
     )
-    raise ValueError(msg)
+    log.warning(msg)
+    return "N/A"
 
 
 def parse_timestamp(timestamp: str) -> str:
