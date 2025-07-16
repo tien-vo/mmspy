@@ -12,6 +12,7 @@ from mmspy.api.processors.cdf import (
 from mmspy.api.processors.utils import (
     alias_variable_names,
     center_timestamps,
+    filter_variables,
     shorten_variable_names,
 )
 
@@ -84,8 +85,11 @@ def process_hpca_moments(
     # Alias variables
     dataset = alias_variable_names(dataset, instrument=metadata["instrument"])
 
+    # Filter variables
+    dataset = filter_variables(dataset, instrument=metadata["instrument"])
+
     # Final metadata clean-up
-    dataset = dataset.transpose("time", "energy_channel", "rank_1", "rank_2")
+    dataset = dataset.transpose("time", ..., "rank_1", "rank_2")
     dataset = process_cdf_metadata(dataset)
     dataset.attrs.update(**metadata)
 
