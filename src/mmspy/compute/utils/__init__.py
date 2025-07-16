@@ -6,8 +6,11 @@ __all__ = [
     "ensure_quantifiable",
     "to_regular_time",
     "force_odd",
+    "first_valid_index",
+    "last_valid_index",
 ]
 
+from mmspy.compute.utils.index import first_valid_index, last_valid_index
 from mmspy.compute.utils.timing import (
     force_monotonic,
     force_odd,
