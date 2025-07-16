@@ -104,7 +104,9 @@ class FpiAccessor:
                 self.energy_variable = variable
             if "zenith angles" in DESC and "bin delta" not in DESC:
                 self.zenith_variable = variable
-            if "azimuth angles" in DESC and "bin delta" not in DESC:
+            if (
+                "azimuth angles" in DESC or "azimuthal angles" in DESC
+            ) and "bin delta" not in DESC:
                 self.azimuth_variable = variable
 
     def correct_for_spacecraft_potential(
