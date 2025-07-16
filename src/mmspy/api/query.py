@@ -111,6 +111,20 @@ class Query:
         return pd.Timestamp(self.stop_time) + pd.Timedelta(1, "d")
 
     @property
+    def center_time(self) -> pd.Timestamp:
+        return pd.Timestamp(
+            (
+                0.5
+                * (
+                    pd.Timestamp(self.start_time).to_datetime64().astype(float)
+                    + pd.Timestamp(self.stop_time)
+                    .to_datetime64()
+                    .astype(float)
+                )
+            ).astype("datetime64[ns]")
+        )
+
+    @property
     def _probe(self) -> AliasedString:
         return make_aliased_string(self.probe, "aliases/probe")
 
