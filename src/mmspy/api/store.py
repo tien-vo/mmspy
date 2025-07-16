@@ -203,6 +203,15 @@ class Store:
         # Units
         dataset = ensure_quantifiable(dataset)
 
+        # Fix object encoding
+        for v in list(dataset.coords.keys()):
+            if dataset.coords[v].dtype == object:
+                dataset.coords[v] = dataset.coords[v].astype("unicode")
+
+        for v in list(dataset.variables.keys()):
+            if dataset[v].dtype == object:
+                dataset[v] = dataset[v].astype("unicode")
+
         # Chunk
         if not nochunk:
             for variable, chunk in config.get("store/chunk").items():
