@@ -47,7 +47,7 @@ def process_chunk(  # noqa: PLR0913
         Edges of the grid, including the left-most and right-most
         boundaries.
     grid_shape : tuple of int
-        Shape of the grid
+        Shape of the grid.
 
     Returns
     -------
@@ -55,8 +55,11 @@ def process_chunk(  # noqa: PLR0913
         Interpolation result.
 
     """
-    # Filter invalid data
+    # Unroll data chunk
     data_chunk = data_chunk.squeeze()
+    data_chunk = data_chunk.reshape(-1, data_chunk.shape[-1])
+
+    # Filter invalid data
     valid = np.isfinite(data_chunk).all(axis=1)
     if np.sum(valid) == 0:
         return np.zeros((1, *grid_shape))
@@ -95,6 +98,7 @@ def interpolate_distribution(
     variable: str = "f",
     mode: str = "mean",
     method: str = "histogram",
+    roll: int | None = None,
 ) -> xr.DataArray:
     """Interpolate a particle distribution function onto a regular grid.
 
@@ -117,6 +121,9 @@ def interpolate_distribution(
         Method of interpolation. 'histogram' is performed with
         `scipy.stats.binned_statistics_dd`. Other methods are performed
         with `scipy.interpolate.griddata`.
+    roll : int, optional
+        Whether to roll the data in time before interpolation. Set to
+        specify the rolling window.
 
     Returns
     -------
@@ -138,7 +145,15 @@ def interpolate_distribution(
     da = ds.to_dataarray()
     if "time" not in da.dims:
         da = da.expand_dims("time")
-    da = da.chunk(time=1).transpose("time", "sample", "variable")
+
+    drop_axis: tuple[int, ...]
+    if bool(roll):
+        da = da.rolling(time=roll, center=True).construct("window")
+        drop_axis = (1, 2, 3)
+    else:
+        drop_axis = (1, 2)
+
+    da = da.chunk(time=1).transpose(..., "sample", "variable")
 
     # Define metadata for block mapping
     grid_center = [item.center.magnitude for item in grid.values()]
@@ -175,7 +190,7 @@ def interpolate_distribution(
                 grid_edge,
                 grid_shape,
                 meta=np.array((), dtype=ds[variable].dtype),
-                drop_axis=(1, 2),
+                drop_axis=drop_axis,
                 new_axis=tuple(range(1, len(grid_shape) + 1)),
                 chunks=(1, *grid_shape),
             ),

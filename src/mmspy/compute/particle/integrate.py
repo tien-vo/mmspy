@@ -104,7 +104,6 @@ def integrate_distribution(
     zenith="theta",
     azimuth="phi",
     flip_direction=True,
-    density=None,
     W0=u("100 eV"),
 ):
     # -- Extract particle information
@@ -134,33 +133,28 @@ def integrate_distribution(
     # Density
     N = (f * jacobian).integrate(dims).pint.to("number_density_unit")
     N = xr.where(N > 0, N, np.nan)
-    N_ = (
-        N
-        if density is None
-        else match_time_resolution(density, N.time, average=False)
-    )
 
     # Velocity
     sign = -1 if flip_direction else 1
     vx = sign * v * np.sin(theta) * np.cos(phi)
     vy = sign * v * np.sin(theta) * np.sin(phi)
     vz = sign * v * np.cos(theta)
-    Vx = (f * vx * jacobian).integrate(dims) / N_
-    Vy = (f * vy * jacobian).integrate(dims) / N_
-    Vz = (f * vz * jacobian).integrate(dims) / N_
+    Vx = (f * vx * jacobian).integrate(dims) / N
+    Vy = (f * vy * jacobian).integrate(dims) / N
+    Vz = (f * vz * jacobian).integrate(dims) / N
     V = xr.combine_nested(
         [Vx, Vy, Vz],
         concat_dim=[pd.Index(["x", "y", "z"], name="rank_1")],
     ).pint.to("velocity_unit")
 
     # Pressure
-    Pxx = mass * ((f * vx * vx * jacobian).integrate(dims) - N_ * Vx * Vx)
-    Pyy = mass * ((f * vy * vy * jacobian).integrate(dims) - N_ * Vy * Vy)
-    Pzz = mass * ((f * vz * vz * jacobian).integrate(dims) - N_ * Vz * Vz)
-    Pxy = mass * ((f * vx * vy * jacobian).integrate(dims) - N_ * Vx * Vy)
-    Pxy = mass * ((f * vx * vy * jacobian).integrate(dims) - N_ * Vx * Vy)
-    Pxz = mass * ((f * vx * vz * jacobian).integrate(dims) - N_ * Vx * Vz)
-    Pyz = mass * ((f * vy * vz * jacobian).integrate(dims) - N_ * Vy * Vz)
+    Pxx = mass * ((f * vx * vx * jacobian).integrate(dims) - N * Vx * Vx)
+    Pyy = mass * ((f * vy * vy * jacobian).integrate(dims) - N * Vy * Vy)
+    Pzz = mass * ((f * vz * vz * jacobian).integrate(dims) - N * Vz * Vz)
+    Pxy = mass * ((f * vx * vy * jacobian).integrate(dims) - N * Vx * Vy)
+    Pxy = mass * ((f * vx * vy * jacobian).integrate(dims) - N * Vx * Vy)
+    Pxz = mass * ((f * vx * vz * jacobian).integrate(dims) - N * Vx * Vz)
+    Pyz = mass * ((f * vy * vz * jacobian).integrate(dims) - N * Vy * Vz)
     P = xr.combine_nested(
         [Pxx, Pyy, Pzz, Pxy, Pxz, Pyz],
         concat_dim=[
