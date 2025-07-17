@@ -23,5 +23,5 @@
     number_flux_unit = cm**(-2) s**(-1)
     energy_flux_unit = cm**(-2) s**(-1) eV**(-1)
     fluence = cm**(-2)
-    phase_space_density_unit = cm**(-3) km**(-3) s**3
+    phase_space_density_unit = s**3 km**(-6)
 @end
