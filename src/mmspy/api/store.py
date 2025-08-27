@@ -169,6 +169,7 @@ class Store:
         time_dimension: str = "time",
         mode: str = "w",
         nochunk: bool = False,
+        **kwargs,
     ) -> None:
         """Write a dataset to a data store.
 
@@ -223,6 +224,7 @@ class Store:
             store=str(full_path),
             consolidated=True,
             mode=mode,
+            **kwargs,
         )  # type: ignore[call-overload]
 
     def get_local_files(self, store: str, **kwargs) -> list[Path]:
