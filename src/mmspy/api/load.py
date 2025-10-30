@@ -9,10 +9,16 @@ import xarray as xr
 from mmspy.api.query import query
 from mmspy.api.store import store as store_
 from mmspy.api.utils.file import truncate_file_list_using_metadata
+from mmspy.compute.utils import force_monotonic
 from mmspy.configure.config import config
 
 log = logging.getLogger(__name__)
-default_load_kwargs = {"combine": "nested", "parallel": True}
+default_load_kwargs = {
+    "combine": "nested",
+    "join": "exact",
+    "compat": "no_conflicts",
+    "parallel": True,
+}
 
 
 def preprocess(dataset: xr.Dataset, variables: list[str] | None) -> xr.Dataset:
@@ -25,6 +31,7 @@ def preprocess(dataset: xr.Dataset, variables: list[str] | None) -> xr.Dataset:
 def load(
     store: str = "remote",
     variables: list[str] | None = None,
+    time_dependent: bool = True,
     quantify: bool = True,
     time_clip: bool = True,
     load_kwargs: dict = default_load_kwargs,
@@ -66,9 +73,14 @@ def load(
     else:
         paths = store_.get_local_files(store)
 
+    query.restore_state()
+
     if not bool(paths):
         log.info("No file found. Please check your query parameters.")
         return xr.Dataset()
+
+    if time_dependent:
+        load_kwargs["concat_dim"] = "time"
 
     dataset = xr.open_mfdataset(
         paths,
@@ -77,6 +89,12 @@ def load(
         **load_kwargs,
     )
 
+    if time_dependent:
+        dataset = force_monotonic(dataset)
+
+    if quantify:
+        dataset = dataset.pint.quantify()
+
     if time_clip:
         for coordinate in dataset.coords:
             if np.issubdtype(dataset[coordinate].dtype, np.datetime64):
@@ -84,8 +102,4 @@ def load(
                     {coordinate: slice(query.start_time, query.stop_time)}
                 ).transpose(coordinate, ...)
 
-    if quantify:
-        dataset = dataset.pint.quantify()
-
-    query.restore_state()
     return dataset
