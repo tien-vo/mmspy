@@ -116,8 +116,8 @@ class Query:
             (
                 0.5
                 * (
-                    pd.Timestamp(self.start_time).to_datetime64().astype(float)
-                    + pd.Timestamp(self.stop_time)
+                    self.start_time.as_unit("ns").to_datetime64().astype(float)
+                    + self.stop_time.as_unit("ns")
                     .to_datetime64()
                     .astype(float)
                 )
