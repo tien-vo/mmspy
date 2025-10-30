@@ -1,5 +1,5 @@
 __all__ = ["process_scm"]
-
+import numpy as np
 import xarray as xr
 
 from mmspy.api.processors.cdf import (
@@ -40,6 +40,13 @@ def process_scm(
 
     # Shorten variable names
     dataset = shorten_variable_names(dataset, prefix=prefix, suffix=suffix)
+
+    # Translate flag
+    dataset["qf_scm123"] = (
+        dataset.acb_gse.dims,
+        np.array([list(x) for x in dataset.qf_scm123.data]),
+        dataset.qf_scm123.attrs,
+    )
 
     # Alias variables
     dataset = alias_variable_names(dataset, instrument=metadata["instrument"])
