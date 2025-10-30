@@ -85,11 +85,11 @@ def process_chunk(  # noqa: PLR0913
                     values=value,
                     method=method,
                     xi=np.meshgrid(*grid_center, indexing="ij"),
-                    fill_value=0.0,
+                    fill_value=np.nan,
                 )
             except QhullError:
                 results = np.zeros(grid_shape)
-    return np.nan_to_num(results)[np.newaxis, ...]
+    return results[np.newaxis, ...]
 
 
 def interpolate_distribution(
@@ -166,6 +166,8 @@ def interpolate_distribution(
 
     statistic: str | Callable
     match mode:
+        case "sum":
+            statistic = "sum"
         case "mean":
             statistic = "mean"
         case "spread":
