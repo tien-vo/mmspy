@@ -13,8 +13,9 @@ from mmspy.compute.utils import force_monotonic
 
 log = logging.getLogger(__name__)
 default_load_kwargs = {
+    "data_vars": "all",
     "combine": "by_coords",
-    "join": "exact",
+    "join": "outer",
     "compat": "no_conflicts",
     "parallel": True,
 }

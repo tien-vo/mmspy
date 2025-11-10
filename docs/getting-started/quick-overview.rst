@@ -496,6 +496,7 @@ density, and add a factor of 2pi (because ``f_omni`` is solid-angle averaged):
 .. jupyter-execute::
 
     V = f_interpolated.V
+    f_interpolated = f_interpolated.fillna(0.0)  # Fill NaNs with zeros
     n = 2 * np.pi * (V**2 * f_interpolated).integrate("V").pint.to("cm-3")
     n.data.dask
 
