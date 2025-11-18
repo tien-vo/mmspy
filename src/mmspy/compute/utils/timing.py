@@ -44,6 +44,7 @@ def match_time_resolution(
     data: xr.DataArray,
     target: xr.DataArray | Quantity,
     average: bool = False,
+    method: str = "linear",
     kwargs: dict[str, Any] = {"fill_value": np.nan, "bounds_error": False},
 ) -> xr.DataArray:
     """Match time resolution onto a target time resolution.
@@ -87,16 +88,17 @@ def match_time_resolution(
     if quantified := is_quantified(data):
         data = data.pint.dequantify()
 
+    interp_kw = {"time": time, "method": method, "kwargs": kwargs}
     if average:
         data_resolution = pd.Timedelta(data.time.diff("time").min().values)
         window = force_odd(max(1, int(data_resolution / target_resolution)))
         interpolated_data = (
             data.rolling(time=window, min_periods=1, center=True)
             .mean()
-            .interp(time=time, kwargs=kwargs)
+            .interp(**interp_kw)
         )
     else:
-        interpolated_data = data.interp(time=time, kwargs=kwargs)
+        interpolated_data = data.interp(**interp_kw)
 
     return (
         interpolated_data
