@@ -12,9 +12,9 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def enable_diagnostics():
+def enable_diagnostics(**kwargs):
     """Open `dask` dashboard for diagnostics."""
-    client = Client()
+    client = Client(**kwargs)
     msg = f"Dask dashboard opened at {client.dashboard_link}"
     log.info(msg)
     return client
