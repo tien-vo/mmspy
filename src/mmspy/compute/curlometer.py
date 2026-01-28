@@ -159,11 +159,9 @@ def curlometer(
                 grad.sel(i="x", j="z").reset_coords(drop=True),
                 grad.sel(i="y", j="z").reset_coords(drop=True),
             ],
-            concat_dim=[
-                pd.Index(["xx", "yy", "zz", "xy", "xz", "yz"], name="rank_2"),
-            ],
+            concat_dim="rank_2",
             combine_attrs="no_conflicts",
-        )
+        ).assign_coords(rank_2=["xx", "yy", "zz", "xy", "xz", "yz"])
         ds_clm = ds_clm.assign(
             {
                 f"grad_{name}": grad,

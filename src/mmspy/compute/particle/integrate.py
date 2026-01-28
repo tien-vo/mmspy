@@ -142,10 +142,11 @@ def integrate_distribution(
     Vx = (f * vx * jacobian).integrate(dims) / N
     Vy = (f * vy * jacobian).integrate(dims) / N
     Vz = (f * vz * jacobian).integrate(dims) / N
-    V = xr.combine_nested(
-        [Vx, Vy, Vz],
-        concat_dim=[pd.Index(["x", "y", "z"], name="rank_1")],
-    ).pint.to("velocity_unit")
+    V = (
+        xr.concat((Vx, Vy, Vz), "rank_1")
+        .assign_coords(rank_1=["x", "y", "z"])
+        .pint.to("velocity_unit")
+    )
 
     # Pressure
     Pxx = mass * ((f * vx * vx * jacobian).integrate(dims) - N * Vx * Vx)
@@ -155,15 +156,11 @@ def integrate_distribution(
     Pxy = mass * ((f * vx * vy * jacobian).integrate(dims) - N * Vx * Vy)
     Pxz = mass * ((f * vx * vz * jacobian).integrate(dims) - N * Vx * Vz)
     Pyz = mass * ((f * vy * vz * jacobian).integrate(dims) - N * Vy * Vz)
-    P = xr.combine_nested(
-        [Pxx, Pyy, Pzz, Pxy, Pxz, Pyz],
-        concat_dim=[
-            pd.Index(
-                ["xx", "yy", "zz", "xy", "xz", "yz"],
-                name="rank_2",
-            ),
-        ],
-    ).pint.to("pressure_unit")
+    P = (
+        xr.concat((Pxx, Pyy, Pzz, Pxy, Pxz, Pyz), "rank_2")
+        .assign_coords(rank_2=["xx", "yy", "zz", "xy", "xz", "yz"])
+        .pint.to("pressure_unit")
+    )
 
     return (
         xr.Dataset({"N": N, "V": V, "P": P})
