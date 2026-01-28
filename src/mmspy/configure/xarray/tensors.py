@@ -3,7 +3,6 @@
 __all__ = ["TensorAccessor"]
 
 
-import pandas as pd
 import xarray as xr
 
 from mmspy.compute.vector import vector_norm
@@ -39,26 +38,27 @@ class TensorAccessor:
             case 1:
                 return self._tensor.rename(rank_1="j")
             case 2:
-                xx = self._tensor.sel(rank_2="xx")
-                yy = self._tensor.sel(rank_2="yy")
-                zz = self._tensor.sel(rank_2="zz")
-                xy = self._tensor.sel(rank_2="xy")
-                xz = self._tensor.sel(rank_2="xz")
-                yz = self._tensor.sel(rank_2="yz")
-                return xr.DataArray(
+                xx = self._tensor.sel(rank_2="xx", drop=True)
+                yy = self._tensor.sel(rank_2="yy", drop=True)
+                zz = self._tensor.sel(rank_2="zz", drop=True)
+                xy = self._tensor.sel(rank_2="xy", drop=True)
+                xz = self._tensor.sel(rank_2="xz", drop=True)
+                yz = self._tensor.sel(rank_2="yz", drop=True)
+                return (
                     xr.combine_nested(
                         [[xx, xy, xz], [xy, yy, yz], [xz, yz, zz]],
                         concat_dim=[
-                            pd.Index(["x", "y", "z"], name="i"),
-                            pd.Index(["x", "y", "z"], name="j"),
+                            "i",
+                            "j",
+                            # pd.Index(["x", "y", "z"], name="i"),
+                            # pd.Index(["x", "y", "z"], name="j"),
                         ],
-                        combine_attrs="identical",
                     )
-                    .drop_vars("rank_2")
-                    .transpose(..., "i", "j"),
+                    .assign_coords(i=["x", "y", "z"], j=["x", "y", "z"])
+                    .transpose(..., "i", "j")
                 )
             case _:
-                msg = "Currently only supporting rank 0, 1 and 2." ""
+                msg = "Currently only supporting rank 0, 1 and 2."
                 raise NotImplementedError(msg)
 
     @property
@@ -70,5 +70,5 @@ class TensorAccessor:
             case 1:
                 return vector_norm(self._tensor, dim="rank_1")
             case _:
-                msg = "Currently only supporting rank 0 and 1." ""
+                msg = "Currently only supporting rank 0 and 1."
                 raise NotImplementedError(msg)

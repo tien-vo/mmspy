@@ -148,7 +148,7 @@ class FpiAccessor:
             dataset = dataset.assign(
                 {
                     self.psd_variable: xr.where(
-                        np.abs(V_sc) < dataset[self.energy_variable],
+                        (2 * np.abs(V_sc)) < dataset[self.energy_variable],
                         dataset[self.psd_variable],
                         0.0,
                     )
@@ -158,9 +158,9 @@ class FpiAccessor:
         dataset = dataset.assign(
             {self.energy_variable: dataset[self.energy_variable] + V_sc}
         )
-        dataset[self.energy_variable].attrs[
-            "VAR_NOTES"
-        ] += "; Adjusted for spacecraft potential"
+        #  dataset[self.energy_variable].attrs[
+        #      "VAR_NOTES"
+        #  ] += "; Adjusted for spacecraft potential"
 
         return dataset
 
