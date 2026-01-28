@@ -3,7 +3,7 @@
 import numpy as np
 import xarray as xr
 from scipy.interpolate import griddata
-from scipy.spatial._qhull import QhullError
+from scipy.spatial import QhullError
 from scipy.stats import binned_statistic_dd
 
 from mmspy.compute.particle.grid import ParticleGrid
@@ -86,6 +86,7 @@ def process_chunk(  # noqa: PLR0913
                     method=method,
                     xi=np.meshgrid(*grid_center, indexing="ij"),
                     fill_value=np.nan,
+                    rescale=True,
                 )
             except QhullError:
                 results = np.zeros(grid_shape)
