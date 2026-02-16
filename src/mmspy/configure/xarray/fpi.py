@@ -113,6 +113,7 @@ class FpiAccessor:
         self,
         spacecraft_potential: xr.DataArray,
         average: bool = False,
+        factor: float = 2.0,
     ) -> xr.Dataset:
         """Subtract spacecraft potential from the recorded energy.
 
@@ -144,16 +145,15 @@ class FpiAccessor:
             attrs=V_sc.attrs,
         )
 
-        if species == "elc":
-            dataset = dataset.assign(
-                {
-                    self.psd_variable: xr.where(
-                        (2 * np.abs(V_sc)) < dataset[self.energy_variable],
-                        dataset[self.psd_variable],
-                        0.0,
-                    )
-                }
-            )
+        dataset = dataset.assign(
+            {
+                self.psd_variable: xr.where(
+                    dataset[self.energy_variable] > (factor * np.abs(V_sc)),
+                    dataset[self.psd_variable],
+                    0.0,
+                )
+            }
+        )
 
         dataset = dataset.assign(
             {self.energy_variable: dataset[self.energy_variable] + V_sc}
