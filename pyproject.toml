@@ -1,6 +1,6 @@
 [project]
 name = "mmspy"
-version = "0.2.10"
+version = "0.3.0"
 description = "A Python package for querying and analysing data from the NASA Magnetospheric Multiscale (MMS) mission."
 authors = [{ name = "tien-vo", email = "tvo.work@proton.me" }]
 requires-python = ">=3.11"
