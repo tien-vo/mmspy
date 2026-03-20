@@ -150,7 +150,7 @@ def curlometer(
             + k3.rename(**kw_i) * Q3.rename(**kw_j)
             + k4.rename(**kw_i) * Q4.rename(**kw_j)
         ).pint.quantify(Q_unit / R_unit)
-        grad = xr.combine_nested(
+        grad = xr.concat(
             [
                 grad.sel(i="x", j="x").reset_coords(drop=True),
                 grad.sel(i="y", j="y").reset_coords(drop=True),
@@ -159,8 +159,7 @@ def curlometer(
                 grad.sel(i="x", j="z").reset_coords(drop=True),
                 grad.sel(i="y", j="z").reset_coords(drop=True),
             ],
-            concat_dim="rank_2",
-            combine_attrs="no_conflicts",
+            "rank_2",
         ).assign_coords(rank_2=["xx", "yy", "zz", "xy", "xz", "yz"])
         ds_clm = ds_clm.assign(
             {
