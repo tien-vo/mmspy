@@ -1,16 +1,16 @@
-r"""Tests for functionalities in `mmspy.computation.transform`"""
+r"""Tests for functionalities in `mmspy.compute.transform`"""
 
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
 
-from mmspy.computation.transform import (
+from mmspy.compute.transform import (
     cartesian_to_fac,
     fac_to_cartesian,
     rotation_matrix,
 )
-from mmspy.computation.vector import matrix_multiply
+from mmspy.compute.vector import matrix_multiply
 
 
 def random_3d_vector(n):

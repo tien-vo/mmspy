@@ -1,10 +1,10 @@
-"""Tests for functionality in `mmspy.utils.index`."""
+"""Tests for functionality in `mmspy.compute.utils.index`."""
 
 import numpy as np
 import pytest
 import xarray as xr
 
-from mmspy.utils.index import first_valid_index, last_valid_index
+from mmspy.compute.utils.index import first_valid_index, last_valid_index
 
 
 class TestFindValidIndex:

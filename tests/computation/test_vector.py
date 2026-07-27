@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from mmspy.computation.vector import (
+from mmspy.compute.vector import (
     cross,
     matrix_multiply,
     quaternion_conjugate,
