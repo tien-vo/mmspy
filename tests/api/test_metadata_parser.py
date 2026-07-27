@@ -1,7 +1,7 @@
 import pytest
 from attr import define
 
-from mmspy.api.process.metadata import parse_metadata_from_file_name
+from mmspy.api.utils.file import CdfFile
 
 
 @define
@@ -281,5 +281,13 @@ feeps_srvy = [
     ],
 )
 def test_parser(case):
-    metadata = parse_metadata_from_file_name(case.name, case.instrument)
-    assert case.result == metadata
+    file = CdfFile(cdf_file_name=case.name)
+
+    assert file.cdf_file_name == case.result["cdf_file_name"]
+    assert file.probe == case.result["probe"]
+    assert file.instrument == case.result["instrument"]
+    assert file.data_rate == case.result["data_rate"]
+    assert file.data_type == case.result["data_type"]
+    assert file.data_level == case.result["data_level"]
+    assert file.version == case.result["version"]
+    assert file.timestamp == case.result["time_string"].replace("-", "_")
